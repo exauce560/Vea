@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Profil Vendeur</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --topbar-bg: rgba(255, 255, 255, 0.9);
+      --back-btn-bg: #f1f5f9;
+      --back-btn-active: #e2e8f0;
+      --handle-color: #0284c7;
+      --badge-bg: #e0f2fe;
+      --badge-color: #0369a1;
+      --desc-color: #475569;
+      --social-bg: #f1f5f9;
+      --social-color: #334155;
+      --social-hover: #e2e8f0;
+      --follow-btn-bg: #0f172a;
+      --follow-btn-text: #ffffff;
+      --follow-btn-sub-bg: #e2e8f0;
+      --follow-btn-sub-text: #334155;
+      --prod-title-color: #1e293b;
+      --prod-price-color: #0284c7;
+      --empty-text: #94a3b8;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #ffffff;
+      --text-muted: #a0a0a0;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --topbar-bg: rgba(30, 30, 30, 0.9);
+      --back-btn-bg: #2d2d2d;
+      --back-btn-active: #3d3d3d;
+      --handle-color: #38bdf8;
+      --badge-bg: rgba(56, 189, 248, 0.15);
+      --badge-color: #38bdf8;
+      --desc-color: #cbd5e1;
+      --social-bg: #2d2d2d;
+      --social-color: #cbd5e1;
+      --social-hover: #3d3d3d;
+      --follow-btn-bg: #2563eb;
+      --follow-btn-text: #ffffff;
+      --follow-btn-sub-bg: #334155;
+      --follow-btn-sub-text: #cbd5e1;
+      --prod-title-color: #f1f5f9;
+      --prod-price-color: #38bdf8;
+      --empty-text: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--topbar-bg);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .back-btn {
+      background: var(--back-btn-bg);
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .back-btn:active {
+      background: var(--back-btn-active);
+    }
+
+    .top-bar-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .shop-header-banner {
+      height: 100px;
+      background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+      width: 100%;
+    }
+
+    .profile-card {
+      background: var(--card-bg);
+      margin: -30px 16px 16px 16px;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      position: relative;
+      border: 1px solid var(--border-color);
+    }
+
+    .profile-header-flex {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .shop-info-left {
+      flex: 1;
+      text-align: left;
+    }
+
+    .shop-name-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .shop-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-color);
+      line-height: 1.2;
+    }
+
+    .shop-handle {
+      font-size: 0.82rem;
+      color: var(--handle-color);
+      font-weight: 600;
+    }
+
+    .shop-role-badge {
+      font-size: 0.65rem;
+      background: var(--badge-bg);
+      color: var(--badge-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .shop-location {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .shop-location svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .avatar-right {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--card-bg);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background-color: var(--back-btn-bg);
+      flex-shrink: 0;
+    }
+
+    .description-container {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .shop-description {
+      font-size: 0.85rem;
+      color: var(--desc-color);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .shop-description.expanded {
+      -webkit-line-clamp: initial;
+      overflow: visible;
+    }
+
+    .toggle-desc-btn {
+      background: none;
+      border: none;
+      color: #2563eb;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 2px;
+      display: none;
+    }
+
+    .social-links-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .social-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--social-bg);
+      color: var(--social-color);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-icon-btn:hover {
+      background: var(--social-hover);
+      transform: translateY(-2px);
+    }
+
+    .social-icon-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+      gap: 12px;
+    }
+
+    .followers-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    .followers-count-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .followers-count {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-color);
+    }
+
+    /* Compteur Vert / Badge Toast */
+    .show-toast-badge {
+      background-color: #10b981;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      display: none;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .followers-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .whatsapp-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #25d366;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      text-decoration: none;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.92);
+    }
+
+    .whatsapp-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .follow-btn {
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      border: none !important;
+      outline: none;
+      background: var(--follow-btn-bg);
+      color: var(--follow-btn-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    .follow-btn:active {
+      transform: scale(0.95);
+    }
+
+    .follow-btn.subscribed {
+      background: var(--follow-btn-sub-bg);
+      color: var(--follow-btn-sub-text);
+      box-shadow: none;
+    }
+
+    .catalog-header {
+      padding: 16px 16px 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .catalog-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-color);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 0 16px 16px 16px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .product-card:active {
+      transform: scale(0.98);
+    }
+
+    .product-image-box {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      background-color: var(--back-btn-bg);
+    }
+
+    .product-image-box img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-card.sold {
+      opacity: 0.8;
+    }
+
+    .badge-sold {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .product-likes {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--topbar-bg);
+      backdrop-filter: blur(4px);
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-color);
+      z-index: 2;
+    }
+
+    .product-likes svg {
+      width: 11px;
+      height: 11px;
+      fill: #ef4444;
+    }
+
+    .product-info {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .product-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--prod-title-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-price {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--prod-price-color);
+    }
+
+    .loading-state, .empty-state {
+      grid-column: span 2;
+      text-align: center;
+      padding: 30px 16px;
+      color: var(--empty-text);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <button class="back-btn" onclick="window.location.href='acceuil.html'" aria-label="Retour à l'accueil">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <span class="top-bar-title" data-i18n="topbar_title">Boutique</span>
+    <div style="width: 38px;"></div>
+  </div>
+
+  <div class="shop-header-banner"></div>
+
+  <div class="profile-card">
+
+    <div class="profile-header-flex">
+      <div class="shop-info-left">
+        <div class="shop-name-container">
+          <h1 id="shopName" class="shop-name" data-i18n="loading">Chargement...</h1>
+          <span id="shopRoleBadge" class="shop-role-badge" style="display: none;"></span>
+        </div>
+        <div id="shopHandle" class="shop-handle"></div>
+
+        <div class="shop-location">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span id="shopLocation">---, ---</span>
+        </div>
+      </div>
+
+      <img id="vendorAvatar" class="avatar-right" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>" alt="Logo Boutique">
+    </div>
+
+    <div class="description-container">
+      <p id="shopDesc" class="shop-description"></p>
+      <button id="toggleDescBtn" class="toggle-desc-btn" data-i18n="see_more">Voir plus</button>
+    </div>
+
+    <div id="socialLinksBar" class="social-links-bar"></div>
+
+    <div class="actions-bar">
+      <div class="followers-box">
+        <div class="followers-count-wrapper">
+          <span id="followersCount" class="followers-count">0</span>
+          <!-- COMPTEUR VERT SHOWTOAST POUR LE VENDEUR -->
+          <span id="showToastBadge" class="show-toast-badge">+0</span>
+        </div>
+        <span class="followers-label" data-i18n="followers_label">Abonnés</span>
+      </div>
+
+      <div class="action-buttons">
+        <a id="whatsappBtn" href="#" target="_blank" class="whatsapp-btn" aria-label="Contacter sur WhatsApp" style="display:none;">
+          <svg viewBox="0 0 24 24">
+            <path d="M12.012 2c-5.508 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.166 5.289-1.386c1.472.802 3.13 1.225 4.783 1.226h.004c5.506 0 9.987-4.478 9.988-9.984 0-2.668-1.038-5.176-2.925-7.062a9.925 9.925 0 0 0-7.065-2.945zm5.71 14.156c-.236.662-1.371 1.216-1.89 1.261-.519.046-1.189.215-3.905-.881-3.264-1.317-5.328-4.633-5.49-4.85-.162-.216-1.319-1.758-1.319-3.351 0-1.594.836-2.378 1.134-2.702.298-.324.649-.405.865-.405.216 0 .432.002.622.011.202.01.473-.077.743.573.27.649.919 2.243.999 2.406.081.162.135.351.027.568-.108.216-.162.351-.324.54-.162.189-.342.423-.487.568-.162.162-.332.338-.143.662.189.324.843 1.391 1.808 2.251 1.24 1.106 2.286 1.448 2.61 1.61.324.162.513.135.702-.081.189-.216.811-.946 1.027-1.27.216-.324.432-.27.729-.162.298.108 1.891.891 2.215 1.053.324.162.54.243.621.378.081.135.081.784-.155 1.446z"/>
+          </svg>
+        </a>
+
+        <button id="followBtn" class="follow-btn" data-i18n="follow_btn">SUIVRE LA BOUTIQUE</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="catalog-header">
+    <h2 class="catalog-title" data-i18n="available_items">Articles disponibles</h2>
+  </div>
+  <div id="productsGrid" class="products-grid">
+    <div class="loading-state" data-i18n="loading_catalog">Chargement du catalogue...</div>
+  </div>
+
+  <div class="catalog-header">
+    <h2 class="catalog-title" data-i18n="sold_items">Articles vendus</h2>
+  </div>
+  <div id="soldProductsGrid" class="products-grid">
+    <div class="loading-state" data-i18n="loading_sold">Chargement des articles vendus...</div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, collection, query, where,
+    onSnapshot, updateDoc, setDoc, increment, arrayUnion, arrayRemove
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+    authDomain: "v-ea-fb4c4.firebaseapp.com",
+    projectId: "v-ea-fb4c4",
+    storageBucket: "v-ea-fb4c4.firebasestorage.app",
+    messagingSenderId: "357462139035",
+    appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+    measurementId: "G-WEG1X65STP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const vendeurId = urlParams.get('vendeurId') || urlParams.get('id');
+
+  let isSubscribed = false;
+  let currentFollowers = 0;
+  let currentUser = null;
+  let vendorCurrency = "";
+  let targetCollection = "vendeurs";
+  let currentLang = localStorage.getItem('app_lang') || 'fr';
+
+  const translations = {
+    fr: {
+      topbar_title: "Boutique",
+      loading: "Chargement...",
+      see_more: "Voir plus",
+      see_less: "Réduire",
+      followers_label: "Abonnés",
+      follow_btn: "SUIVRE LA BOUTIQUE",
+      subscribed_btn: "ABONNÉ(E)",
+      available_items: "Articles disponibles",
+      sold_items: "Articles vendus",
+      loading_catalog: "Chargement du catalogue...",
+      loading_sold: "Chargement des articles vendus...",
+      badge_sold: "VENDU",
+      price_on_request: "Prix sur demande",
+      vendor_not_found: "Vendeur introuvable",
+      shop_not_found: "Boutique inexistante",
+      default_bio: "Bienvenue dans notre boutique !",
+      no_active_items: "Aucun article disponible pour le moment.",
+      no_sold_items: "Aucun article vendu enregistré.",
+      err_loading: "Erreur de chargement des articles.",
+      auth_required: "Veuillez vous connecter pour vous abonner.",
+      self_subscribe_error: "Vous ne pouvez pas vous abonner à votre propre compte."
+    },
+    en: {
+      topbar_title: "Shop",
+      loading: "Loading...",
+      see_more: "See more",
+      see_less: "See less",
+      followers_label: "Followers",
+      follow_btn: "FOLLOW SHOP",
+      subscribed_btn: "FOLLOWING",
+      available_items: "Available Items",
+      sold_items: "Sold Items",
+      loading_catalog: "Loading catalog...",
+      loading_sold: "Loading sold items...",
+      badge_sold: "SOLD",
+      price_on_request: "Price on request",
+      vendor_not_found: "Vendor not found",
+      shop_not_found: "Shop does not exist",
+      default_bio: "Welcome to our shop!",
+      no_active_items: "No items available at the moment.",
+      no_sold_items: "No sold items recorded.",
+      err_loading: "Error loading items.",
+      auth_required: "Please log in to follow.",
+      self_subscribe_error: "You cannot follow your own account."
+    }
+  };
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
+    } else {
+      document.body.classList.add('light-mode');
+      document.body.classList.remove('dark-mode');
+    }
+  }
+
+  function applyLanguage(lang) {
+    currentLang = lang || 'fr';
+    document.documentElement.lang = currentLang;
+    const texts = translations[currentLang] || translations.fr;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (texts[key]) {
+        el.textContent = texts[key];
+      }
+    });
+
+    updateFollowButtonUI(isSubscribed);
+  }
+
+  applyTheme(localStorage.getItem('app_theme') || 'light');
+  applyLanguage(currentLang);
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'app_theme') applyTheme(e.newValue);
+    if (e.key === 'app_lang') applyLanguage(e.newValue);
+  });
+
+  const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+
+  const svgIcons = {
+    instagram: `<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
+    facebook: `<svg viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>`,
+    tiktok: `<svg viewBox="0 0 24 24"><path d="M12.525 0h3.08c.12 1.662.903 3.123 2.152 4.103 1.238.97 2.805 1.44 4.382 1.326v3.284a8.775 8.775 0 0 1-4.382-1.171v8.138c0 4.542-3.69 8.232-8.232 8.232-4.542 0-8.232-3.69-8.232-8.232 0-4.542 3.69-8.232 8.232-8.232.41 0 .816.03 1.215.09v3.297a4.932 4.932 0 0 0-1.215-.155c-2.721 0-4.935 2.214-4.935 4.935 0 2.721 2.214 4.935 4.935 4.935 2.721 0 4.935-2.214 4.935-4.935V0z"/></svg>`,
+    website: `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`
+  };
+
+  function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(num % 1000 < 100 ? 0 : 1) + 'K';
+    return num;
+  }
+
+  function formatPrice(valeurPrix, productCurrency) {
+    const t = translations[currentLang] || translations.fr;
+    if (valeurPrix === undefined || valeurPrix === null || valeurPrix === "") {
+      return t.price_on_request;
+    }
+    const currency = productCurrency || vendorCurrency || "FCFA";
+    const formattedVal = Number(valeurPrix).toLocaleString(currentLang === 'en' ? 'en-US' : 'fr-FR');
+    const prefixCurrencies = ["$", "€", "£", "¥"];
+    return prefixCurrencies.includes(currency) ? `${currency}${formattedVal}` : `${formattedVal} ${currency}`;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    if (user) {
+      try {
+        const userDocRef = doc(db, "vendeurs", user.uid);
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists()) {
+          const uData = userSnap.data();
+          if (uData.theme) {
+            localStorage.setItem('app_theme', uData.theme);
+            applyTheme(uData.theme);
+          }
+          if (uData.langue || uData.lang) {
+            const l = uData.langue || uData.lang;
+            localStorage.setItem('app_lang', l);
+            applyLanguage(l);
+          }
+        }
+      } catch(err) {
+        console.log("Erreur synchro profil:", err);
+      }
+
+      if (vendeurId) {
+        if (user.uid === vendeurId) {
+          const followBtn = document.getElementById("followBtn");
+          if(followBtn) followBtn.style.display = "none";
+        } else {
+          checkInitialSubscriptionStatus();
+        }
+      }
+    }
+  });
+
+  async function checkInitialSubscriptionStatus() {
+    try {
+      const buyerRef = doc(db, "acheteurs", currentUser.uid);
+      const buyerSnap = await getDoc(buyerRef);
+      if (buyerSnap.exists()) {
+        const abonnements = buyerSnap.data().abonnements || [];
+        if (abonnements.includes(vendeurId)) {
+          isSubscribed = true;
+          updateFollowButtonUI(true);
+        }
+      }
+    } catch (e) {
+      console.error("Erreur vérification abonnement:", e);
+    }
+  }
+
+  function updateFollowButtonUI(subscribed) {
+    const followBtn = document.getElementById("followBtn");
+    if (!followBtn) return;
+    const t = translations[currentLang] || translations.fr;
+    if (subscribed) {
+      followBtn.textContent = t.subscribed_btn;
+      followBtn.classList.add("subscribed");
+    } else {
+      followBtn.textContent = t.follow_btn;
+      followBtn.classList.remove("subscribed");
+    }
+  }
+
+  async function initVendorRealtime() {
+    const t = translations[currentLang] || translations.fr;
+    if (!vendeurId) {
+      document.getElementById("shopName").textContent = t.vendor_not_found;
+      return;
+    }
+
+    let vendorRef = doc(db, "vendeurs", vendeurId);
+    let vendorSnap = await getDoc(vendorRef);
+
+    if (!vendorSnap.exists()) {
+      targetCollection = "vendeurs_clients";
+      vendorRef = doc(db, "vendeurs_clients", vendeurId);
+      vendorSnap = await getDoc(vendorRef);
+    }
+
+    if (!vendorSnap.exists()) {
+      document.getElementById("shopName").textContent = t.shop_not_found;
+      return;
+    }
+
+    onSnapshot(vendorRef, (docSnap) => {
+      if (!docSnap.exists()) return;
+      const vendeur = docSnap.data();
+
+      vendorCurrency = vendeur.devise || vendeur.currency || vendeur.currencySymbol || "";
+      document.getElementById("shopName").textContent = vendeur.nom || vendeur.shopName || "Boutique";
+
+      const mention = vendeur.handle || vendeur.username || vendeur.mention || "";
+      document.getElementById("shopHandle").textContent = mention ? `@${mention.replace(/^@/, '')}` : "";
+
+      const roleBadge = document.getElementById("shopRoleBadge");
+      const role = vendeur.role || (targetCollection === "vendeurs_clients" ? "Vendeur-Client" : "Vendeur");
+      roleBadge.textContent = role;
+      roleBadge.style.display = "inline-block";
+
+      const avatarUrl = vendeur.photoUrl || vendeur.photoURL || vendeur.photo || vendeur.avatar;
+      document.getElementById("vendorAvatar").src = avatarUrl || DEFAULT_AVATAR;
+
+      const addr = vendeur.address || {};
+      const country = addr.country || vendeur.country || vendeur.pays || "Cameroun";
+      const city = addr.city || vendeur.city || vendeur.ville || "Douala";
+      document.getElementById("shopLocation").textContent = `${city}, ${country}`;
+
+      const desc = vendeur.bio || vendeur.description || t.default_bio;
+      const descEl = document.getElementById("shopDesc");
+      const toggleBtn = document.getElementById("toggleDescBtn");
+      descEl.textContent = desc;
+      if (desc.length > 80) {
+        toggleBtn.style.display = "inline-block";
+        toggleBtn.onclick = () => {
+          const expanded = descEl.classList.toggle("expanded");
+          toggleBtn.textContent = expanded ? t.see_less : t.see_more;
+        };
+      }
+
+      currentFollowers = vendeur.followersCount ?? vendeur.followers ?? vendeur.subscribers ?? 0;
+      document.getElementById("followersCount").textContent = formatNumber(currentFollowers);
+
+      // Gestion du compteur vert (Toast Badge) pour le propriétaire de la boutique
+      const toastBadge = document.getElementById("showToastBadge");
+      const newSubCount = vendeur.showToastCount || 0;
+      if (currentUser && currentUser.uid === vendeurId && newSubCount > 0) {
+        toastBadge.textContent = `+${newSubCount}`;
+        toastBadge.style.display = "inline-block";
+
+        // Réinitialise le compteur lorsque le vendeur visite son profil
+        updateDoc(vendorRef, { showToastCount: 0 }).catch(e => console.error(e));
+      } else {
+        toastBadge.style.display = "none";
+      }
+
+      const phone = vendeur.telephone || vendeur.phone || vendeur.whatsapp;
+      const whatsappBtn = document.getElementById("whatsappBtn");
+      if (phone) {
+        const cleanPhone = String(phone).replace(/[^0-9]/g, '');
+        whatsappBtn.href = `https://wa.me/${cleanPhone}`;
+        whatsappBtn.style.display = "flex";
+      } else {
+        whatsappBtn.style.display = "none";
+      }
+
+      renderSocialLinks(vendeur.socialLinks || vendeur.reseaux || []);
+    });
+
+    initProductsRealtime();
+  }
+
+  function renderSocialLinks(links) {
+    const container = document.getElementById("socialLinksBar");
+    container.innerHTML = "";
+
+    if (!Array.isArray(links)) return;
+
+    links.forEach((linkObj) => {
+      const platform = (linkObj.platform || linkObj.nom || "").toLowerCase();
+      const url = linkObj.url || linkObj.lien || "#";
+      const iconSvg = svgIcons[platform] || svgIcons.website;
+
+      if (url && url !== "#") {
+        const a = document.createElement("a");
+        a.className = "social-icon-btn";
+        a.href = url;
+        a.target = "_blank";
+        a.ariaLabel = platform;
+        a.innerHTML = iconSvg;
+        container.appendChild(a);
+      }
+    });
+  }
+
+  const followBtn = document.getElementById("followBtn");
+  followBtn.addEventListener("click", async () => {
+    const t = translations[currentLang] || translations.fr;
+    if (!currentUser) {
+      alert(t.auth_required);
+      return;
+    }
+
+    if (currentUser.uid === vendeurId) {
+      alert(t.self_subscribe_error);
+      return;
+    }
+
+    isSubscribed = !isSubscribed;
+    updateFollowButtonUI(isSubscribed);
+
+    try {
+      const vendorRef = doc(db, targetCollection, vendeurId);
+      const buyerRef = doc(db, "acheteurs", currentUser.uid);
+
+      if (isSubscribed) {
+        await updateDoc(vendorRef, {
+          followersCount: increment(1),
+          showToastCount: increment(1)
+        });
+        await setDoc(buyerRef, { abonnements: arrayUnion(vendeurId) }, { merge: true });
+      } else {
+        await updateDoc(vendorRef, { followersCount: increment(-1) });
+        await setDoc(buyerRef, { abonnements: arrayRemove(vendeurId) }, { merge: true });
+      }
+    } catch (e) {
+      console.error("Erreur mise à jour abonnement:", e);
+    }
+  });
+
+  function initProductsRealtime() {
+    const activeGrid = document.getElementById("productsGrid");
+    const soldGrid = document.getElementById("soldProductsGrid");
+
+    const q = query(collection(db, "produits"), where("vendeurId", "==", vendeurId));
+
+    onSnapshot(q, (snapshot) => {
+      const t = translations[currentLang] || translations.fr;
+      activeGrid.innerHTML = "";
+      soldGrid.innerHTML = "";
+
+      let activeCount = 0;
+      let soldCount = 0;
+
+      if (snapshot.empty) {
+        activeGrid.innerHTML = `<div class="empty-state">${t.no_active_items}</div>`;
+        soldGrid.innerHTML = `<div class="empty-state">${t.no_sold_items}</div>`;
+        return;
+      }
+
+      snapshot.forEach((docSnap) => {
+        const product = docSnap.data();
+        const prodId = docSnap.id;
+        const imageUrl = product.image || product.imageUrl || product.photo || DEFAULT_AVATAR;
+        const title = product.nom || product.title || product.name || "Article";
+
+        const rawPrice = product.prix ?? product.price;
+        const productCurrency = product.devise || product.currency || product.currencySymbol || product.unit;
+        const priceDisplay = formatPrice(rawPrice, productCurrency);
+
+        const likesCount = product.favorisCount ?? product.favoris ?? product.likes ?? product.likesCount ?? 0;
+        const finalLikes = Array.isArray(likesCount) ? likesCount.length : likesCount;
+
+        const isSold = product.vendu === true || product.status === "sold" || product.statut === "vendu";
+
+        const card = document.createElement("div");
+        card.className = `product-card ${isSold ? 'sold' : ''}`;
+        card.onclick = () => { window.location.href = `article.html?id=${prodId}`; };
+
+        card.innerHTML = `
+          ${isSold ? `<span class="badge-sold">${t.badge_sold}</span>` : ''}
+          <div class="product-image-box">
+            <img src="${imageUrl}" alt="${title}">
+            <div class="product-likes">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span>${finalLikes}</span>
+            </div>
+          </div>
+          <div class="product-info">
+            <span class="product-title">${title}</span>
+            <span class="product-price">${priceDisplay}</span>
+          </div>
+        `;
+
+        if (isSold) {
+          soldGrid.appendChild(card);
+          soldCount++;
+        } else {
+          activeGrid.appendChild(card);
+          activeCount++;
+        }
+      });
+
+      if (activeCount === 0) {
+        activeGrid.innerHTML = `<div class="empty-state">${t.no_active_items}</div>`;
+      }
+      if (soldCount === 0) {
+        soldGrid.innerHTML = `<div class="empty-state">${t.no_sold_items}</div>`;
+      }
+    }, (err) => {
+      const t = translations[currentLang] || translations.fr;
+      console.error("Erreur écoute produits:", err);
+      activeGrid.innerHTML = `<div class="empty-state">${t.err_loading}</div>`;
+    });
+  }
+
+  initVendorRealtime();
+</script>
+</body>
+</html>

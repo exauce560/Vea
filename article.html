@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Détails du Produit</title>
+  <style>
+    :root{
+        --accent-gold: linear-gradient(135deg, #FFD700, #FFA500);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      color: #ffffff;
+    }
+
+    .feed-container {
+      width: 100%;
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .feed-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product-view {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px 30px 16px;
+    }
+
+    .image-carousel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      z-index: 1;
+    }
+
+    .image-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .bg-image {
+      min-width: 100%;
+      height: 100%;
+      object-fit: cover;
+      scroll-snap-align: start;
+      flex-shrink: 0;
+    }
+
+    .carousel-dots {
+      position: absolute;
+      bottom: 155px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .dot.active {
+      background: #ffffff;
+      transform: scale(1.3);
+    }
+
+    .overlay-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0) 30%,
+        rgba(0, 0, 0, 0.1) 60%,
+        rgba(0, 0, 0, 0.75) 100%
+      );
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 30;
+      background: rgba(0, 0, 0, 0.35);
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .share-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.35);
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .share-menu {
+      position: absolute;
+      top: 60px;
+      right: 16px;
+      z-index: 15;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .share-menu.active {
+      display: flex;
+    }
+
+    .share-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .share-item:active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .share-item svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .vendor-header {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 40px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .vendor-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .vendor-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+    }
+
+    .vendor-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .vendor-name-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vendor-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Badge Coche dans un rond pour compte boosté / vérifié */
+    .account-boost-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .account-boost-badge svg {
+      width: 12px;
+      height: 12px;
+      stroke: #ffffff;
+      stroke-width: 3;
+    }
+
+    .vendor-location {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .vendor-flag-container {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 6px;
+      border-radius: 8px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .country-flag-badge img {
+      width: 32px;
+      height: 22px;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .product-details {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .delivery-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      width: fit-content;
+      backdrop-filter: blur(6px);
+    }
+
+    .delivery-badge.available {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+
+    .delivery-badge.unavailable {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+
+    .delivery-badge svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .cart-btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      width: fit-content;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .cart-btn-action:active {
+      transform: scale(0.95);
+    }
+
+    .cart-icon {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: #94a3b8;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.3s, fill 0.3s;
+    }
+
+    .cart-btn-action.active .cart-icon {
+      stroke: #2563eb;
+      fill: rgba(37, 99, 235, 0.2);
+    }
+
+    .fav-count-text {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .product-price {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .product-meta {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Badge Article Boosté */
+    .article-boost-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+      text-transform: uppercase;
+    }
+
+    .whatsapp-btn {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: #25d366;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+      transition: transform 0.2s, background-color 0.2s;
+      text-shadow: none;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.97);
+      background-color: #1eb857;
+    }
+
+    .whatsapp-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background-color: #0f172a;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 100;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      pointer-events: none;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .toast-container.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .pc-nav-btn {
+      display: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 15px;
+      opacity: 0.7;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .pc-nav-btn:hover {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.15);
+    }
+
+    .pc-nav-btn.prev {
+      left: 10px;
+    }
+
+    .pc-nav-btn.next {
+      right: 10px;
+    }
+
+    @media (min-width: 768px) {
+      .pc-nav-btn {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">Chargement du fil d'articles...</div>
+
+  <button class="back-btn" onclick="history.back()" aria-label="Retour">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </button>
+
+  <div class="feed-container" id="feedContainer"></div>
+
+  <div class="toast-container" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialProductId = urlParams.get('id');
+
+    let currentUser = null;
+    let userRole = "acheteur";
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
+    }
+
+    const countryCodeMap = {
+      "rdc": "cd", "congo": "cd", "democratic republic of the congo": "cd", "republique democratique du congo": "cd", "république démocratique du congo": "cd",
+      "rwanda": "rw",
+      "burundi": "bi",
+      "france": "fr",
+      "belgique": "be", "belgium": "be",
+      "ouganda": "ug", "ouanda": "ug", "uganda": "ug",
+      "kenya": "ke",
+      "tanzanie": "tz", "tanzania": "tz",
+      "cameroun": "cm", "cameroon": "cm",
+      "cote d'ivoire": "ci", "côte d'ivoire": "ci", "ivory coast": "ci",
+      "senegal": "sn", "sénégal": "sn"
+    };
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    try {
+      let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
+      let userData = null;
+
+      if (userSnap.exists()) {
+        userRole = "vendeurs_clients";
+        userData = userSnap.data();
+      } else {
+        userSnap = await getDoc(doc(db, "vendeurs", user.uid));
+        if (userSnap.exists()) {
+          userRole = "vendeurs";
+          userData = userSnap.data();
+        } else {
+          userRole = "acheteur";
+        }
+      }
+
+    } catch (e) {
+      console.error("Erreur d'identification du rôle :", e);
+    }
+  }
+  loadFeedData();
+});
+    async function loadFeedData() {
+      const feedContainer = document.getElementById("feedContainer");
+      try {
+        const querySnapshot = await getDocs(collection(db, "produits"));
+        let products = [];
+
+        querySnapshot.forEach((docSnap) => {
+          products.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        if (products.length === 0) {
+          document.getElementById("loadingScreen").textContent = "Aucun produit disponible.";
+          return;
+        }
+
+        if (initialProductId) {
+          const targetIndex = products.findIndex(p => p.id === initialProductId);
+          if (targetIndex > -1) {
+            const targetProduct = products.splice(targetIndex, 1)[0];
+            products.unshift(targetProduct);
+          }
+        }
+
+        feedContainer.innerHTML = "";
+
+        for (const product of products) {
+          const card = await buildProductCard(product);
+          feedContainer.appendChild(card);
+        }
+
+        document.getElementById("loadingScreen").style.display = "none";
+
+      } catch (error) {
+        console.error("Erreur de chargement du feed :", error);
+        document.getElementById("loadingScreen").textContent = "Erreur lors du chargement des données.";
+      }
+    }
+
+    async function buildProductCard(product) {
+      const card = document.createElement("div");
+      card.className = "product-view";
+
+      let currentFavCount = 0;
+      if (typeof product.favoris === "number") {
+        currentFavCount = product.favoris;
+      } else if (Array.isArray(product.favoris)) {
+        currentFavCount = product.favoris.length;
+      } else {
+        currentFavCount = Number(product.favoris) || 0;
+      }
+
+      const isDeliverable = product.livraison === true;
+
+      // Vérification si l'article est boosté
+      const isArticleBoosted = product.boost === true || product.isBoosted === true;
+
+      let imagesList = [];
+      if (Array.isArray(product.images) && product.images.length > 0) {
+        imagesList = product.images;
+      } else if (product.image) {
+        imagesList = [product.image];
+      } else {
+        imagesList = [DEFAULT_AVATAR];
+      }
+
+      let imagesHTML = '<div class="image-carousel">';
+      imagesList.forEach(url => {
+        imagesHTML += `<img class="bg-image" src="${url}" alt="${product.nom || 'Produit'}">`;
+      });
+      imagesHTML += '</div>';
+
+      let dotsHTML = '';
+      if (imagesList.length > 1) {
+        dotsHTML = '<div class="carousel-dots">';
+        imagesList.forEach((_, index) => {
+          dotsHTML += `<span class="dot ${index === 0 ? 'active' : ''}"></span>`;
+        });
+        dotsHTML += '</div>';
+      }
+
+      card.innerHTML = `
+        ${imagesHTML}
+        ${dotsHTML}
+        <div class="overlay-gradient"></div>
+
+        <button class="pc-nav-btn prev" aria-label="Photo précédente">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="pc-nav-btn next" aria-label="Photo suivante">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+
+        <button class="share-btn" aria-label="Partager">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+        </button>
+
+        <div class="share-menu">
+          <a href="#" target="_blank" class="share-item share-wa">
+            <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            WhatsApp
+          </a>
+          <a href="#" target="_blank" class="share-item share-fb">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </a>
+          <button type="button" class="share-item share-insta">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            Instagram (Copier)
+          </button>
+        </div>
+
+        <div class="vendor-header">
+          <a class="vendor-link" href="visit-visit-v.html?vendeurId=${product.vendeurId || ''}">
+            <img class="vendor-avatar" src="${DEFAULT_AVATAR}" alt="Vendeur">
+            <div class="vendor-info">
+              <div class="vendor-name-wrapper">
+                <span class="vendor-name">---</span>
+                <span class="account-boost-badge-container"></span>
+              </div>
+              <span class="vendor-location">
+                <span class="v-country">---</span>, <span class="v-city">---</span>
+              </span>
+            </div>
+          </a>
+          <div class="vendor-flag-container vendor-flag">🌐</div>
+        </div>
+
+        <div class="product-details">
+          <div class="delivery-badge ${isDeliverable ? 'available' : 'unavailable'}">
+            <svg viewBox="0 0 24 24">
+              ${isDeliverable
+                ? '<path d="M20 6L9 17l-5-5"></path>'
+                : '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'}
+            </svg>
+            <span>${isDeliverable ? 'Article livrable' : 'Non livrable'}</span>
+          </div>
+
+          <div class="cart-btn-action ${currentFavCount > 0 ? 'active' : ''}">
+            <svg class="cart-icon" viewBox="0 0 24 24">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-2z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span class="fav-count-text">${currentFavCount}</span>
+          </div>
+
+          <div class="product-price">
+            ${product.prix ?? '0'} ${product.devise || 'FC'}
+          </div>
+
+          <div class="product-meta">
+            <span>${product.stock ?? '1'} - ${product.nom || product.type || 'ARTICLE'}</span>
+            ${isArticleBoosted ? '<span class="article-boost-badge">⭐ VIP Boost</span>' : ''}
+          </div>
+
+          <button class="whatsapp-btn">
+            <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            WHATSAPP
+          </button>
+        </div>
+      `;
+
+      const carousel = card.querySelector(".image-carousel");
+      const dots = card.querySelectorAll(".dot");
+
+      if (carousel && dots.length > 0) {
+        carousel.addEventListener("scroll", () => {
+          const index = Math.round(carousel.scrollLeft / carousel.clientWidth);
+          dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+        });
+      }
+
+      const prevBtn = card.querySelector(".pc-nav-btn.prev");
+      const nextBtn = card.querySelector(".pc-nav-btn.next");
+
+      if (prevBtn && nextBtn) {
+        prevBtn.addEventListener("click", () => {
+          carousel.scrollBy({ left: -carousel.clientWidth, behavior: "smooth" });
+        });
+        nextBtn.addEventListener("click", () => {
+          carousel.scrollBy({ left: carousel.clientWidth, behavior: "smooth" });
+        });
+      }
+
+      const cartBtn = card.querySelector(".cart-btn-action");
+      const favText = card.querySelector(".fav-count-text");
+
+      cartBtn.addEventListener("click", async () => {
+        currentFavCount++;
+        favText.textContent = currentFavCount;
+        cartBtn.classList.add("active");
+
+        try {
+          await updateDoc(doc(db, "produits", product.id), {
+            favoris: increment(1)
+          });
+        } catch (err) {
+          console.error("Erreur de mise à jour des favoris :", err);
+        }
+      });
+
+      let whatsappNumber = "";
+      if (product.vendeurId) {
+        try {
+          // Recherche dans la collection 'vendeurs' ou 'vendeurs_clients'
+          let vendeurSnap = await getDoc(doc(db, "vendeurs", product.vendeurId));
+          if (!vendeurSnap.exists()) {
+            vendeurSnap = await getDoc(doc(db, "vendeurs_clients", product.vendeurId));
+          }
+
+          if (vendeurSnap.exists()) {
+            const vendeur = vendeurSnap.data();
+            const addr = vendeur.address || {};
+
+            const countryName = addr.country || vendeur.country || vendeur.pays || "";
+            const cityName = addr.city || vendeur.city || vendeur.ville || "---";
+
+            card.querySelector(".vendor-name").textContent = vendeur.shopName || vendeur.nom || "Boutique";
+
+            // Vérification si le compte (vendeur ou vendeur_client) est boosté ou VIP
+            const isAccountBoosted = vendeur.boost === true || vendeur.isBoosted === true || vendeur.isPremium === true;
+            if (isAccountBoosted) {
+              const boostContainer = card.querySelector(".account-boost-badge-container");
+              if (boostContainer) {
+                // Coche blanche dans un cercle rond bleu à côté du nom de la boutique
+                boostContainer.innerHTML = `
+                  <span class="account-boost-badge" title="Compte Boosté">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </span>
+                `;
+              }
+            }
+
+            card.querySelector(".v-country").textContent = countryName || "---";
+            card.querySelector(".v-city").textContent = cityName;
+
+            const flagContainer = card.querySelector(".vendor-flag");
+            if (flagContainer && countryName) {
+              const cleanCountry = countryName.toLowerCase().trim();
+              const isoCode = countryCodeMap[cleanCountry] || cleanCountry.substring(0, 2);
+              if (isoCode && isoCode.length === 2) {
+                flagContainer.innerHTML = `
+                  <div class="country-flag-badge" title="${countryName}">
+                    <img src="https://flagcdn.com/w80/${isoCode}.png" alt="${countryName}">
+                  </div>
+                `;
+              }
+            }
+
+            if (vendeur.photoUrl || vendeur.photo) {
+              card.querySelector(".vendor-avatar").src = vendeur.photoUrl || vendeur.photo;
+            }
+
+            whatsappNumber = vendeur.telephone || vendeur.phone || vendeur.whatsapp || "";
+          }
+        } catch (e) {
+          console.error("Erreur chargement vendeur :", e);
+        }
+      }
+
+      const waBtn = card.querySelector(".whatsapp-btn");
+      waBtn.addEventListener("click", () => {
+        if (userRole === "vendeurs") {
+          showToast("Vous avez un compte vendeur, vous ne pouvez pas contacter un autre vendeur. Veuillez passer à un compte vendeur-client.");
+          return;
+        }
+
+        if (whatsappNumber) {
+          const cleanPhone = String(whatsappNumber).replace(/[^0-9]/g, '');
+          const message = encodeURIComponent(`Bonjour, je suis intéressé par votre article "${product.nom || ''}" à ${product.prix} ${product.devise || 'FC'}.`);
+          window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+        } else {
+          showToast("Numéro du vendeur non disponible.");
+        }
+      });
+
+      const shareBtn = card.querySelector(".share-btn");
+      const shareMenu = card.querySelector(".share-menu");
+
+      shareBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const productUrl = `${window.location.origin}${window.location.pathname}?id=${product.id}`;
+        const encodedUrl = encodeURIComponent(productUrl);
+
+        if (navigator.share && window.innerWidth < 768) {
+          navigator.share({
+            title: product.nom || 'Article',
+            url: productUrl
+          }).catch(() => {});
+          return;
+        }
+
+        card.querySelector(".share-wa").href = `https://api.whatsapp.com/send?text=${encodedUrl}`;
+        card.querySelector(".share-fb").href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        shareMenu.classList.toggle("active");
+      });
+
+      card.querySelector(".share-insta").addEventListener("click", () => {
+        const productUrl = `${window.location.origin}${window.location.pathname}?id=${product.id}`;
+        navigator.clipboard.writeText(productUrl).then(() => {
+          showToast("Lien de l'article copié dans le presse-papier !");
+        });
+        shareMenu.classList.remove("active");
+      });
+
+      document.addEventListener("click", () => {
+        shareMenu.classList.remove("active");
+      });
+
+      return card;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 36px 24px;
+      box-shadow: 0 10px 30px rgba(0, 119, 182, 0.12), 0 2px 8px rgba(0, 80, 140, 0.06);
+      text-align: center;
+    }
+
+    .logo-icon {
+      width: 70px;
+      height: 70px;
+      background: #e0f2fe;
+      color: #0077b6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+    }
+
+    .logo-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .btn-google {
+      width: 100%;
+      background-color: #ffffff;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-google:hover {
+      background-color: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .btn-google svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e0f2fe;
+      border-top: 3px solid #0077b6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .error-msg {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+
+    <!-- Écran de chargement initial -->
+    <div id="loader" class="loader-container hidden">
+      <div class="spinner"></div>
+      <p style="margin: 0;" id="loader-text">Vérification du compte...</p>
+    </div>
+
+    <!-- Écran de connexion -->
+    <div id="login-content">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+      </div>
+
+      <h1>Changer ou Choisir un Compte</h1>
+      <p>Sélectionnez le compte Google avec lequel vous souhaitez vous connecter.</p>
+
+      <button class="btn-google" onclick="loginWithGoogle()">
+        <svg viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.14C3.25 21.27 7.31 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.59H1.27C.46 8.21 0 10.05 0 12s.46 3.79 1.27 5.41l4.01-3.14z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.73 1.27 6.59l4.01 3.14c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        Choisir un compte Google
+      </button>
+
+      <p id="error-message" class="error-msg hidden"></p>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+
+    // Fonction de vérification et redirection dans Firestore
+    async function redirectUser(user) {
+      try {
+        // 1. Recherche dans la collection acheteurs
+        const acheteurSnap = await getDoc(doc(db, "acheteurs", user.uid));
+        if (acheteurSnap.exists()) {
+          window.location.assign("./acceuil.html");
+          return;
+        }
+
+        // 2. Recherche dans la collection vendeurs
+        const vendeurSnap = await getDoc(doc(db, "vendeurs", user.uid));
+        if (vendeurSnap.exists()) {
+          window.location.assign("./acceuil.html");
+          return;
+        }
+
+        // 3. Recherche dans la collection vendeurs_clients
+        const vendeurClientSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
+        if (vendeurClientSnap.exists()) {
+          window.location.assign("./acceuil.html");
+          return;
+        }
+
+        // 4. Si c'est un nouveau compte
+        window.location.assign("./acheteur.html");
+      } catch (err) {
+        console.error("Erreur de base de données :", err);
+        showError("Erreur lors de la recherche du compte dans Firestore.");
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById("loader").classList.add("hidden");
+      document.getElementById("login-content").classList.remove("hidden");
+      const errElem = document.getElementById("error-message");
+      errElem.textContent = msg;
+      errElem.classList.remove("hidden");
+    }
+
+    // Action lors du clic sur le bouton Google
+    window.loginWithGoogle = async function() {
+      // Masquer le bouton et afficher le loader pendant la tentative
+      document.getElementById("login-content").classList.add("hidden");
+      document.getElementById("loader").classList.remove("hidden");
+      document.getElementById("error-message").classList.add("hidden");
+
+      try {
+        // Ouverture de la fenêtre contextuelle (Popup)
+        const result = await signInWithPopup(auth, provider);
+        if (result && result.user) {
+          await redirectUser(result.user);
+        }
+      } catch (error) {
+        console.error("Erreur de connexion :", error);
+
+        // Si l'utilisateur ferme lui-même la popup sans se connecter, on ne montre pas une erreur critique
+        if (error.code === 'auth/popup-closed-by-user') {
+          document.getElementById("loader").classList.add("hidden");
+          document.getElementById("login-content").classList.remove("hidden");
+        } else {
+          showError("Échec de connexion : " + error.message);
+        }
+      }
+    };
+  </script>
+</body>
+</html>

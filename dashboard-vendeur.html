@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publier un premier produit ?</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --- ARRIÈRE-PLAN AVEC TRÈS LÉGER FLOU --- */
+    .background-grid {
+      position: absolute;
+      inset: 0;
+      padding: 12px;
+      overflow-y: hidden;
+      filter: blur(1px) brightness(0.65);
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .header-mock {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 4px 8px;
+    }
+
+    .search-bar {
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 60%;
+    }
+
+    .location-badge {
+      background: #ffffff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #e63946;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .product-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .seller-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .image-container {
+      position: relative;
+      height: 110px;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #eee;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .category-overlay {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .product-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .price { color: #0077b6; }
+    .stock { color: #555; font-size: 0.75rem; }
+
+    /* --- OVERLAY LÉGER --- */
+    .backdrop-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 2;
+    }
+
+    /* --- CONTENEUR DE TEXTE ÉPURÉ --- */
+    .prompt-content {
+      position: relative;
+      z-index: 10;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .prompt-title {
+      font-size: 1.35rem;
+      color: #ffffff;
+      font-weight: 800;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .prompt-subtitle {
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      font-weight: 500;
+      margin-bottom: 32px;
+      line-height: 1.5;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    /* --- BOUTONS --- */
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-action {
+      padding: 16px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: block;
+      box-sizing: border-box;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-yes {
+      background: #0077b6;
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      border: none;
+    }
+
+    .btn-yes:hover {
+      background: #0096c7;
+      transform: translateY(-2px);
+    }
+
+    .btn-no {
+      background: rgba(15, 23, 42, 0.75);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-no:hover {
+      background: rgba(15, 23, 42, 0.9);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ARRIÈRE-PLAN DES PRODUITS -->
+  <div class="background-grid">
+    <div class="header-mock">
+      <div class="search-bar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span id="search-placeholder">Recherche</span>
+      </div>
+      <div class="location-badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e63946" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        GOMA
+      </div>
+    </div>
+
+    <div class="grid-container">
+      <div class="product-card">
+        <div class="seller-name">ALICE</div>
+        <div class="image-container">
+          <img class="product-img" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300" alt="Habit">
+          <div class="category-overlay tag-habit">HABIT</div>
+        </div>
+        <div class="product-details">
+          <div class="price">2900 CFA</div>
+          <div class="stock">4</div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="seller-name">SHOES-B</div>
+        <div class="image-container">
+          <img class="product-img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300" alt="Meuble">
+          <div class="category-overlay tag-meuble">MEUBLE</div>
+        </div>
+        <div class="product-details">
+          <div class="price">30 000 CFA</div>
+          <div class="stock">1</div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="seller-name">I-FASHION</div>
+        <div class="image-container">
+          <img class="product-img" src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=300" alt="Habit">
+          <div class="category-overlay tag-habit">HABIT</div>
+        </div>
+        <div class="product-details">
+          <div class="price">45.3 $</div>
+          <div class="stock">6</div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="seller-name">ADRESO</div>
+        <div class="image-container">
+          <img class="product-img" src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=300" alt="Habit">
+          <div class="category-overlay tag-habit">HABIT</div>
+        </div>
+        <div class="product-details">
+          <div class="price">7 000 FC</div>
+          <div class="stock">10</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY TRÈS LÉGER -->
+  <div class="backdrop-overlay"></div>
+
+  <!-- CONTENU MULTILINGUE -->
+  <div class="prompt-content">
+    <h2 class="prompt-title" id="prompt-title">
+      Voulez-vous publier un premier produit maintenant ?
+    </h2>
+    <p class="prompt-subtitle" id="prompt-subtitle">
+      Vous n'avez rien à perdre, publier c'est gratuit.
+    </p>
+
+    <div class="button-container">
+      <a href="add-product.html" class="btn-action btn-yes" id="btn-yes">OUI</a>
+      <a href="acceuil.html" class="btn-action btn-no" id="btn-no">NON</a>
+    </div>
+  </div>
+
+  <script>
+    // Dictionnaire de traduction
+    const translations = {
+      fr: {
+        title: "Voulez-vous publier un premier produit maintenant ?",
+        subtitle: "Vous n'avez rien à perdre, publier c'est gratuit.",
+        yes: "OUI",
+        no: "NON",
+        search: "Recherche",
+        habit: "HABIT",
+        meuble: "MEUBLE"
+      },
+      en: {
+        title: "Do you want to post a first product now?",
+        subtitle: "You have nothing to lose, posting is free.",
+        yes: "YES",
+        no: "NO",
+        search: "Search",
+        habit: "CLOTHING",
+        meuble: "FURNITURE"
+      }
+    };
+
+    // Récupérer la langue enregistrée au préalable (défaut 'fr')
+    const currentLang = localStorage.getItem('app_lang') || 'fr';
+
+    // Application des textes selon la langue
+    const t = translations[currentLang] || translations.fr;
+
+    document.getElementById('prompt-title').textContent = t.title;
+    document.getElementById('prompt-subtitle').textContent = t.subtitle;
+    document.getElementById('btn-yes').textContent = t.yes;
+    document.getElementById('btn-no').textContent = t.no;
+    document.getElementById('search-placeholder').textContent = t.search;
+
+    document.querySelectorAll('.tag-habit').forEach(el => el.textContent = t.habit);
+    document.querySelectorAll('.tag-meuble').forEach(el => el.textContent = t.meuble);
+
+    // Mettre à jour l'attribut HTML lang
+    document.documentElement.lang = currentLang;
+  </script>
+
+</body>
+</html>

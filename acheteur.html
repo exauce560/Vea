@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Client</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 28px 24px 32px 24px;
+      box-shadow: 0 10px 30px rgba(0, 119, 182, 0.12), 0 2px 8px rgba(0, 80, 140, 0.06);
+      position: relative;
+    }
+
+    .lang-switcher {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .lang-btn.active {
+      color: #0077b6;
+      background: #e0f2fe;
+    }
+
+    /* Rond de sélection de la photo d'acheteur */
+    .avatar-upload {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px auto;
+    }
+
+    .avatar-preview {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-svg {
+      width: 42px;
+      height: 42px;
+      stroke: #ffffff;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    /* Champs du formulaire */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background-color: #f8fafc;
+      font-size: 0.95rem;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%3c64748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #0077b6;
+      background-color: #ffffff;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .btn-submit {
+      background-color: #0077b6;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: #005b8e;
+    }
+
+    /* Styles du Toast UI */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      padding: 14px 20px;
+      position: fixed;
+      z-index: 1000;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s, bottom 0.3s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 40px;
+    }
+
+    #toast.error {
+      background-color: #ef4444;
+    }
+
+    #toast.success {
+      background-color: #10b981;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLanguage('fr', event)">FR</button>
+      <button class="lang-btn" onclick="setLanguage('en', event)">EN</button>
+    </div>
+
+    <!-- AVATAR ACHETEUR -->
+    <div class="avatar-upload" onclick="document.getElementById('file-input').click();">
+      <div class="avatar-preview" id="avatar-preview">
+        <svg xmlns="http://www.w3.org/2000/svg" class="user-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <input type="file" id="file-input" accept="image/*" onchange="previewImage(event)">
+    </div>
+
+    <!-- FORMULAIRE ACHETEUR -->
+    <form id="acheteur-form">
+      <div class="form-group">
+        <input type="text" id="fullName" placeholder="Nom complet" required>
+      </div>
+
+      <div class="form-group">
+        <select id="country" onchange="updateLocationData()" required>
+          <option value="" disabled selected>Choisir un pays</option>
+          <option value="RDC">RDC (Congo)</option>
+          <option value="Rwanda">Rwanda</option>
+          <option value="Burundi">Burundi</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <select id="province" onchange="updateCities()" required disabled>
+          <option value="" disabled selected>Province / Région</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <select id="city" required disabled>
+          <option value="" disabled selected>Ville</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <input type="tel" id="whatsapp" placeholder="Numéro WhatsApp" required>
+      </div>
+
+      <div class="btn-container">
+        <button type="button" class="btn-submit" id="btn-submit">
+          CONFIRMER AVEC GOOGLE
+        </button>
+      </div>
+    </form>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION UI -->
+  <div id="toast"></div>
+
+  <!-- FIREBASE ENGINE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      signOut,
+      GoogleAuthProvider
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Enregistrer les données de l'acheteur dans Firestore après vérification
+    async function processBuyerRegistration(user) {
+      // 1. VÉRIFICATION : Est-ce que le compte existe déjà ?
+      const userRef = doc(db, "acheteurs", user.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        // Le compte existe déjà -> On refuse la création
+        showToast("Un compte existe déjà avec ce profil Google.", "error");
+
+        // Déconnexion de la session Google initiée
+        await signOut(auth);
+        return;
+      }
+
+      // 2. Si le compte n'existe pas, on procède à la création
+      const fullName = document.getElementById('fullName').value;
+      const country = document.getElementById('country').value;
+      const province = document.getElementById('province').value;
+      const city = document.getElementById('city').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+
+      const savedPhoto = window.uploadedPhotoBase64 || sessionStorage.getItem('temp_buyer_photo') || user.photoURL || "";
+
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: fullName || user.displayName,
+        role: "acheteur",
+        address: {
+          country: country,
+          province: province,
+          city: city
+        },
+        whatsapp: whatsapp,
+        photoUrl: savedPhoto,
+        createdAt: new Date()
+      });
+
+      sessionStorage.removeItem('temp_buyer_photo');
+
+      showToast("Compte client créé avec succès !", "success");
+
+      setTimeout(() => {
+        window.location.href = "achet-pref.html";
+      }, 1500);
+    }
+
+    // Gestion de la redirection Google Auth
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          showToast("Vérification du compte...", "default");
+          await processBuyerRegistration(result.user);
+        }
+      } catch (error) {
+        console.error("Erreur après redirection :", error);
+        showToast("Erreur lors de la confirmation d'authentification.", "error");
+      }
+    });
+
+    // Soumission du formulaire
+    document.getElementById('btn-submit').addEventListener('click', async () => {
+      const fullName = document.getElementById('fullName').value;
+      const country = document.getElementById('country').value;
+      const province = document.getElementById('province').value;
+      const city = document.getElementById('city').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+
+      if (!fullName || !country || !province || !city || !whatsapp) {
+        showToast("Veuillez remplir tous les champs obligatoires.", "error");
+        return;
+      }
+
+      if (window.uploadedPhotoBase64) {
+        sessionStorage.setItem('temp_buyer_photo', window.uploadedPhotoBase64);
+      }
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        await processBuyerRegistration(result.user);
+      } catch (error) {
+        console.warn("Popup échouée ou bloquée, basculement sur la redirection:", error);
+        if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+          showToast("Redirection vers Google en cours...", "default");
+          await signInWithRedirect(auth, provider);
+        } else {
+          showToast("Erreur lors de la connexion avec Google.", "error");
+        }
+      }
+    });
+  </script>
+
+  <!-- SCRIPTS INTERACTIFS -->
+  <script>
+    window.uploadedPhotoBase64 = "";
+
+    function showToast(message, type = "default") {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.className = `show ${type}`;
+
+      setTimeout(() => {
+        toast.className = toast.className.replace(`show ${type}`, "");
+      }, 3500);
+    }
+
+    const locationData = {
+      "RDC": {
+        code: "+243 ",
+        provinces: {
+            "Bas-Uélé": ["Buta", "Aketi", "Bambesa"],
+            "Équateur": ["Mbandaka", "Bikoro", "Lukolela"],
+            "Haut-Katanga": ["Lubumbashi", "Likasi", "Kasumbalesa"],
+            "Haut-Lomami": ["Kamina", "Kabongo", "Malemba-Nkulu"],
+            "Haut-Uélé": ["Isiro", "Watsa", "Dungu"],
+            "Ituri": ["Bunia", "Aru", "Mahagi"],
+            "Kasaï": ["Tshikapa", "Luebo", "Ilebo"],
+            "Kasaï-Central": ["Kananga", "Tshimbulu", "Demba"],
+            "Kasaï-Oriental": ["Mbuji-Mayi", "Kabeya-Kamwanga", "Tshilenge"],
+            "Kinshasa": ["Kinshasa"],
+            "Kongo-Central": ["Matadi", "Boma", "Moanda"],
+            "Kwango": ["Kenge", "Popokabaka", "Feshi"],
+            "Kwilu": ["Bandundu", "Kikwit", "Bulungu"],
+            "Lomami": ["Kabinda", "Mwene-Ditu", "Ngandajika"],
+            "Lualaba": ["Kolwezi", "Dilolo", "Mutshatsha"],
+            "Mai-Ndombe": ["Inongo", "Kutu", "Nioki"],
+            "Maniema": ["Kindu", "Kalima", "Kasongo"],
+            "Mongala": ["Lisala", "Bumba", "Bongandanga"],
+            "Nord-Kivu": ["Goma", "Beni", "Butembo"],
+            "Nord-Ubangi": ["Gbadolite", "Businga", "Yakoma"],
+            "Sankuru": ["Lusambo", "Lodja", "Katako-Kombe"],
+            "Sud-Kivu": ["Bukavu", "Uvira", "Baraka"],
+            "Sud-Ubangi": ["Gemena", "Libenge", "Zongo"],
+            "Tanganyika": ["Kalemie", "Kongolo", "Nyunzu"],
+            "Tshopo": ["Kisangani", "Buta", "Opala"],
+            "Tshuapa": ["Boende", "Befale", "Bokungu"]
+        }
+      },
+      "Rwanda": {
+        code: "+250 ",
+        provinces: {
+            "Kigali": ["Kigali"],
+            "Province de l'Est": ["Rwamagana", "Kayonza", "Nyagatare"],
+            "Province du Nord": ["Musanze", "Byumba", "Gicumbi"],
+            "Province de l'Ouest": ["Rubavu", "Rusizi", "Karongi"],
+            "Province du Sud": ["Huye", "Nyanza", "Muhanga"]
+        }
+      },
+      "Burundi": {
+        code: "+257 ",
+        provinces: {
+          "Bujumbura Mairie": ["Bujumbura"],
+          "Bubanza": ["Bubanza", "Gihanga", "Musigati"],
+          "Bujumbura Rural": ["Isale", "Kabezi", "Mubimbi"],
+          "Bururi": ["Bururi", "Rumonge", "Matana"],
+          "Cankuzo": ["Cankuzo", "Cendajuru", "Mishiha"],
+          "Cibitoke": ["Cibitoke", "Buganda", "Rugombo"],
+          "Gitega": ["Gitega", "Mutaho", "Ryansoro"],
+          "Karuzi": ["Karuzi", "Buhiga", "Gitaramuka"],
+          "Kayanza": ["Kayanza", "Gatara", "Matongo"],
+          "Kirundo": ["Kirundo", "Bugabira", "Busoni"],
+          "Makamba": ["Makamba", "Kayogoro", "Nyanza-Lac"],
+          "Muramvya": ["Muramvya", "Bukeye", "Mbuye"],
+          "Muyinga": ["Muyinga", "Buhinyuza", "Gashoho"],
+          "Mwaro": ["Kiganda", "Ndava", "Kayokwe"],
+          "Ngozi": ["Ngozi", "Busiga", "Kiremba"],
+          "Rutana": ["Rutana", "Mpinga-Kayove", "Musongati"],
+          "Ruyigi": ["Ruyigi", "Butezi", "Butaganzwa"]
+        }
+      }
+    };
+
+    function updateLocationData() {
+      const countrySelect = document.getElementById('country');
+      const provinceSelect = document.getElementById('province');
+      const citySelect = document.getElementById('city');
+      const whatsappInput = document.getElementById('whatsapp');
+
+      const selectedCountry = countrySelect.value;
+      const data = locationData[selectedCountry];
+
+      if (data) {
+        whatsappInput.value = data.code;
+      }
+
+      provinceSelect.innerHTML = '<option value="" disabled selected>Province / Région</option>';
+      citySelect.innerHTML = '<option value="" disabled selected>Ville</option>';
+      citySelect.disabled = true;
+
+      if (data && data.provinces) {
+        for (let prov in data.provinces) {
+          let opt = document.createElement('option');
+          opt.value = prov;
+          opt.textContent = prov;
+          provinceSelect.appendChild(opt);
+        }
+        provinceSelect.disabled = false;
+      }
+    }
+
+    function updateCities() {
+      const country = document.getElementById('country').value;
+      const province = document.getElementById('province').value;
+      const citySelect = document.getElementById('city');
+
+      citySelect.innerHTML = '<option value="" disabled selected>Ville</option>';
+
+      if (locationData[country] && locationData[country].provinces[province]) {
+        let cities = locationData[country].provinces[province];
+        cities.forEach(city => {
+          let opt = document.createElement('option');
+          opt.value = city;
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+        citySelect.disabled = false;
+      }
+    }
+
+    function previewImage(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        window.uploadedPhotoBase64 = e.target.result;
+
+        const preview = document.getElementById('avatar-preview');
+        if (preview) {
+          preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const translations = {
+      fr: {
+        fullName: "Nom complet",
+        whatsapp: "Numéro WhatsApp",
+        submit: "CONFIRMER AVEC GOOGLE"
+      },
+      en: {
+        fullName: "Full Name",
+        whatsapp: "WhatsApp Number",
+        submit: "CONFIRM WITH GOOGLE"
+      }
+    };
+
+    function setLanguage(lang, evt) {
+      document.getElementById('fullName').placeholder = translations[lang].fullName;
+      document.getElementById('whatsapp').placeholder = translations[lang].whatsapp;
+      document.getElementById('btn-submit').textContent = translations[lang].submit;
+
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
+    }
+  </script>
+
+</body>
+</html>

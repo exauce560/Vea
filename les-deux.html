@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Vendeur - Client</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 28px 24px 32px 24px;
+      box-shadow: 0 10px 30px rgba(0, 119, 182, 0.12), 0 2px 8px rgba(0, 80, 140, 0.06);
+      position: relative;
+    }
+
+    .lang-switcher {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .lang-btn.active {
+      color: #0077b6;
+      background: #e0f2fe;
+    }
+
+    .avatar-upload {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 20px auto;
+    }
+
+    .avatar-preview {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .store-svg {
+      width: 42px;
+      height: 42px;
+      stroke: #ffffff;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background-color: #f8fafc;
+      font-size: 0.95rem;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #0077b6;
+      background-color: #ffffff;
+    }
+
+    .form-group textarea {
+      resize: none;
+      height: 70px;
+    }
+
+    .social-section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+      margin: 10px 0 6px 2px;
+    }
+
+    .social-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .social-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .social-row select {
+      width: 35%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+
+    .social-row input {
+      width: 55%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+
+    .btn-remove-link {
+      width: 10%;
+      background: #fee2e2;
+      color: #ef4444;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .social-preview {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #0284c7;
+      word-break: break-all;
+      display: none;
+    }
+
+    .social-preview a {
+      color: #0077b6;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .btn-add-link {
+      background: #e0f2fe;
+      color: #0077b6;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 14px;
+      display: inline-block;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
+
+    .btn-submit {
+      background-color: #0077b6;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: #005b8e;
+    }
+
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      padding: 14px 20px;
+      position: fixed;
+      z-index: 1000;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s, bottom 0.3s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 40px;
+    }
+
+    #toast.error {
+      background-color: #ef4444;
+    }
+
+    #toast.success {
+      background-color: #10b981;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLanguage('fr', event)">FR</button>
+      <button class="lang-btn" onclick="setLanguage('en', event)">EN</button>
+    </div>
+
+    <div class="avatar-upload" onclick="document.getElementById('file-input').click();">
+      <div class="avatar-preview" id="avatar-preview">
+        <svg xmlns="http://www.w3.org/2000/svg" class="store-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/>
+          <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/>
+          <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/>
+        </svg>
+      </div>
+      <input type="file" id="file-input" accept="image/*" onchange="previewAndCompressImage(event)">
+    </div>
+
+    <form id="vendeur-client-form">
+      <div class="form-group">
+        <input type="text" id="shopName" placeholder="Nom de la boutique" required>
+      </div>
+
+      <div class="form-group">
+        <select id="country" onchange="updateLocationData()" required>
+          <option value="" disabled selected>Choisir un pays</option>
+          <option value="RDC">RDC (Congo)</option>
+          <option value="Rwanda">Rwanda</option>
+          <option value="Burundi">Burundi</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <select id="province" onchange="updateCities()" required disabled>
+          <option value="" disabled selected>Province / Région</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <select id="city" required disabled>
+          <option value="" disabled selected>Ville</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <textarea id="description" placeholder="Description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <input type="tel" id="whatsapp" placeholder="Numéro WhatsApp" required>
+      </div>
+
+      <div class="social-section-title" id="social-title">Réseaux & Liens</div>
+      <div id="social-container"></div>
+      <button type="button" class="btn-add-link" onclick="addSocialField()" id="btn-add-social">+ Ajouter un lien</button>
+
+      <div class="btn-container">
+        <button type="button" class="btn-submit" id="btn-submit">
+          CONFIRMER AVEC GOOGLE
+        </button>
+      </div>
+    </form>
+
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    let uploadedAvatarBase64 = "";
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      signOut,
+      GoogleAuthProvider
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    async function saveVendorClientData(user) {
+      const vendorClientRef = doc(db, "vendeurs_clients", user.uid);
+      const docSnap = await getDoc(vendorClientRef);
+
+      if (docSnap.exists()) {
+        showToast("Un compte Vendeur-Client existe déjà avec ce profil Google.", "error");
+        await signOut(auth);
+        return;
+      }
+
+      const shopName = document.getElementById('shopName').value;
+      const country = document.getElementById('country').value;
+      const province = document.getElementById('province').value;
+      const city = document.getElementById('city').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+      const description = document.getElementById('description')?.value || "";
+
+      const socialLinks = [];
+      const cards = document.querySelectorAll('.social-card');
+      cards.forEach(card => {
+        const platform = card.querySelector('.social-platform').value;
+        const linkElement = card.querySelector('.social-preview a');
+        if (linkElement && linkElement.href) {
+          socialLinks.push({
+            platform: platform,
+            url: linkElement.href
+          });
+        }
+      });
+
+      const finalPhotoUrl = uploadedAvatarBase64 || user.photoURL || "";
+
+      await setDoc(vendorClientRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        role: "vendeur_client",
+        shopName: shopName,
+        address: {
+          country: country,
+          province: province,
+          city: city
+        },
+        description: description,
+        whatsapp: whatsapp,
+        socialLinks: socialLinks,
+        photoUrl: finalPhotoUrl,
+        createdAt: new Date()
+      });
+
+      showToast("Compte Vendeur-Client enregistré avec succès !", "success");
+
+      setTimeout(() => {
+        window.location.href = "vend-client-dashboard.html";
+      }, 1500);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          showToast("Vérification du compte...", "default");
+          await saveVendorClientData(result.user);
+        }
+      } catch (error) {
+        console.error("Erreur après redirection :", error);
+        showToast("Erreur lors de la confirmation d'authentification.", "error");
+      }
+    });
+
+    document.getElementById('btn-submit').addEventListener('click', async () => {
+      const shopName = document.getElementById('shopName').value;
+      const country = document.getElementById('country').value;
+      const province = document.getElementById('province').value;
+      const city = document.getElementById('city').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+
+      if (!shopName || !country || !province || !city || !whatsapp) {
+        showToast("Veuillez remplir tous les champs obligatoires.", "error");
+        return;
+      }
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        await saveVendorClientData(result.user);
+      } catch (error) {
+        console.warn("Popup échouée ou bloquée, basculement sur la redirection:", error);
+        if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+          showToast("Redirection vers Google en cours...", "default");
+          await signInWithRedirect(auth, provider);
+        } else {
+          showToast("Erreur lors de la connexion avec Google.", "error");
+        }
+      }
+    });
+  </script>
+
+  <script>
+    const baseUrls = {
+      "Facebook": "https://facebook.com/",
+      "TikTok": "https://tiktok.com/@",
+      "Instagram": "https://instagram.com/",
+      "Web": "https://"
+    };
+
+    function showToast(message, type = "default") {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.className = `show ${type}`;
+
+      setTimeout(() => {
+        toast.className = toast.className.replace(`show ${type}`, "");
+      }, 3500);
+    }
+
+    function updateSocialUrl(element) {
+      const card = element.closest('.social-card');
+      if (!card) return;
+
+      const platform = card.querySelector('.social-platform').value;
+      const usernameInput = card.querySelector('.social-username');
+      const previewBox = card.querySelector('.social-preview');
+
+      let username = usernameInput.value.trim().replace(/^@/, '');
+
+      if (username !== "") {
+        const fullUrl = baseUrls[platform] + username;
+        previewBox.innerHTML = `Aperçu : <a href="${fullUrl}" target="_blank" rel="noopener noreferrer">${fullUrl}</a>`;
+        previewBox.style.display = "block";
+      } else {
+        previewBox.style.display = "none";
+      }
+    }
+
+    function addSocialField(platformValue = "Facebook", usernameValue = "") {
+      const container = document.getElementById("social-container");
+      if (!container) return;
+
+      const card = document.createElement("div");
+      card.className = "social-card";
+
+      card.innerHTML = `
+        <div class="social-row">
+          <select class="social-platform" onchange="updateSocialUrl(this)">
+            <option value="Facebook" ${platformValue === 'Facebook' ? 'selected' : ''}>Facebook</option>
+            <option value="TikTok" ${platformValue === 'TikTok' ? 'selected' : ''}>TikTok</option>
+            <option value="Instagram" ${platformValue === 'Instagram' ? 'selected' : ''}>Instagram</option>
+            <option value="Web" ${platformValue === 'Web' ? 'selected' : ''}>Site Web</option>
+          </select>
+          <input type="text" class="social-username" placeholder="Nom d'utilisateur (pseudo)" value="${usernameValue}" oninput="updateSocialUrl(this)">
+          <button type="button" class="btn-remove-link" onclick="this.closest('.social-card').remove()">×</button>
+        </div>
+        <div class="social-preview"></div>
+      `;
+
+      container.appendChild(card);
+      updateSocialUrl(card.querySelector('.social-username'));
+    }
+
+    const locationData = {
+      "RDC": {
+        code: "+243 ",
+        provinces: {
+            "Bas-Uélé": ["Buta", "Aketi", "Bambesa"],
+            "Équateur": ["Mbandaka", "Bikoro", "Lukolela"],
+            "Haut-Katanga": ["Lubumbashi", "Likasi", "Kasumbalesa"],
+            "Haut-Lomami": ["Kamina", "Kabongo", "Malemba-Nkulu"],
+            "Haut-Uélé": ["Isiro", "Watsa", "Dungu"],
+            "Ituri": ["Bunia", "Aru", "Mahagi"],
+            "Kasaï": ["Tshikapa", "Luebo", "Ilebo"],
+            "Kasaï-Central": ["Kananga", "Tshimbulu", "Demba"],
+            "Kasaï-Oriental": ["Mbuji-Mayi", "Kabeya-Kamwanga", "Tshilenge"],
+            "Kinshasa": ["Kinshasa"],
+            "Kongo-Central": ["Matadi", "Boma", "Moanda"],
+            "Kwango": ["Kenge", "Popokabaka", "Feshi"],
+            "Kwilu": ["Bandundu", "Kikwit", "Bulungu"],
+            "Lomami": ["Kabinda", "Mwene-Ditu", "Ngandajika"],
+            "Lualaba": ["Kolwezi", "Dilolo", "Mutshatsha"],
+            "Mai-Ndombe": ["Inongo", "Kutu", "Nioki"],
+            "Maniema": ["Kindu", "Kalima", "Kasongo"],
+            "Mongala": ["Lisala", "Bumba", "Bongandanga"],
+            "Nord-Kivu": ["Goma", "Beni", "Butembo"],
+            "Nord-Ubangi": ["Gbadolite", "Businga", "Yakoma"],
+            "Sankuru": ["Lusambo", "Lodja", "Katako-Kombe"],
+            "Sud-Kivu": ["Bukavu", "Uvira", "Baraka"],
+            "Sud-Ubangi": ["Gemena", "Libenge", "Zongo"],
+            "Tanganyika": ["Kalemie", "Kongolo", "Nyunzu"],
+            "Tshopo": ["Kisangani", "Buta", "Opala"],
+            "Tshuapa": ["Boende", "Befale", "Bokungu"]
+        }
+      },
+      "Rwanda": {
+        code: "+250 ",
+        provinces: {
+            "Kigali": ["Kigali"],
+            "Province de l'Est": ["Rwamagana", "Kayonza", "Nyagatare"],
+            "Province du Nord": ["Musanze", "Byumba", "Gicumbi"],
+            "Province de l'Ouest": ["Rubavu", "Rusizi", "Karongi"],
+            "Province du Sud": ["Huye", "Nyanza", "Muhanga"]
+        }
+      },
+      "Burundi": {
+        code: "+257 ",
+        provinces: {
+          "Bujumbura Mairie": ["Bujumbura"],
+          "Bubanza": ["Bubanza", "Gihanga", "Musigati"],
+          "Bujumbura Rural": ["Isale", "Kabezi", "Mubimbi"],
+          "Bururi": ["Bururi", "Rumonge", "Matana"],
+          "Cankuzo": ["Cankuzo", "Cendajuru", "Mishiha"],
+          "Cibitoke": ["Cibitoke", "Buganda", "Rugombo"],
+          "Gitega": ["Gitega", "Mutaho", "Ryansoro"],
+          "Karuzi": ["Karuzi", "Buhiga", "Gitaramuka"],
+          "Kayanza": ["Kayanza", "Gatara", "Matongo"],
+          "Kirundo": ["Kirundo", "Bugabira", "Busoni"],
+          "Makamba": ["Makamba", "Kayogoro", "Nyanza-Lac"],
+          "Muramvya": ["Muramvya", "Bukeye", "Mbuye"],
+          "Muyinga": ["Muyinga", "Buhinyuza", "Gashoho"],
+          "Mwaro": ["Kiganda", "Ndava", "Kayokwe"],
+          "Ngozi": ["Ngozi", "Busiga", "Kiremba"],
+          "Rutana": ["Rutana", "Mpinga-Kayove", "Musongati"],
+          "Ruyigi": ["Ruyigi", "Butezi", "Butaganzwa"]
+        }
+      }
+    };
+
+    function updateLocationData() {
+      const countrySelect = document.getElementById('country');
+      const provinceSelect = document.getElementById('province');
+      const citySelect = document.getElementById('city');
+      const whatsappInput = document.getElementById('whatsapp');
+
+      const selectedCountry = countrySelect.value;
+      const data = locationData[selectedCountry];
+
+      if (data) {
+        whatsappInput.value = data.code;
+      }
+
+      provinceSelect.innerHTML = '<option value="" disabled selected>Province / Région</option>';
+      citySelect.innerHTML = '<option value="" disabled selected>Ville</option>';
+      citySelect.disabled = true;
+
+      if (data && data.provinces) {
+        for (let prov in data.provinces) {
+          let opt = document.createElement('option');
+          opt.value = prov;
+          opt.textContent = prov;
+          provinceSelect.appendChild(opt);
+        }
+        provinceSelect.disabled = false;
+      }
+    }
+
+    function updateCities() {
+      const country = document.getElementById('country').value;
+      const province = document.getElementById('province').value;
+      const citySelect = document.getElementById('city');
+
+      citySelect.innerHTML = '<option value="" disabled selected>Ville</option>';
+
+      if (locationData[country] && locationData[country].provinces[province]) {
+        let cities = locationData[country].provinces[province];
+        cities.forEach(city => {
+          let opt = document.createElement('option');
+          opt.value = city;
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+        citySelect.disabled = false;
+      }
+    }
+
+    // Compression de l'image pour éviter l'erreur Firebase (> 1 Mo)
+    function previewAndCompressImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 300;
+          const MAX_HEIGHT = 300;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compression au format JPEG avec une qualité de 0.7 pour rester sous les 1 Mo
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+          const preview = document.getElementById('avatar-preview');
+          if (preview) {
+            preview.innerHTML = `<img src="${compressedDataUrl}" alt="Preview">`;
+          }
+          uploadedAvatarBase64 = compressedDataUrl;
+        }
+        img.src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+
+    const translations = {
+      fr: {
+        shopName: "Nom de la boutique / entreprise",
+        description: "Description",
+        whatsapp: "Numéro WhatsApp",
+        submit: "CONFIRMER AVEC GOOGLE",
+        socialTitle: "Réseaux & Liens",
+        addSocial: "+ Ajouter un lien"
+      },
+      en: {
+        shopName: "Shop / Business Name",
+        description: "Description",
+        whatsapp: "WhatsApp Number",
+        submit: "CONFIRM WITH GOOGLE",
+        socialTitle: "Social Media & Links",
+        addSocial: "+ Add a link"
+      }
+    };
+
+    function setLanguage(lang, evt) {
+      document.getElementById('shopName').placeholder = translations[lang].shopName;
+      document.getElementById('description').placeholder = translations[lang].description;
+      document.getElementById('whatsapp').placeholder = translations[lang].whatsapp;
+      document.getElementById('btn-submit').textContent = translations[lang].submit;
+
+      const socialTitle = document.getElementById('social-title');
+      if (socialTitle) socialTitle.textContent = translations[lang].socialTitle;
+
+      const btnAddSocial = document.getElementById('btn-add-social');
+      if (btnAddSocial) btnAddSocial.textContent = translations[lang].addSocial;
+
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      addSocialField("Facebook");
+    });
+  </script>
+
+</body>
+</html>

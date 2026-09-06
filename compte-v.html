@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VÉA Vendeur - Mon Compte</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #ffffff;
+      --text-muted: #a0a0a0;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --primary: #2563eb;
+    }
+
+    body.light-mode {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #0f172a;
+      --text-muted: #64748b;
+      --border-color: rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      padding-bottom: 90px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    /* En-tête */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cart-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cart-custom-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cart-svg-mini {
+      width: 18px;
+      height: 18px;
+      fill: #ffffff;
+    }
+
+    .brand-logo-svg {
+      width: 80px;
+      height: auto;
+      fill: currentColor;
+    }
+
+    /* Carte Profil Pro */
+    .profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .profile-avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .avatar-wrapper:hover .avatar-overlay {
+      opacity: 1;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .profile-name-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .account-badge-vendeur {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
+
+    .profile-location-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .location-svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .edit-profile-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      align-self: flex-start;
+    }
+
+    /* Liste des sections / Menus */
+    .section-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      margin-bottom: 4px;
+      padding-left: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-list {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      width: 100%;
+      text-align: left;
+    }
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Rond vert (Nouvelles publications d'abonnements) */
+    .new-badge {
+      width: 10px;
+      height: 10px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      display: none;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    }
+
+    .menu-svg-icon {
+      width: 20px;
+      height: 20px;
+      stroke: var(--primary);
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    .menu-value {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Réseaux Sociaux */
+    .social-links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .social-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+    .social-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+    .social-item-platform { font-weight: 600; }
+    .social-item-url { color: var(--text-muted); font-size: 0.75rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+
+    /* Grille des produits du vendeur */
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-img-wrapper {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      background: #333;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Overlay produit vendu */
+    .product-card.sold .product-img {
+      filter: grayscale(80%) brightness(0.6);
+    }
+
+    .sold-badge-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+    }
+    .product-card.sold .sold-badge-overlay {
+      display: flex;
+    }
+
+    .sold-check {
+      background: #10b981;
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .sold-check-svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
+    }
+
+    .product-info {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .product-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-stock {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-sold { background: #059669; color: #fff; }
+    .btn-sold:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+    .btn-delete { background: #dc2626; color: #fff; }
+
+    .action-svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+    }
+
+    /* Switch toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 22px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: #444; transition: .3s; border-radius: 22px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px;
+      left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Modales */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 400px;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border: 1px solid var(--border-color);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .modal-input, .modal-textarea, .modal-select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 0.95rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: #444; color: #fff; }
+    .btn-icon { padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; }
+
+    /* Bouton retour */
+    .back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 90;
+    }
+
+    /* Système de Toast Notification */
+    #toast-container {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Conteneur Toast -->
+  <div id="toast-container"></div>
+
+  <div class="app-container">
+    <!-- En-tête -->
+    <div class="header">
+      <div class="brand-logo-container">
+        <!-- Conteneur Panier mis à jour avec lien photo personnalisable -->
+        <div class="cart-icon-wrapper" title="Panier">
+          <img id="cartCustomPhoto" class="cart-custom-img" src="https://via.placeholder.com/150" alt="Icone Panier Vendeur" style="display:none;" />
+          <svg id="cartSvgDefault" class="cart-svg-mini" viewBox="0 0 1254.000000 1254.000000" preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(0.000000,1254.000000) scale(0.100000,-0.100000)">
+              <path d="M6030 10989 c-447 -52 -834 -216 -1160 -494 -272 -232 -491 -592 -584 -964 -56 -219 -59 -264 -63 -873 l-5 -567 25 -25 c21 -21 37 -25 133 -32 60 -5 270 -9 467 -9 l359 0 19 24 c18 22 19 46 19 536 0 645 8 714 113 930 99 203 234 341 432 440 149 75 268 105 446 112 220 9 383 -26 566 -121 233 -121 416 -357 490 -631 l27 -100 6 -578 5 -579 24 -19 c22 -18 43 -19 319 -19 163 0 371 5 462 11 157 10 166 12 188 35 l22 25 0 505 c0 278 -5 560 -11 627 -61 700 -495 1307 -1137 1591 -203 89 -408 145 -630 171 -136 16 -409 18 -532 4z m485 -119 c245 -27 458 -87 672 -190 499 -239 842 -656 978 -1190 48 -187 54 -290 55 -837 l0 -503 -37 0 c-21 0 -146 -5 -278 -11 -132 -6 -291 -8 -352 -4 l-113 7 0 466 c0 257 -5 508 -10 557 -50 473 -361 853 -801 979 -297 85 -639 54 -904 -82 -303 -156 -496 -418 -576 -780 -20 -91 -22 -131 -26 -618 l-5 -522 -97 -6 c-93 -7 -657 11 -673 20 -5 3 -8 227 -8 499 0 393 3 518 16 617 87 670 504 1208 1132 1459 154 62 336 110 487 128 50 6 101 13 115 15 56 8 341 5 425 -4z"/>
+              <path d="M3500 7977 c-14 -7 -33 -28 -43 -47 -16 -32 -17 -64 -15 -355 3 -283 5 -325 21 -360 14 -30 20 -83 28 -215 34 -638 112 -1411 195 -1940 172 -1100 398 -1823 722 -2315 155 -234 291 -363 487 -460 238 -118 470 -156 1072 -176 442 -14 963 5 1256 46 550 79 835 324 1119 963 219 495 388 1098 507 1809 92 548 169 1240 206 1848 8 138 17 284 19 325 3 41 13 93 23 115 15 35 18 80 21 360 4 448 16 431 -276 391 -474 -65 -857 -99 -1562 -138 -366 -20 -1701 -17 -2090 5 -610 35 -1123 81 -1508 138 -156 22 -150 22 -182 6z"/>
+            </g>
+          </svg>
+        </div>
+        <svg class="brand-logo-svg" viewBox="0 0 1717.000000 916.000000" preserveAspectRatio="xMidYMid meet">
+          <g transform="translate(0.000000,916.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none">
+            <path d="M3815 7646 c-430 -72 -811 -328 -979 -656 -98 -191 -130 -330 -130 -565 0 -303 45 -427 162 -452 65 -14 311 -8 409 10 116 21 266 68 361 114 102 48 112 66 112 213 0 219 27 289 130 343 49 25 63 28 127 25 53 -2 79 -9 100 -24 70 -52 104 -156 85 -254 -21 -100 -73 -189 -160 -271 -212 -201 -516 -299 -925 -299 -198 0 -372 20 -608 70 -306 66 -387 70 -465 26 -81 -45 -104 -139 -104 -424 0 -186 16 -327 44 -380 37 -72 106 -99 336 -132 318 -45 559 -59 960 -55 412 3 519 13 763 66 558 122 925 425 1096 906 72 202 86 288 86 538 0 175 -4 237 -18 305 -42 191 -125 368 -236 500 -171 203 -349 311 -626 381 -104 26 -400 35 -520 15z"/>
+          </g>
+        </svg>
+      </div>
+      <span style="font-weight: 700; font-size: 0.95rem;" data-i18n="header_title">Paramètres Vendeur</span>
+    </div>
+
+    <!-- Profil Vendeur -->
+    <div class="profile-card">
+      <div class="avatar-wrapper" onclick="openAvatarModal()" title="Changer la photo de profil">
+        <img id="userAvatar" class="profile-avatar" src="https://via.placeholder.com/150" alt="Avatar">
+        <div class="avatar-overlay">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        </div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-name-container">
+          <span id="userName" class="profile-name">Chargement...</span>
+          <span class="account-badge-vendeur" id="userRoleBadge" data-i18n="badge_seller">Vendeur</span>
+        </div>
+        <div class="profile-location-container">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="location-svg"><path d="M15 22a1 1 0 0 1-1-1v-4a1 1 0 0 1 .445-.832l3-2a1 1 0 0 1 1.11 0l3 2A1 1 0 0 1 22 17v4a1 1 0 0 1-1 1z"/><path d="M18 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 .601.2"/><path d="M18 22v-3"/><circle cx="10" cy="10" r="3"/></svg>
+          <span id="userAddress" data-i18n="no_address">Adresse non définie</span>
+        </div>
+        <button type="button" class="edit-profile-btn" onclick="openProfileModal()" data-i18n="btn_edit_profile">Modifier le profil</button>
+      </div>
+    </div>
+
+    <!-- Section Liens Sociaux -->
+    <div class="section-title">
+      <span>Réseaux & Liens</span>
+      <button class="btn btn-primary btn-icon" onclick="openSocialModal()">+ Ajouter / Modifier</button>
+    </div>
+    <div id="socialLinksContainer" class="social-links-list">
+      <span style="color: var(--text-muted); font-size: 0.85rem; padding: 4px;">Aucun lien configuré</span>
+    </div>
+
+    <!-- Gestion des Produits Postés -->
+    <div class="section-title" data-i18n="section_products">Mes Produits Postés</div>
+    <div id="vendorProductsContainer" class="products-container">
+      <span style="grid-column: span 2; text-align: center; color: var(--text-muted); padding: 16px;" data-i18n="loading_products">Chargement des produits...</span>
+    </div>
+
+    <!-- Paramètres & Menus -->
+    <div class="section-title" data-i18n="section_config">Configuration</div>
+    <div class="menu-list">
+
+      <!-- Option Abonnement exclusive au compte vendeurs_clients -->
+      <a href="abonnement.html" id="menuAbonnement" class="menu-item" style="display: none;">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span data-i18n="menu_subscriptions">Abonnements</span>
+        </span>
+        <span class="menu-item-right">
+          <span id="subNewBadge" class="new-badge"></span>
+          <span>&rsaquo;</span>
+        </span>
+      </a>
+
+      <button type="button" class="menu-item" onclick="openDescModal()">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M3 19h18"/><path d="M15 12H3"/><path d="M9 5H3"/></svg>
+          <span data-i18n="menu_desc">Description de la boutique</span>
+        </span>
+        <span class="menu-value">&rsaquo;</span>
+      </button>
+
+      <button type="button" class="menu-item" onclick="openPhoneModal()">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+          <span data-i18n="menu_whatsapp">Numéro WhatsApp</span>
+        </span>
+        <span id="userPhoneDisplay" class="menu-value">---</span>
+      </button>
+
+      <div class="menu-item">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Demande confirmation produit vendu</span>
+        </span>
+        <label class="switch">
+          <input type="checkbox" id="askHomeSoldToggle" onchange="toggleAskHomeSold(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="menu-item">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="m15 8 2 2 4-4"/><path d="M16.8607 4.4824A6 6 0 0 0 6 8C6 12.499 4.589 13.956 3.262 15.326"/><path d="M3.262 15.326A1 1 0 0 0 4 17H20A1 1 0 0 0 20.74 15.327C20.209 14.779 19.665 14.218 19.203 13.454"/></svg>
+          <span data-i18n="menu_notifications">Notifications</span>
+        </span>
+        <label class="switch">
+          <input type="checkbox" id="notifToggle" onchange="toggleNotifications(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button type="button" class="menu-item" onclick="openLangModal()">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+          <span data-i18n="menu_lang_appearance">Langue & Apparence</span>
+        </span>
+        <span id="currentLangLabel" class="menu-value">FR / Sombre</span>
+      </button>
+
+      <a href="premium.html" class="menu-item">
+        <span class="menu-item-left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></svg>
+          Premium Plus
+        </span>
+        <span>&rsaquo;</span>
+      </a>
+    </div>
+
+    <!-- Déconnexion -->
+    <div class="menu-list" style="margin-top: 10px;">
+      <button type="button" class="menu-item" onclick="logoutUser()" style="color: #ef4444;">
+        <span class="menu-item-left">
+          <svg class="menu-svg-icon" style="color: #ef4444;" viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+          <span data-i18n="menu_logout">Se déconnecter</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Pied de page -->
+    <footer style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
+      VÉA Market © 2026
+    </footer>
+  </div>
+
+  <!-- Bouton de retour -->
+  <button class="back-button" onclick="history.back()" title="Retour">
+    <svg style="width:20px;height:20px;fill:currentColor;" viewBox="0 0 24 24">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+  </button>
+
+  <!-- Modale Modification Profil -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-title" data-i18n="modal_profile_title">Modifier le Profil</div>
+      <label style="font-size:0.85rem; color:var(--text-muted);" data-i18n="label_shopname">Nom de la boutique (ShopName)</label>
+      <input type="text" id="editShopName" class="modal-input" placeholder="Ex: Ma Super Boutique">
+
+      <label style="font-size:0.85rem; color:var(--text-muted);">Pays</label>
+      <select id="editCountrySelect" class="modal-select" onchange="handleCountryChange()">
+        <option value="">Sélectionner un pays</option>
+        <option value="RDC">RDC</option>
+        <option value="Rwanda">Rwanda</option>
+        <option value="Burundi">Burundi</option>
+      </select>
+
+      <label style="font-size:0.85rem; color:var(--text-muted);">Province / Région</label>
+      <select id="editProvinceSelect" class="modal-select">
+        <option value="">Sélectionner d'abord un pays</option>
+      </select>
+
+      <label style="font-size:0.85rem; color:var(--text-muted);">Ville / Commune</label>
+      <input type="text" id="editCityInput" class="modal-input" placeholder="Ex: Goma, Kinshasa, Kigali...">
+
+      <label style="font-size:0.85rem; color:var(--text-muted);" data-i18n="label_avatar">URL de l'Avatar / Photo</label>
+      <input type="text" id="editAvatarUrl" class="modal-input" placeholder="https://...">
+
+      <label style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Lien Photo du Panier (Header)</label>
+      <input type="text" id="editCartPhotoUrl" class="modal-input" placeholder="https://... (Lien image panier)">
+
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeProfileModal()" data-i18n="btn_cancel">Annuler</button>
+        <button class="btn btn-primary" onclick="saveProfileChanges()" data-i18n="btn_save">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Changer Photo Profil Directement -->
+  <div class="modal-overlay" id="avatarModal">
+    <div class="modal-content">
+      <div class="modal-title">Changer la Photo de Profil</div>
+
+      <label style="font-size:0.85rem; color:var(--text-muted);">Importer une image locale</label>
+      <input type="file" id="avatarFileInput" accept="image/*" class="modal-input" onchange="previewAvatarFile(event)">
+
+      <label style="font-size:0.85rem; color:var(--text-muted); margin-top:8px;">Ou coller une URL d'image</label>
+      <input type="text" id="avatarUrlDirectInput" class="modal-input" placeholder="https://...">
+
+      <div style="text-align:center; margin-top:8px;">
+        <img id="avatarPreview" src="" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:none; margin: 0 auto; border:2px solid var(--primary);">
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeAvatarModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="saveAvatarChange()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Description -->
+  <div class="modal-overlay" id="descModal">
+    <div class="modal-content">
+      <div class="modal-title" data-i18n="modal_desc_title">Description de la boutique</div>
+      <textarea id="descInput" class="modal-textarea" placeholder="Décrivez vos produits..."></textarea>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeDescModal()" data-i18n="btn_cancel">Annuler</button>
+        <button class="btn btn-primary" onclick="updateDescription()" data-i18n="btn_update">Mettre à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Numéro WhatsApp -->
+  <div class="modal-overlay" id="phoneModal">
+    <div class="modal-content">
+      <div class="modal-title" data-i18n="modal_phone_title">Numéro WhatsApp</div>
+      <input type="tel" id="phoneInput" class="modal-input" placeholder="+243...">
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closePhoneModal()" data-i18n="btn_cancel">Annuler</button>
+        <button class="btn btn-primary" onclick="updatePhoneNumber()" data-i18n="btn_update">Mettre à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Ajouter / Modifier Lien Social -->
+  <div class="modal-overlay" id="socialModal">
+    <div class="modal-content">
+      <div class="modal-title">Lien Social (socialLinks)</div>
+
+      <label style="font-size:0.85rem; color:var(--text-muted);">Plateforme</label>
+      <select id="socialPlatformInput" class="modal-select">
+        <option value="Facebook">Facebook</option>
+        <option value="Instagram">Instagram</option>
+        <option value="TikTok">TikTok</option>
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Autre">Autre</option>
+      </select>
+
+      <label style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">URL du Lien</label>
+      <input type="url" id="socialUrlInput" class="modal-input" placeholder="https://facebook.com/MaPage">
+
+      <label style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Numéro WhatsApp (optionnel)</label>
+      <input type="tel" id="socialWhatsappInput" class="modal-input" placeholder="+243 982869702">
+
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeSocialModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="saveSocialLink()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale Langue & Mode -->
+  <div class="modal-overlay" id="langModal">
+    <div class="modal-content">
+      <div class="modal-title" data-i18n="modal_lang_title">Langue & Apparence</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span data-i18n="label_lang">Langue</span>
+        <select id="langSelect" style="padding:6px; border-radius:6px; background:var(--bg-color); color:var(--text-color); border:1px solid var(--border-color);">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span data-i18n="label_darkmode">Mode Sombre</span>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="saveLangSettings()" data-i18n="btn_save">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script de traduction (Traducteur global synchronisé) -->
+  <script>
+    const translations = {
+      fr: {
+        header_title: "Paramètres Vendeur",
+        badge_seller: "Vendeur",
+        no_address: "Adresse non définie",
+        btn_edit_profile: "Modifier le profil",
+        section_products: "Mes Produits Postés",
+        loading_products: "Chargement des produits...",
+        section_config: "Configuration",
+        menu_subscriptions: "Abonnements",
+        menu_desc: "Description de la boutique",
+        menu_whatsapp: "Numéro WhatsApp",
+        menu_notifications: "Notifications",
+        menu_lang_appearance: "Langue & Apparence",
+        menu_logout: "Se déconnecter",
+        modal_profile_title: "Modifier le Profil",
+        label_shopname: "Nom de la boutique (ShopName)",
+        label_address: "Adresse / Ville / Pays",
+        label_avatar: "URL de l'Avatar / Photo",
+        modal_desc_title: "Description de la boutique",
+        modal_phone_title: "Numéro WhatsApp",
+        modal_lang_title: "Langue & Apparence",
+        label_lang: "Langue",
+        label_darkmode: "Mode Sombre",
+        btn_cancel: "Annuler",
+        btn_save: "Enregistrer",
+        btn_update: "Mettre à jour",
+        profile_updated: "Profil mis à jour !",
+        desc_updated: "Description mise à jour !",
+        phone_updated: "Numéro mis à jour !",
+        status_error: "Erreur lors de la mise à jour du statut.",
+        delete_confirm: "Produit supprimé avec succès !",
+        delete_error: "Erreur lors de la suppression.",
+        settings_saved: "Paramètres enregistrés !"
+      },
+      en: {
+        header_title: "Vendor Settings",
+        badge_seller: "Seller",
+        no_address: "Address not set",
+        btn_edit_profile: "Edit Profile",
+        section_products: "My Posted Products",
+        loading_products: "Loading products...",
+        section_config: "Configuration",
+        menu_subscriptions: "Subscriptions",
+        menu_desc: "Shop Description",
+        menu_whatsapp: "WhatsApp Number",
+        menu_notifications: "Notifications",
+        menu_lang_appearance: "Language & Appearance",
+        menu_logout: "Log out",
+        modal_profile_title: "Edit Profile",
+        label_shopname: "Shop Name",
+        label_address: "Address / City / Country",
+        label_avatar: "Avatar / Photo URL",
+        modal_desc_title: "Shop Description",
+        modal_phone_title: "WhatsApp Number",
+        modal_lang_title: "Language & Appearance",
+        label_lang: "Language",
+        label_darkmode: "Dark Mode",
+        btn_cancel: "Cancel",
+        btn_save: "Save",
+        btn_update: "Update",
+        profile_updated: "Profile updated!",
+        desc_updated: "Description updated!",
+        phone_updated: "Number updated!",
+        status_error: "Error updating status.",
+        delete_confirm: "Product deleted successfully!",
+        delete_error: "Error deleting product.",
+        settings_saved: "Settings saved!"
+      }
+    };
+
+    function showToast(message) {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 10);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => container.removeChild(toast), 300);
+      }, 3000);
+    }
+
+    function applyTranslations(lang) {
+      const elements = document.querySelectorAll("[data-i18n]");
+      elements.forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+    }
+
+    function getTranslation(key) {
+      const lang = localStorage.getItem("app_lang") || "fr";
+      return translations[lang][key] || key;
+    }
+
+    // Données des provinces par pays pour la sélection dynamique
+    const provincesByCountry = {
+      "RDC": ["Nord-Kivu", "Sud-Kivu", "Kinshasa", "Haut-Katanga", "Ituri", "Kasaï-Central", "Equateur", "Autre"],
+      "Rwanda": ["Kigali", "Province du Nord", "Province du Sud", "Province de l'Est", "Province de l'Ouest"],
+      "Burundi": ["Bujumbura Mairie", "Bujumbura Rural", "Gitega", "Ngozi", "Rumonge", "Autre"]
+    };
+
+    function handleCountryChange() {
+      const country = document.getElementById("editCountrySelect").value;
+      const provinceSelect = document.getElementById("editProvinceSelect");
+      provinceSelect.innerHTML = "";
+
+      if (!country || !provincesByCountry[country]) {
+        provinceSelect.innerHTML = '<option value="">Sélectionner d\'abord un pays</option>';
+        return;
+      }
+
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "Sélectionner une province";
+      provinceSelect.appendChild(defaultOpt);
+
+      provincesByCountry[country].forEach(prov => {
+        const opt = document.createElement("option");
+        opt.value = prov;
+        opt.textContent = prov;
+        provinceSelect.appendChild(opt);
+      });
+    }
+  </script>
+
+  <!-- Script Firebase & Logique Vendeur / Vendeur_Client -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let userCollection = null; // "vendeurs" ou "vendeurs_clients"
+    let socialLinksArray = [];
+
+    window.ASK_ON_HOMEPAGE_WHEN_SOLD = localStorage.getItem("ask_homepage_when_sold") === "true";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const isValidUser = await verifyAndLoadUserData(user.uid);
+        if (isValidUser) {
+          loadVendorProducts(user.uid);
+        } else {
+          showToast("Accès refusé. Compte réservé aux vendeurs.");
+          setTimeout(() => {
+            signOut(auth).then(() => window.location.href = "index.html");
+          }, 2000);
+        }
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    // Verification stricte dans "vendeurs" et "vendeurs_clients" UNIQUEMENT
+    async function verifyAndLoadUserData(uid) {
+      try {
+        let ref = doc(db, "vendeurs", uid);
+        let snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          userCollection = "vendeurs";
+        } else {
+          // Si non trouve dans vendeurs, verifier dans vendeurs_clients
+          ref = doc(db, "vendeurs_clients", uid);
+          snap = await getDoc(ref);
+          if (snap.exists()) {
+            userCollection = "vendeurs_clients";
+          }
+        }
+
+        // Si le compte n'appartient ni a "vendeurs" ni a "vendeurs_clients"
+        if (!snap.exists() || !userCollection) {
+          return false;
+        }
+
+        const data = snap.data();
+        const shopName = data.shopName || data.nom || "Ma Boutique";
+
+        // Afficher/Masquer le menu "Abonnements" & vérifier les nouveautés si vendeurs_clients
+        const menuAbonnement = document.getElementById("menuAbonnement");
+        if (userCollection === "vendeurs_clients") {
+          menuAbonnement.style.display = "flex";
+          checkSubscribedSellersNewProducts(data.subscriptions || []);
+        } else {
+          menuAbonnement.style.display = "none";
+        }
+
+        // Chargement de l'adresse (gestion des objets ou des chaînes)
+        let formattedAddress = "";
+        let countryVal = data.pays || "";
+        let provinceVal = data.province || "";
+        let cityVal = data.ville || "";
+
+        if (typeof data.address === 'object' && data.address !== null) {
+          countryVal = data.address.country || countryVal;
+          provinceVal = data.address.province || provinceVal;
+          cityVal = data.address.city || cityVal;
+        } else if (typeof data.address === 'string') {
+          formattedAddress = data.address;
+        }
+
+        if (!formattedAddress) {
+          const parts = [cityVal, provinceVal, countryVal].filter(p => p !== "");
+          formattedAddress = parts.join(", ") || "Localisation non définie";
+        }
+
+        const photo = data.photoUrl || data.photoURL || data.avatar || "https://via.placeholder.com/150";
+        const cartPhoto = data.cartPhotoUrl || "";
+        const phone = data.telephone || data.whatsapp || "";
+        const desc = data.description || "";
+
+        socialLinksArray = data.socialLinks || [
+          {
+            platform: "Facebook",
+            url: "https://facebook.com/Mig%20kb",
+            uid: uid,
+            updatedAt: "27 août 2026 à 20:45:37 UTC+2",
+            whatsapp: "+243 982869702"
+          }
+        ];
+
+        document.getElementById("userName").textContent = shopName;
+        document.getElementById("userAddress").textContent = formattedAddress;
+        document.getElementById("userAvatar").src = photo;
+        document.getElementById("userPhoneDisplay").textContent = phone || "Ajouter";
+        document.getElementById("userRoleBadge").textContent = userCollection === "vendeurs_clients" ? "Vendeur-Client" : "Vendeur";
+
+        // Chargement photo du panier si configurée
+        setCartPhoto(cartPhoto);
+
+        document.getElementById("editShopName").value = shopName;
+        document.getElementById("editCountrySelect").value = countryVal;
+        handleCountryChange();
+        document.getElementById("editProvinceSelect").value = provinceVal;
+        document.getElementById("editCityInput").value = cityVal;
+
+        document.getElementById("editAvatarUrl").value = photo;
+        document.getElementById("editCartPhotoUrl").value = cartPhoto;
+        document.getElementById("descInput").value = desc;
+
+        renderSocialLinks();
+        return true;
+      } catch (err) {
+        console.error("Erreur chargement profil:", err);
+        showToast("Erreur lors de la vérification de votre compte.");
+        return false;
+      }
+    }
+
+    // Vérification des produits récents chez les vendeurs suivis
+    async function checkSubscribedSellersNewProducts(subscriptions) {
+      if (!subscriptions || subscriptions.length === 0) return;
+
+      const subNewBadge = document.getElementById("subNewBadge");
+      const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+
+      try {
+        // découpage par paquets de 10 max pour la requête 'in' de Firestore
+        const chunks = [];
+        for (let i = 0; i < subscriptions.length; i += 10) {
+          chunks.push(subscriptions.slice(i, i + 10));
+        }
+
+        let hasRecentProduct = false;
+
+        for (const chunk of chunks) {
+          const q = query(
+            collection(db, "produits"),
+            where("vendeurId", "in", chunk)
+          );
+          const snap = await getDocs(q);
+
+          snap.forEach(docSnap => {
+            const prod = docSnap.data();
+            let createdTime = 0;
+
+            if (prod.createdAt) {
+              if (typeof prod.createdAt.toMillis === 'function') {
+                createdTime = prod.createdAt.toMillis();
+              } else if (typeof prod.createdAt === 'number') {
+                createdTime = prod.createdAt;
+              } else if (typeof prod.createdAt === 'string') {
+                createdTime = new Date(prod.createdAt).getTime();
+              }
+            }
+
+            if (createdTime > 0 && (now - createdTime) < THREE_DAYS_MS) {
+              hasRecentProduct = true;
+            }
+          });
+
+          if (hasRecentProduct) break;
+        }
+
+        if (hasRecentProduct && subNewBadge) {
+          subNewBadge.style.display = "inline-block";
+        }
+      } catch (e) {
+        console.error("Erreur vérification nouveautés abonnements:", e);
+      }
+    }
+
+    function setCartPhoto(url) {
+      const cartImg = document.getElementById("cartCustomPhoto");
+      const cartSvg = document.getElementById("cartSvgDefault");
+      if (url && url.trim() !== "") {
+        cartImg.src = url;
+        cartImg.style.display = "block";
+        cartSvg.style.display = "none";
+      } else {
+        cartImg.style.display = "none";
+        cartSvg.style.display = "block";
+      }
+    }
+
+    function renderSocialLinks() {
+      const container = document.getElementById("socialLinksContainer");
+      if (!socialLinksArray || socialLinksArray.length === 0) {
+        container.innerHTML = `<span style="color: var(--text-muted); font-size: 0.85rem; padding: 4px;">Aucun lien configuré</span>`;
+        return;
+      }
+      container.innerHTML = "";
+      socialLinksArray.forEach((link, idx) => {
+        const item = document.createElement("div");
+        item.className = "social-item";
+        item.innerHTML = `
+          <div class="social-item-info">
+            <span class="social-item-platform">${link.platform}</span>
+            <span class="social-item-url">${link.url}</span>
+          </div>
+          <button class="btn btn-secondary btn-icon" onclick="removeSocialLink(${idx})">&times;</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    window.saveSocialLink = async function() {
+      const platform = document.getElementById("socialPlatformInput").value;
+      const url = document.getElementById("socialUrlInput").value.trim();
+      const whatsapp = document.getElementById("socialWhatsappInput").value.trim() || "+243 982869702";
+
+      if (!url) {
+        showToast("Veuillez entrer une URL valide");
+        return;
+      }
+
+      const newSocialLink = {
+        platform: platform,
+        url: url,
+        uid: currentUser.uid,
+        updatedAt: new Date().toISOString(),
+        whatsapp: whatsapp
+      };
+
+      socialLinksArray.push(newSocialLink);
+
+      try {
+        const ref = doc(db, userCollection, currentUser.uid);
+        await updateDoc(ref, { socialLinks: socialLinksArray });
+        renderSocialLinks();
+        closeSocialModal();
+        showToast("Lien mis à jour avec succès");
+      } catch (err) {
+        showToast("Erreur lors de la sauvegarde du lien");
+      }
+    };
+
+    window.removeSocialLink = async function(index) {
+      socialLinksArray.splice(index, 1);
+      try {
+        const ref = doc(db, userCollection, currentUser.uid);
+        await updateDoc(ref, { socialLinks: socialLinksArray });
+        renderSocialLinks();
+        showToast("Lien supprimé");
+      } catch (err) {
+        showToast("Erreur lors de la suppression");
+      }
+    };
+
+    // Charger et afficher les produits postés par le vendeur avec gestion stricte du stock et état "vendu"
+    async function loadVendorProducts(uid) {
+      const container = document.getElementById("vendorProductsContainer");
+      container.innerHTML = "";
+      try {
+        const q = query(collection(db, "produits"), where("vendeurId", "==", uid));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          container.innerHTML = `<span style="grid-column: span 2; text-align: center; color: var(--text-muted); padding: 16px;">Aucun produit disponible</span>`;
+          return;
+        }
+
+        querySnapshot.forEach((documentSnap) => {
+          const prod = documentSnap.data();
+          const prodId = documentSnap.id;
+
+          // Stock par défaut si non spécifié
+          const stockVal = prod.stock !== undefined ? Number(prod.stock) : 0;
+          const isSold = prod.vendu === true || stockVal <= 0;
+
+          const card = document.createElement("div");
+          card.className = `product-card ${isSold ? 'sold' : ''}`;
+          card.innerHTML = `
+            <div class="product-img-wrapper">
+              <img class="product-img" src="${prod.imageUrl || prod.image || 'https://via.placeholder.com/150'}" alt="Produit">
+              <div class="sold-badge-overlay" style="display: ${isSold ? 'flex' : 'none'};">
+                <div class="sold-check">
+                  <svg class="sold-check-svg" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-title">${prod.titre || prod.nom || 'Produit'}</span>
+              <span class="product-stock">Stock restant : ${stockVal}</span>
+              <div class="product-actions">
+                <button class="btn-action btn-sold" ${isSold ? 'disabled' : ''} onclick="handleSellProduct('${prodId}', ${stockVal})">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="action-svg"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                  ${isSold ? 'Vendu' : 'Vendu'}
+                </button>
+                <button class="btn-action btn-delete" onclick="deleteProduct('${prodId}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="action-svg"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Erreur chargement produits:", err);
+        container.innerHTML = `<span style="grid-column: span 2; text-align: center; color: #ef4444;">Erreur de chargement.</span>`;
+      }
+    }
+
+    // Gestion du clic sur "Vendu" : décrémente le stock de 1 et verrouille une fois arrivé à 0
+    window.handleSellProduct = async function(prodId, currentStock) {
+      if (currentStock <= 0) {
+        showToast("Cet article est déjà épuisé/vendu.");
+        return;
+      }
+
+      const newStock = currentStock - 1;
+      const isNowSold = newStock <= 0;
+
+      try {
+        // Mise à jour partielle dans la base de données sans altérer la structure du produit
+        await updateDoc(doc(db, "produits", prodId), {
+          stock: newStock,
+          vendu: isNowSold
+        });
+
+        showToast(isNowSold ? "Stock épuisé ! Marqué comme VENDU." : `Vente enregistrée ! Stock restant : ${newStock}`);
+        loadVendorProducts(currentUser.uid);
+      } catch (err) {
+        console.error("Erreur mise à jour stock:", err);
+        showToast(getTranslation('status_error'));
+      }
+    };
+
+    // Supprimer un produit avec alerte Toast
+    window.deleteProduct = async function(prodId) {
+      try {
+        await deleteDoc(doc(db, "produits", prodId));
+        showToast(getTranslation('delete_confirm'));
+        loadVendorProducts(currentUser.uid);
+      } catch (err) {
+        showToast(getTranslation('delete_error'));
+      }
+    };
+
+    // Sauvegarde Profil (met à jour adresse avec Pays, Province, Ville)
+    window.saveProfileChanges = async function() {
+        const shopName = document.getElementById("editShopName").value.trim();
+        const country = document.getElementById("editCountrySelect").value;
+        const province = document.getElementById("editProvinceSelect").value;
+        const city = document.getElementById("editCityInput").value.trim();
+
+        const photoUrl = document.getElementById("editAvatarUrl").value.trim();
+        const cartPhotoUrl = document.getElementById("editCartPhotoUrl").value.trim();
+
+        const formattedAddress = [city, province, country].filter(Boolean).join(", ");
+
+        // Objet de mise à jour Firebase complet
+        const updateData = {
+            shopName: shopName,
+            pays: country,
+            province: province,
+            ville: city,
+            address: formattedAddress
+        };
+
+        // Ne mettre à jour les photos que si le champ n'est pas vide
+        if (photoUrl !== "") {
+            updateData.photoUrl = photoUrl;
+        }
+        if (cartPhotoUrl !== "") {
+            updateData.cartPhotoUrl = cartPhotoUrl;
+        }
+
+        try {
+            const ref = doc(db, userCollection, currentUser.uid);
+            await updateDoc(ref, updateData);
+            closeProfileModal();
+            verifyAndLoadUserData(currentUser.uid);
+            showToast(getTranslation('profile_updated'));
+        } catch (err) {
+            console.error(err);
+            showToast(getTranslation('status_error'));
+        }
+    };
+
+    // Déconnexion
+    window.logoutUser = function() {
+      signOut(auth).then(() => {
+        showToast("Déconnexion réussie");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1000);
+      });
+    };
+
+    // Fonctions de mise à jour description et téléphone
+    window.updateDescription = async function() {
+      const desc = document.getElementById("descInput").value.trim();
+      try {
+        await updateDoc(doc(db, userCollection, currentUser.uid), { description: desc });
+        closeDescModal();
+        showToast(getTranslation('desc_updated'));
+      } catch (err) {
+        showToast("Erreur lors de la mise à jour de la description.");
+      }
+    };
+
+    window.updatePhoneNumber = async function() {
+      const phone = document.getElementById("phoneInput").value.trim();
+      try {
+        await updateDoc(doc(db, userCollection, currentUser.uid), { telephone: phone, whatsapp: phone });
+        document.getElementById("userPhoneDisplay").textContent = phone;
+        closePhoneModal();
+        showToast(getTranslation('phone_updated'));
+      } catch (err) {
+        showToast("Erreur lors de la mise à jour du numéro.");
+      }
+    };
+
+    // Prévisualisation et Enregistrement Avatar
+    window.previewAvatarFile = function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const preview = document.getElementById("avatarPreview");
+          preview.src = evt.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    window.saveAvatarChange = async function() {
+      const previewSrc = document.getElementById("avatarPreview").src;
+      const urlDirect = document.getElementById("avatarUrlDirectInput").value.trim();
+      const finalPhoto = urlDirect || previewSrc;
+
+      if (!finalPhoto) {
+        showToast("Veuillez sélectionner ou saisir une photo.");
+        return;
+      }
+
+      try {
+        const ref = doc(db, userCollection, currentUser.uid);
+        await updateDoc(ref, { photoUrl: finalPhoto });
+        document.getElementById("userAvatar").src = finalPhoto;
+        closeAvatarModal();
+        showToast("Photo de profil mise à jour !");
+      } catch (err) {
+        showToast("Erreur lors de la mise à jour de la photo");
+      }
+    };
+  </script>
+
+  <!-- Gestionnaire d'interface & Synchro Globale -->
+  <script>
+    function openProfileModal() { document.getElementById("profileModal").style.display = "flex"; }
+    function closeProfileModal() { document.getElementById("profileModal").style.display = "none"; }
+    function openAvatarModal() { document.getElementById("avatarModal").style.display = "flex"; }
+    function closeAvatarModal() { document.getElementById("avatarModal").style.display = "none"; }
+    function openDescModal() { document.getElementById("descModal").style.display = "flex"; }
+    function closeDescModal() { document.getElementById("descModal").style.display = "none"; }
+    function openPhoneModal() { document.getElementById("phoneModal").style.display = "flex"; }
+    function closePhoneModal() { document.getElementById("phoneModal").style.display = "none"; }
+    function openSocialModal() { document.getElementById("socialModal").style.display = "flex"; }
+    function closeSocialModal() { document.getElementById("socialModal").style.display = "none"; }
+    function openLangModal() { document.getElementById("langModal").style.display = "flex"; }
+
+    function toggleDarkMode(isDark) {
+      if (isDark) {
+        document.body.classList.remove("light-mode");
+        localStorage.setItem("app_theme", "dark");
+      } else {
+        document.body.classList.add("light-mode");
+        localStorage.setItem("app_theme", "light");
+      }
+    }
+
+    function toggleAskHomeSold(enabled) {
+      window.ASK_ON_HOMEPAGE_WHEN_SOLD = enabled;
+      localStorage.setItem("ask_homepage_when_sold", enabled ? "true" : "false");
+      showToast(enabled ? "Option activée" : "Option désactivée");
+    }
+
+    function saveLangSettings() {
+      const lang = document.getElementById("langSelect").value;
+      const isDark = document.getElementById("darkModeToggle").checked;
+      localStorage.setItem("app_lang", lang);
+
+      applyTranslations(lang);
+
+      const themeText = isDark ? (lang === 'en' ? 'Dark' : 'Sombre') : (lang === 'en' ? 'Light' : 'Clair');
+      document.getElementById("currentLangLabel").textContent = `${lang.toUpperCase()} / ${themeText}`;
+      document.getElementById("langModal").style.display = "none";
+      showToast(getTranslation('settings_saved'));
+    }
+
+    function toggleNotifications(enabled) {
+      localStorage.setItem("app_notif", enabled ? "enabled" : "disabled");
+      showToast(enabled ? "Notifications activées" : "Notifications désactivées");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("app_theme") || "dark";
+      const isDark = savedTheme === "dark";
+      if (!isDark) {
+        document.body.classList.add("light-mode");
+        document.getElementById("darkModeToggle").checked = false;
+      } else {
+        document.body.classList.remove("light-mode");
+        document.getElementById("darkModeToggle").checked = true;
+      }
+
+      const savedLang = localStorage.getItem("app_lang") || "fr";
+      document.getElementById("langSelect").value = savedLang;
+      applyTranslations(savedLang);
+
+      const themeText = isDark ? (savedLang === 'en' ? 'Dark' : 'Sombre') : (savedLang === 'en' ? 'Light' : 'Clair');
+      document.getElementById("currentLangLabel").textContent = `${savedLang.toUpperCase()} / ${themeText}`;
+
+      const savedNotif = localStorage.getItem("app_notif");
+      if (savedNotif === "enabled") {
+        document.getElementById("notifToggle").checked = true;
+      }
+
+      const savedAskHome = localStorage.getItem("ask_homepage_when_sold");
+      if (savedAskHome === "true") {
+        document.getElementById("askHomeSoldToggle").checked = true;
+      }
+    });
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === "app_theme") {
+        const isDark = event.newValue === "dark";
+        toggleDarkMode(isDark);
+        document.getElementById("darkModeToggle").checked = isDark;
+      }
+      if (event.key === "app_lang") {
+        document.getElementById("langSelect").value = event.newValue;
+        applyTranslations(event.newValue);
+      }
+    });
+  </script>
+</body>
+</html>

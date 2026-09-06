@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vos Préférences</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      padding: 24px 20px 32px 20px;
+      box-shadow: 0 10px 30px rgba(0, 119, 182, 0.12), 0 2px 8px rgba(0, 80, 140, 0.06);
+    }
+
+    .lang-switcher {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .lang-btn.active {
+      color: #0077b6;
+      background: #e0f2fe;
+    }
+
+    .header-text {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header-text h2 {
+      font-size: 1.25rem;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .header-text p {
+      font-size: 0.88rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* Grille organisée par groupes de 2 */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .category-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      height: 120px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .category-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .category-card .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.1) 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 10px;
+    }
+
+    .category-card .title {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 2;
+    }
+
+    /* Coche verte de sélection */
+    .checkmark {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      background-color: #10b981; /* Vert */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s ease;
+      z-index: 3;
+    }
+
+    .checkmark svg {
+      width: 14px;
+      height: 14px;
+      stroke: #ffffff;
+      stroke-width: 3;
+    }
+
+    /* État sélectionné */
+    .category-card.selected {
+      border-color: #10b981;
+    }
+
+    .category-card.selected .checkmark {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .category-card.selected img {
+      transform: scale(1.05);
+    }
+
+    .btn-submit {
+      background-color: #0077b6;
+      color: #ffffff;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: #005b8e;
+    }
+
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      padding: 12px 20px;
+      position: fixed;
+      z-index: 1000;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      font-size: 0.88rem;
+      opacity: 0;
+      transition: opacity 0.3s, bottom 0.3s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 40px;
+    }
+
+    #toast.error { background-color: #ef4444; }
+    #toast.success { background-color: #10b981; }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLanguage('fr', event)">FR</button>
+      <button class="lang-btn" onclick="setLanguage('en', event)">EN</button>
+    </div>
+
+    <div class="header-text">
+      <h2 id="title-text">Vos Préférences</h2>
+      <p id="sub-text">Ici vous nous dites vos préférences pour vous dégoter de bonnes affaires (3 max).</p>
+    </div>
+
+    <!-- Grille de catégories (Groupes de 2) -->
+    <div class="grid-container">
+
+      <div class="category-card" onclick="toggleSelection(this, 'Habits')">
+        <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&q=80" alt="Habits">
+        <div class="overlay"><span class="title" data-fr="Habits" data-en="Clothes">Habits</span></div>
+        <div class="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      </div>
+
+      <div class="category-card" onclick="toggleSelection(this, 'Meubles')">
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80" alt="Meubles">
+        <div class="overlay"><span class="title" data-fr="Meubles" data-en="Furniture">Meubles</span></div>
+        <div class="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      </div>
+
+      <div class="category-card" onclick="toggleSelection(this, 'Appareils Electroniques')">
+        <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80" alt="Appareils Electroniques">
+        <div class="overlay"><span class="title" data-fr="Électronique" data-en="Electronics">Électronique</span></div>
+        <div class="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      </div>
+
+      <div class="category-card" onclick="toggleSelection(this, 'Perruques')">
+        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&q=80" alt="Perruques">
+        <div class="overlay"><span class="title" data-fr="Perruques" data-en="Wigs">Perruques</span></div>
+        <div class="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      </div>
+
+      <div class="category-card" onclick="toggleSelection(this, 'Chaussures')">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" alt="Chaussures">
+        <div class="overlay"><span class="title" data-fr="Chaussures" data-en="Shoes">Chaussures</span></div>
+        <div class="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      </div>
+
+      <div class="category-card" onclick="toggleSelection(this, 'Cosmétiques')">
+        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" alt="Cosmétiques">
+        <div class="overlay"><span class="title" data-fr="Cosmétiques" data-en="Cosmetics">Cosmétiques</span></div>
+        <div class="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+      </div>
+
+    </div>
+
+    <button type="button" class="btn-submit" id="btn-submit" onclick="savePreferences()">ENREGISTRER</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- FIREBASE ENGINE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        window.location.href = "acheteur.html";
+      }
+    });
+
+    window.savePreferencesToFirebase = async function() {
+      if (!currentUser) {
+        showToast("Utilisateur non connecté.", "error");
+        return;
+      }
+
+      if (selectedPreferences.length === 0) {
+        showToast(currentLang === 'fr' ? "Sélectionnez au moins une préférence." : "Select at least one preference.", "error");
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, "acheteurs", currentUser.uid), {
+          preferences: selectedPreferences
+        });
+
+        showToast(currentLang === 'fr' ? "Préférences enregistrées !" : "Preferences saved!", "success");
+
+        setTimeout(() => {
+          window.location.href = "acceuil.html";
+        }, 1200);
+
+      } catch (error) {
+        console.error("Erreur d'enregistrement:", error);
+        showToast("Erreur lors de la sauvegarde.", "error");
+      }
+    };
+  </script>
+
+  <!-- SCRIPTS INTERACTIFS -->
+  <script>
+    const selectedPreferences = [];
+    let currentLang = 'fr';
+
+    function toggleSelection(element, category) {
+      const index = selectedPreferences.indexOf(category);
+
+      if (index > -1) {
+        selectedPreferences.splice(index, 1);
+        element.classList.remove('selected');
+      } else {
+        if (selectedPreferences.length >= 3) {
+          showToast(currentLang === 'fr' ? "Maximum 3 préférences !" : "Maximum 3 preferences!", "error");
+          return;
+        }
+        selectedPreferences.push(category);
+        element.classList.add('selected');
+      }
+    }
+
+    function savePreferences() {
+      if (window.savePreferencesToFirebase) {
+        window.savePreferencesToFirebase();
+      }
+    }
+
+    function showToast(message, type = "default") {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.className = `show ${type}`;
+
+      setTimeout(() => {
+        toast.className = "";
+      }, 3000);
+    }
+
+    const translations = {
+      fr: {
+        title: "Vos Préférences",
+        sub: "Ici vous nous dites vos préférences pour vous dégoter de bonnes affaires (3 max).",
+        submit: "ENREGISTRER"
+      },
+      en: {
+        title: "Your Preferences",
+        sub: "Tell us your preferences so we can find great deals for you (3 max).",
+        submit: "SAVE PREFERENCES"
+      }
+    };
+
+    function setLanguage(lang, evt) {
+      currentLang = lang;
+      document.getElementById('title-text').textContent = translations[lang].title;
+      document.getElementById('sub-text').textContent = translations[lang].sub;
+      document.getElementById('btn-submit').textContent = translations[lang].submit;
+
+      document.querySelectorAll('.title').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+      });
+
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

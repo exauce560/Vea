@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accueil - Articles</title>
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --text-color: #0f172a;
+      --header-bg: rgba(255, 255, 255, 0.92);
+      --search-bg: rgba(241, 245, 249, 0.92);
+      --card-bg: transparent;
+      --text-muted: #64748b;
+      --border-color: rgba(226, 232, 240, 0.8);
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --header-bg: rgba(15, 23, 42, 0.92);
+      --search-bg: rgba(30, 41, 59, 0.92);
+      --card-bg: transparent;
+      --text-muted: #94a3b8;
+      --border-color: rgba(51, 65, 85, 0.8);
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding-top: 80px;
+      padding-bottom: 30px;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      gap: 10px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .search-bar, .user-location, .profile-btn {
+      pointer-events: auto;
+    }
+
+    .search-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background-color: var(--search-bg);
+      backdrop-filter: blur(8px);
+      border-radius: 25px;
+      padding: 8px 14px;
+      gap: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-bar svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-muted);
+    }
+
+    .search-bar input {
+      border: none;
+      background: transparent;
+      width: 100%;
+      outline: none;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+
+    .user-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-color);
+      text-transform: uppercase;
+      white-space: nowrap;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      padding: 6px 10px;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .user-location:active {
+      transform: scale(0.95);
+      opacity: 0.8;
+    }
+
+    .user-location svg {
+      width: 18px;
+      height: 18px;
+      stroke: #0284c7;
+      transition: transform 0.3s ease;
+    }
+
+    .user-location.refreshing svg {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .profile-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--text-muted);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .profile-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .profile-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .unread-badge {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      width: 10px;
+      height: 10px;
+      background-color: #ef4444;
+      border: 2px solid var(--bg-color);
+      border-radius: 50%;
+      z-index: 10;
+    }
+
+    .search-tabs {
+      display: none;
+      justify-content: space-around;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      padding: 8px 12px;
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .search-tabs.active {
+      display: flex;
+    }
+
+    .tab-btn {
+      position: relative;
+      border: none;
+      background: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background-color: #0284c7;
+      color: #ffffff;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 12px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 600px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: none;
+      border-radius: 16px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .product-card.card-boosted .image-container {
+      box-shadow: 0 4px 14px rgba(234, 179, 8, 0.4);
+    }
+
+    .badge-boost {
+      position: absolute;
+      top: 36px;
+      left: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      border-radius: 50%;
+      color: #ffffff;
+      z-index: 6;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .badge-boost svg {
+      width: 13px;
+      height: 13px;
+      stroke: #ffffff;
+      stroke-width: 3;
+    }
+
+    .badge-pro {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: #fef08a;
+      color: #854d0e;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 6px;
+      margin-left: 4px;
+    }
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-top: 130%;
+      border-radius: 16px;
+      overflow: hidden;
+      background-color: var(--border-color);
+    }
+
+    .image-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .country-flag-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+
+    .country-flag-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: static;
+    }
+
+    .image-dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 5px;
+      z-index: 4;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      padding: 4px 8px;
+      border-radius: 10px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .dot.active {
+      background-color: #ffffff;
+      transform: scale(1.2);
+    }
+
+    .shop-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 8px;
+      max-width: 65%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 5;
+    }
+
+    .fav-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      top: auto;
+      right: auto;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #ffffff;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .fav-btn:active {
+      transform: scale(0.85);
+    }
+
+    .fav-btn .svg-1 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fav-btn .svg-2 {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #22c55e;
+      stroke: #22c55e;
+      fill: #22c55e;
+    }
+
+    .fav-btn.active .svg-1 {
+      display: none;
+    }
+
+    .fav-btn.active .svg-2 {
+      display: flex;
+    }
+
+    .fav-count {
+      display: inline-block !important;
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #64748b;
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: bold;
+      border-radius: 50%;
+      min-width: 18px;
+      height: 18px;
+      line-height: 18px;
+      text-align: center;
+      padding: 0 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.2s ease;
+      z-index: 2;
+    }
+
+    .fav-btn.active .fav-count {
+      background-color: #22c55e;
+    }
+
+    .product-info {
+      padding: 8px 4px 4px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .product-type {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .product-price {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--text-color);
+    }
+
+    .product-stock {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .ad-toast-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(4, 8, 20, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ad-toast-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .ad-toast-card {
+      background: linear-gradient(145deg, #0b1329, #070a16);
+      border: 1.5px solid rgba(234, 179, 8, 0.4);
+      width: 92%;
+      max-width: 440px;
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(234, 179, 8, 0.15);
+      transform: translateY(30px) scale(0.92);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      color: #f8fafc;
+      text-align: left;
+    }
+
+    .ad-toast-overlay.show .ad-toast-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .ad-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .ad-close-btn:hover {
+      background: rgba(234, 179, 8, 0.2);
+      color: #eab308;
+    }
+
+    .ad-close-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .ad-header-flex {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .ad-icon-container {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #eab308, #ca8a04);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+      flex-shrink: 0;
+      animation: pulse-gold 2s infinite;
+    }
+
+    @keyframes pulse-gold {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.5); }
+      70% { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+    }
+
+    .ad-icon-container svg {
+      width: 28px;
+      height: 28px;
+      stroke: #070a16;
+      fill: #070a16;
+    }
+
+    .ad-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .ad-title span {
+      color: #eab308;
+    }
+
+    .ad-features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 18px 0;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .ad-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    .ad-feature-item svg {
+      width: 16px;
+      height: 16px;
+      stroke: #22c55e;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .ad-payment-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #4ade80;
+      background: rgba(34, 197, 94, 0.1);
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .ad-payment-badge svg {
+      width: 14px;
+      height: 14px;
+      stroke: #4ade80;
+    }
+
+    .ad-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .ad-btn-primary {
+      flex: 1;
+      background: linear-gradient(135deg, #eab308, #ca8a04);
+      color: #070a16;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 0.2s, filter 0.2s;
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+      text-align: center;
+    }
+
+    .ad-btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .ad-btn-secondary {
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ad-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .add-product-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 54px;
+      height: 54px;
+      background-color: #0284c7;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+      text-decoration: none;
+      z-index: 1001;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .add-product-btn:hover {
+      background-color: #0369a1;
+      transform: scale(1.05);
+    }
+
+    .add-product-btn svg {
+      width: 28px;
+      height: 28px;
+      stroke: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Recherche..." oninput="handleSearch()">
+    </div>
+
+    <button class="user-location" id="refreshLocationBtn" title="Actualiser la localisation et les produits">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+      </svg>
+      <span id="cityName">---</span>
+    </button>
+
+    <a href="#" class="profile-btn" id="profileBtn" aria-label="Paramètres">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span class="unread-badge" id="profileBadge" style="display: none;"></span>
+    </a>
+  </header>
+
+  <div class="search-tabs" id="searchTabs">
+    <button class="tab-btn active" onclick="setSearchFilter('all', this)">Tout</button>
+    <button class="tab-btn" onclick="setSearchFilter('produits', this)">Produits</button>
+    <button class="tab-btn" onclick="setSearchFilter('boutiques', this)">Boutiques</button>
+    <button class="tab-btn" onclick="setSearchFilter('villes', this)">Adresses</button>
+    <button class="tab-btn" onclick="setSearchFilter('favoris', this)">
+      Abonnements
+      <span class="unread-badge" id="tabBadge" style="display: none;"></span>
+    </button>
+  </div>
+
+  <main class="grid-container" id="productsGrid"></main>
+
+  <div class="ad-toast-overlay" id="adToastOverlay">
+    <div class="ad-toast-card">
+      <button class="ad-close-btn" onclick="closeAdToast()" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="ad-header-flex">
+        <div class="ad-icon-container">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <div class="ad-title">Accédez au Mode <span>Premium</span></div>
+          <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">Boostez vos performances de vente</div>
+        </div>
+      </div>
+
+      <div class="ad-features-list">
+        <div class="ad-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <div><strong>5$ / mois :</strong> Pour booster tous vos articles, obtenir un badge doré certifié & un support WhatsApp 24/7.</div>
+        </div>
+        <div class="ad-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <div><strong>1.5$ :</strong> Pour booster un article en particulier selon vos besoins.</div>
+        </div>
+      </div>
+
+      <div class="ad-payment-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        Paiement 100% fiable et facile via Airtel Money, Orange Money ou M-Pesa.
+      </div>
+
+      <div class="ad-actions">
+        <button class="ad-btn-primary" onclick="window.location.href='premium.html'">Passer au Premium</button>
+        <button class="ad-btn-secondary" onclick="closeAdToast()">Plus tard</button>
+      </div>
+    </div>
+  </div>
+
+  <a href="add-product.html" class="add-product-btn" id="addProductBtn" style="display: none;" aria-label="Ajouter un produit">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </a>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const storedTheme = localStorage.getItem("app_theme") || "light";
+    document.documentElement.setAttribute("data-theme", storedTheme);
+
+    const countryCodeMap = {
+      "congo": "cg",
+      "république démocratique du congo": "cd",
+      "rdc": "cd",
+      "congo-kinshasa": "cd",
+      "congo kinshasa": "cd",
+      "kinshasa": "cd",
+      "goma": "cd",
+      "burundi": "bi",
+      "bujumbura": "bi",
+      "kigali": "rw",
+      "france": "fr",
+      "belgique": "be",
+      "canada": "ca",
+      "cameroun": "cm",
+      "côte d'ivoire": "ci",
+      "cote d'ivoire": "ci",
+      "sénégal": "sn",
+      "senegal": "sn",
+      "états-unis": "us",
+      "usa": "us"
+    };
+
+    const i18n = {
+      fr: { search: "Recherche...", empty: "Aucun article trouvé" },
+      en: { search: "Search...", empty: "No products found" },
+      ln: { search: "Luka...", empty: "Eloko moko te emonani" },
+      sw: { search: "Tafuta...", empty: "Hakuna bidhaa iliyopatikana" }
+    };
+
+    let allProducts = [];
+    let currentUser = null;
+    let userFavorites = [];
+    let searchHistory = [];
+    let userRole = "acheteur";
+    let userCity = "";
+    let userProvince = "";
+    let userCountry = "";
+    let userPreferencesCache = [];
+    let activeFilter = "all";
+
+    const storedLang = localStorage.getItem("app_lang") || "fr";
+    let currentI18n = i18n[storedLang] || i18n.fr;
+    let searchDebounceTimeout = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        let preferences = [];
+
+        try {
+          const profileBtn = document.getElementById("profileBtn");
+          const addBtn = document.getElementById("addProductBtn");
+
+          let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
+          let isVendeurOrVC = false;
+
+          if (userSnap.exists()) {
+            userRole = "vendeurs_clients";
+            profileBtn.href = "compte-v.html";
+            addBtn.style.display = "flex";
+            isVendeurOrVC = true;
+          } else {
+            userSnap = await getDoc(doc(db, "vendeurs", user.uid));
+            if (userSnap.exists()) {
+              userRole = "vendeurs";
+              profileBtn.href = "compte-v.html";
+              addBtn.style.display = "flex";
+              isVendeurOrVC = true;
+            } else {
+              userSnap = await getDoc(doc(db, "acheteurs", user.uid));
+              if (userSnap.exists()) {
+                userRole = "acheteur";
+                profileBtn.href = "compte-a.html";
+                addBtn.style.display = "none";
+              }
+            }
+          }
+
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const addr = userData.address || {};
+
+            userCity = addr.city || userData.city || userData.ville || "";
+            userProvince = addr.province || userData.province || "";
+            userCountry = addr.country || userData.country || userData.pays || "";
+
+            document.getElementById("cityName").textContent = userCity || "--";
+
+            const photoUrl = userData.photoUrl || userData.photo || user.photoUrl;
+            if (photoUrl) {
+              profileBtn.innerHTML = `<img src="${photoUrl}" alt="Profil"><span class="unread-badge" id="profileBadge" style="display: none;"></span>`;
+            }
+
+            preferences = userData.preferences || [];
+            userPreferencesCache = preferences;
+            userFavorites = Array.isArray(userData.favoris) ? userData.favoris : [];
+            searchHistory = Array.isArray(userData.searchHistory) ? userData.searchHistory : [];
+
+            if (!localStorage.getItem("app_lang") && userData.langue) {
+              currentI18n = i18n[userData.langue] || i18n.fr;
+              localStorage.setItem("app_lang", userData.langue);
+            }
+
+            if (!localStorage.getItem("app_theme") && userData.darkMode !== undefined) {
+              const themeName = userData.darkMode === true ? "dark" : "light";
+              document.documentElement.setAttribute("data-theme", themeName);
+              localStorage.setItem("app_theme", themeName);
+            }
+
+            // MODIFICATION 2: Ne pas afficher la pub si le vendeur ou vendeur_client est DEJA boosté ou premium
+            const isUserBoosted = userData.isPremium || userData.isBoosted || (userData.boostUntil && new Date(userData.boostUntil) > new Date());
+            if (isVendeurOrVC && !isUserBoosted) {
+              checkAndShowAd(userData);
+            }
+          }
+        } catch (e) {
+          console.error("Erreur chargement profil:", e);
+        }
+
+        document.getElementById("searchInput").placeholder = currentI18n.search;
+
+        loadProducts(preferences);
+      } else {
+        window.location.href = "acheteur.html";
+      }
+    });
+
+    document.getElementById("refreshLocationBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("refreshLocationBtn");
+      btn.classList.add("refreshing");
+      await loadProducts(userPreferencesCache);
+      setTimeout(() => {
+        btn.classList.remove("refreshing");
+      }, 600);
+    });
+
+    function checkAndShowAd(userData) {
+      const lastAdShown = userData.lastAdShown ? new Date(userData.lastAdShown) : null;
+      const now = new Date();
+
+      let shouldShow = false;
+      if (!lastAdShown) {
+        shouldShow = true;
+      } else {
+        const diffTime = Math.abs(now - lastAdShown);
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        if (diffDays >= 3.5) {
+          shouldShow = true;
+        }
+      }
+
+      if (shouldShow) {
+        setTimeout(() => {
+          document.getElementById("adToastOverlay").classList.add("show");
+          updateLastAdShownTime();
+        }, 1200);
+      }
+    }
+
+    async function updateLastAdShownTime() {
+      if (!currentUser) return;
+      try {
+        let collectionName = userRole === "vendeurs" ? "vendeurs" : "vendeurs_clients";
+        await updateDoc(doc(db, collectionName, currentUser.uid), {
+          lastAdShown: new Date().toISOString()
+        });
+      } catch(err) {
+        console.error("Erreur maj pub:", err);
+      }
+    }
+
+    window.closeAdToast = function() {
+      document.getElementById("adToastOverlay").classList.remove("show");
+    };
+
+    async function loadProducts(userPreferences) {
+      try {
+        const q = query(collection(db, "produits"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        const fetchedProducts = [];
+        const vendeurCache = new Map();
+        const now = new Date();
+        let hasNewUnreadArticles = false;
+
+        for (const docSnap of querySnapshot.docs) {
+          const product = { id: docSnap.id, ...docSnap.data() };
+
+          if (product.createdAt) {
+            const createdDate = product.createdAt.toDate ? product.createdAt.toDate() : new Date(product.createdAt);
+            const hoursDiff = Math.abs(now - createdDate) / 36e5;
+            if (hoursDiff < 24) {
+              hasNewUnreadArticles = true;
+            }
+          }
+
+          if (product.vendu === true || product.statut === "vendu") {
+            product.isSold = true;
+          } else {
+            product.isSold = false;
+          }
+
+          if (product.vendeurId) {
+            try {
+              let vData = vendeurCache.get(product.vendeurId);
+
+              if (!vData) {
+                let vendeurSnap = await getDoc(doc(db, "vendeurs", product.vendeurId));
+                if (!vendeurSnap.exists()) {
+                  vendeurSnap = await getDoc(doc(db, "vendeurs_clients", product.vendeurId));
+                }
+
+                if (vendeurSnap.exists()) {
+                  vData = vendeurSnap.data();
+                  vendeurCache.set(product.vendeurId, vData);
+                }
+              }
+
+              if (vData) {
+                const vAddr = vData.address || {};
+
+                product.shopName = vData.shopName || vData.displayName || vData.nom || "Boutique";
+                product.city = vAddr.city || vData.city || vData.ville || "";
+                product.province = vAddr.province || vData.province || "";
+                product.country = vAddr.country || vData.country || vData.pays || "";
+
+                if (vData.isPremium && vData.premiumUntil && new Date(vData.premiumUntil) > now) {
+                  product.vendeurIsPremium = true;
+                } else {
+                  product.vendeurIsPremium = false;
+                }
+              }
+            } catch (err) {
+              product.shopName = "Boutique";
+            }
+          }
+
+          // MODIFICATION 1: Le boost s'applique systématiquement pour le même pays, et avec 1 chance sur 100 (0.01) pour un pays différent/voisin
+          const isRawBoosted = (product.isBoosted && product.boostUntil && new Date(product.boostUntil) > now) || product.vendeurIsPremium || false;
+          let isBoostedForCurrentUser = false;
+
+          if (isRawBoosted) {
+            const isSameCountry = userCountry && product.country && (userCountry.toLowerCase().trim() === product.country.toLowerCase().trim());
+            if (isSameCountry) {
+              isBoostedForCurrentUser = true;
+            } else {
+              // 1 chance sur 100 pour les pays différents / proches
+              isBoostedForCurrentUser = Math.random() < 0.01;
+            }
+          }
+
+          product.isBoostedActive = isBoostedForCurrentUser;
+
+          fetchedProducts.push(product);
+        }
+
+        const profileBadge = document.getElementById("profileBadge");
+        const tabBadge = document.getElementById("tabBadge");
+        if (hasNewUnreadArticles) {
+          if (profileBadge) profileBadge.style.display = "block";
+          if (tabBadge) tabBadge.style.display = "block";
+        }
+
+        allProducts = fetchedProducts.sort((a, b) => {
+          const calculateScore = (p) => {
+            let score = 0;
+            const pType = (p.type || "").toLowerCase();
+            const pCity = (p.city || "").toLowerCase();
+            const pProvince = (p.province || "").toLowerCase();
+            const pCountry = (p.country || "").toLowerCase();
+
+            const isPref = userPreferences.some(pref => pref.toLowerCase() === pType);
+            const isCityMatch = userCity && pCity === userCity.toLowerCase();
+            const isProvinceMatch = userProvince && pProvince === userProvince.toLowerCase();
+            const isCountryMatch = userCountry && pCountry === userCountry.toLowerCase();
+
+            if (p.isBoostedActive) {
+              score += 1000;
+            }
+
+            if (isPref && isCityMatch) score += 100;
+            else if (isPref && isProvinceMatch) score += 80;
+            else if (isPref && isCountryMatch) score += 60;
+            else if (isPref) score += 40;
+            else if (isCityMatch) score += 20;
+
+            const pNom = (p.nom || "").toLowerCase();
+            searchHistory.forEach(term => {
+              const lowerTerm = term.toLowerCase();
+              if (pNom.includes(lowerTerm) || pType.includes(lowerTerm)) score += 2;
+            });
+
+            return score;
+          };
+
+          return calculateScore(b) - calculateScore(a);
+        });
+
+        renderProducts(allProducts);
+
+      } catch (e) {
+        console.error("Erreur chargement articles:", e);
+      }
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById("productsGrid");
+      grid.innerHTML = "";
+
+      const term = document.getElementById("searchInput").value.toLowerCase().trim();
+
+      let displayList = products.filter(p => {
+        if (!term) {
+          return !p.isSold;
+        }
+        return true;
+      });
+
+      if (displayList.length === 0) {
+        grid.innerHTML = `<div class="empty-state">${currentI18n.empty}</div>`;
+        return;
+      }
+
+      const canLike = userRole === "acheteur" || userRole === "vendeurs_clients";
+
+      displayList.forEach(p => {
+        const isFav = userFavorites.includes(p.id);
+        const favCount = p.favoris || 0;
+
+        let imagesList = [];
+        if (Array.isArray(p.images) && p.images.length > 0) {
+          imagesList = p.images;
+        } else if (p.image) {
+          imagesList = [p.image];
+        }
+
+        const firstImage = imagesList.length > 0 ? imagesList[0] : '';
+        const hasMultipleImages = imagesList.length > 1;
+
+        let dotsHtml = '';
+        if (hasMultipleImages) {
+          dotsHtml = `<div class="image-dots">`;
+          imagesList.forEach((_, idx) => {
+            dotsHtml += `<div class="dot ${idx === 0 ? 'active' : ''}"></div>`;
+          });
+          dotsHtml += `</div>`;
+        }
+
+        const card = document.createElement("div");
+        card.className = `product-card ${p.isBoostedActive ? 'card-boosted' : ''}`;
+        card.onclick = (e) => {
+          if (!e.target.closest('.fav-btn')) {
+            window.location.href = `article.html?id=${p.id}`;
+          }
+        };
+
+        const favButtonHtml = canLike ? `
+          <button class="fav-btn ${isFav ? 'active' : ''}" data-id="${p.id}" onclick="toggleFavorite(event, '${p.id}')">
+            <div class="svg-1">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
+            <div class="svg-2">
+              <svg viewBox="0 0 24 24" width="18" height="18">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
+            <span class="fav-count">${favCount}</span>
+          </button>
+        ` : '';
+
+        let proBadgeHtml = '';
+        if (p.vendeurIsPremium || p.isBoostedActive) {
+          proBadgeHtml = `
+            <span class="badge-pro" title="Certifié Premium / Boosté">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#ca8a04" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+              Pro
+            </span>
+          `;
+        }
+
+        let boostBadgeHtml = '';
+        if (p.isBoostedActive) {
+          boostBadgeHtml = `
+            <span class="badge-boost" title="Compte / Article Boosté">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          `;
+        }
+
+        let soldIndicator = '';
+        if (p.isSold) {
+          soldIndicator = `<span style="background:#ef4444; color:#fff; font-size:0.65rem; padding:2px 6px; border-radius:6px; margin-left:4px; font-weight:bold;">✔ Vendu</span>`;
+        }
+
+        card.innerHTML = `
+          ${boostBadgeHtml}
+          <div class="image-container">
+            <img src="${firstImage}" alt="${p.nom || 'Produit'}" loading="lazy">
+            <div class="shop-badge">${p.shopName || 'Boutique'}</div>
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 5;" class="vendor-flag"></div>
+            ${dotsHtml}
+            ${favButtonHtml}
+          </div>
+          <div class="product-info">
+            <span class="product-type">
+              ${p.type || ''}
+              ${proBadgeHtml}
+              ${soldIndicator}
+            </span>
+            <span class="product-price">${p.prix} ${p.devise}</span>
+            <span class="product-stock">Stock: ${p.stock}</span>
+          </div>
+        `;
+
+        const countryName = p.country;
+        const flagContainer = card.querySelector(".vendor-flag");
+        if (flagContainer && countryName) {
+          const cleanCountry = countryName.toLowerCase().trim();
+          const isoCode = countryCodeMap[cleanCountry] || cleanCountry.substring(0, 2);
+          if (isoCode && isoCode.length === 2) {
+            flagContainer.innerHTML = `
+              <div class="country-flag-badge" title="${countryName}">
+                <img src="https://flagcdn.com/w80/${isoCode}.png" alt="${countryName}">
+              </div>
+            `;
+          }
+        }
+
+        grid.appendChild(card);
+      });
+    }
+
+    window.handleSearch = function() {
+      const term = document.getElementById("searchInput").value.toLowerCase().trim();
+      const tabs = document.getElementById("searchTabs");
+
+      if (term.length > 0) {
+        tabs.classList.add("active");
+        document.body.style.paddingTop = "115px";
+
+        clearTimeout(searchDebounceTimeout);
+        searchDebounceTimeout = setTimeout(() => {
+          saveSearchTerm(term);
+        }, 1200);
+      } else {
+        tabs.classList.remove("active");
+        document.body.style.paddingTop = "80px";
+      }
+
+      applyFilters();
+    };
+
+    async function saveSearchTerm(term) {
+      if (!currentUser || term.length < 2) return;
+      try {
+        let collectionName = "acheteurs";
+        if (userRole === "vendeurs") collectionName = "vendeurs";
+        if (userRole === "vendeurs_clients") collectionName = "vendeurs_clients";
+
+        const userRef = doc(db, collectionName, currentUser.uid);
+
+        await updateDoc(userRef, {
+          searchHistory: arrayUnion(term)
+        });
+
+        if (!searchHistory.includes(term)) {
+          searchHistory.push(term);
+        }
+      } catch (e) {
+        console.error("Erreur enregistrement recherche:", e);
+      }
+    }
+
+    window.setSearchFilter = function(filterType, element) {
+      activeFilter = filterType;
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      element.classList.add("active");
+      applyFilters();
+    };
+
+    function applyFilters() {
+      const term = document.getElementById("searchInput").value.toLowerCase().trim();
+
+      const filtered = allProducts.filter(p => {
+        if (!term && p.isSold) return false;
+
+        const nom = (p.nom || "").toLowerCase();
+        const type = (p.type || "").toLowerCase();
+        const shop = (p.shopName || "").toLowerCase();
+        const city = (p.city || "").toLowerCase();
+
+        const matchesTerm = !term || (
+          nom.includes(term) ||
+          type.includes(term) ||
+          shop.includes(term) ||
+          city.includes(term)
+        );
+
+        if (!matchesTerm) return false;
+
+        if (activeFilter === "produits") {
+          return nom.includes(term) || type.includes(term);
+        } else if (activeFilter === "boutiques") {
+          return shop.includes(term);
+        } else if (activeFilter === "villes") {
+          return city.includes(term);
+        } else if (activeFilter === "favoris") {
+          return userFavorites.includes(p.id);
+        }
+
+        return true;
+      });
+
+      renderProducts(filtered);
+    }
+
+    window.toggleFavorite = async function(event, productId) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!currentUser || userRole === "vendeurs") return;
+
+      const btn = event.currentTarget;
+      const countSpan = btn.querySelector('.fav-count');
+      const index = userFavorites.indexOf(productId);
+      const isFav = index !== -1;
+
+      let currentCount = parseInt(countSpan.textContent || '0', 10);
+
+      if (isFav) {
+        userFavorites.splice(index, 1);
+        btn.classList.remove("active");
+        currentCount = Math.max(0, currentCount - 1);
+      } else {
+        userFavorites.push(productId);
+        btn.classList.add("active");
+        currentCount += 1;
+      }
+
+      countSpan.textContent = currentCount;
+
+      const productInList = allProducts.find(p => p.id === productId);
+      if (productInList) {
+        productInList.favoris = currentCount;
+      }
+
+      if (activeFilter === "favoris") {
+        applyFilters();
+      }
+
+      let collectionName = "acheteurs";
+      if (userRole === "vendeurs_clients") collectionName = "vendeurs_clients";
+
+      const userRef = doc(db, collectionName, currentUser.uid);
+      const productRef = doc(db, "produits", productId);
+
+      try {
+        await updateDoc(userRef, {
+          favoris: isFav ? arrayRemove(productId) : arrayUnion(productId)
+        });
+
+        await updateDoc(productRef, {
+          favoris: increment(isFav ? -1 : 1)
+        });
+      } catch (e) {
+        console.error("Erreur de mise à jour des favoris:", e);
+      }
+    };
+  </script>
+</body>
+</html>

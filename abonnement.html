@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="docTitle">Abonnements</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #0f172a;
+      --card-bg: #ffffff;
+      --card-shadow: rgba(37, 99, 235, 0.08);
+      --card-shadow-active: rgba(37, 99, 235, 0.12);
+      --subtext-color: #64748b;
+      --btn-bg: #f1f5f9;
+      --btn-text: #0f172a;
+      --subbed-btn-bg: #f1f5f9;
+      --subbed-btn-text: #475569;
+      --empty-text: #94a3b8;
+    }
+
+    body.dark-theme {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --card-bg: #1e293b;
+      --card-shadow: rgba(0, 0, 0, 0.3);
+      --card-shadow-active: rgba(0, 0, 0, 0.5);
+      --subtext-color: #94a3b8;
+      --btn-bg: #334155;
+      --btn-text: #f8fafc;
+      --subbed-btn-bg: #334155;
+      --subbed-btn-text: #cbd5e1;
+      --empty-text: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 16px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .back-btn {
+      background: var(--btn-bg);
+      border: none;
+      color: var(--btn-text);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .back-btn:active {
+      opacity: 0.8;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--text-color);
+    }
+
+    .vendors-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .vendor-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      border: none !important;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 15px var(--card-shadow);
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+    }
+
+    .vendor-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px var(--card-shadow-active);
+    }
+
+    .vendor-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+    }
+
+    .vendor-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: var(--btn-bg);
+    }
+
+    .new-badge-dot {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 14px;
+      height: 14px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      border: 2px solid var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+    }
+
+    .new-badge-dot svg {
+      width: 6px;
+      height: 6px;
+      fill: #ffffff;
+    }
+
+    .vendor-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shop-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .shop-subtext {
+      font-size: 0.78rem;
+      color: var(--subtext-color);
+      margin-top: 2px;
+    }
+
+    .shop-subtext.has-new {
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    .subscribe-btn {
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none !important;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .subscribe-btn.subscribed {
+      background: var(--subbed-btn-bg);
+      color: var(--subbed-btn-text);
+    }
+
+    .subscribe-btn.not-subscribed {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .subscribe-btn:active {
+      transform: scale(0.95);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--empty-text);
+      margin-top: 60px;
+      font-size: 0.9rem;
+    }
+
+    /* Style du Toast */
+    .toast-notification {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #10b981;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <h1 class="title" id="pageTitle">Abonnements</h1>
+  </div>
+
+  <div class="vendors-list" id="vendorsList">
+    <div class="empty-state" id="loadingState">Chargement de vos abonnements...</div>
+  </div>
+
+  <div id="toast" class="toast-notification">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastMessage">Action effectuée</span>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion, arrayRemove, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // --- INITIALISATION DU THÈME ET DE LA LANGUE ---
+    const appTheme = localStorage.getItem('app_theme') || 'white';
+    const appLang = localStorage.getItem('app_lang') || 'fr';
+
+    if (appTheme === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+
+    const translations = {
+      fr: {
+        title: "Abonnements",
+        loading: "Chargement de vos abonnements...",
+        pleaseLogin: "Veuillez vous connecter pour voir vos abonnements.",
+        noSubscriptions: "Vous ne suivez aucune boutique pour le moment.",
+        shop: "Boutique",
+        newProduct: "Nouveau produit !",
+        subscribed: "Abonné",
+        subscribe: "S'abonner",
+        unsubscribedToast: "Désabonné avec succès !",
+        subscribedToast: "Abonné avec succès !",
+        errorLoading: "Erreur lors du chargement."
+      },
+      en: {
+        title: "Subscriptions",
+        loading: "Loading your subscriptions...",
+        pleaseLogin: "Please log in to view your subscriptions.",
+        noSubscriptions: "You are not following any shop at the moment.",
+        shop: "Shop",
+        newProduct: "New product!",
+        subscribed: "Subscribed",
+        subscribe: "Subscribe",
+        unsubscribedToast: "Successfully unsubscribed!",
+        subscribedToast: "Successfully subscribed!",
+        errorLoading: "Error during loading."
+      }
+    };
+
+    const t = translations[appLang] || translations.fr;
+
+    // Mise à jour de l'interface initiale selon la langue
+    document.title = t.title;
+    document.getElementById("pageTitle").textContent = t.title;
+    document.getElementById("loadingState").textContent = t.loading;
+
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+
+    let currentUser = null;
+    let userDocRef = null; // Stockera la référence dynamique au document utilisateur
+    let seenVendorsMap = {};
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toastMessage");
+      toastMsg.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        loadSubscriptions();
+      } else {
+        document.getElementById("vendorsList").innerHTML = `<div class="empty-state">${t.pleaseLogin}</div>`;
+      }
+    });
+
+    async function loadSubscriptions() {
+      const container = document.getElementById("vendorsList");
+
+      try {
+        // Vérification de l'utilisateur dans "acheteurs", puis dans "vendeurs_clients" si introuvable
+        let userSnap = await getDoc(doc(db, "acheteurs", currentUser.uid));
+
+        if (userSnap.exists()) {
+          userDocRef = doc(db, "acheteurs", currentUser.uid);
+        } else {
+          let vcSnap = await getDoc(doc(db, "vendeurs_clients", currentUser.uid));
+          if (vcSnap.exists()) {
+            userSnap = vcSnap;
+            userDocRef = doc(db, "vendeurs_clients", currentUser.uid);
+          }
+        }
+
+        if (!userSnap || !userSnap.exists() || !userSnap.data().abonnements || userSnap.data().abonnements.length === 0) {
+          container.innerHTML = `<div class="empty-state">${t.noSubscriptions}</div>`;
+          return;
+        }
+
+        const userData = userSnap.data();
+        seenVendorsMap = userData.seenVendors || {};
+
+        const subscribedVendorIds = userData.abonnements;
+        container.innerHTML = "";
+
+        for (const vendorId of subscribedVendorIds) {
+          let vendorRef = doc(db, "vendeurs", vendorId);
+          let vendorSnap = await getDoc(vendorRef);
+
+          if (!vendorSnap.exists()) {
+            vendorRef = doc(db, "vendeurs_clients", vendorId);
+            vendorSnap = await getDoc(vendorRef);
+          }
+
+          if (!vendorSnap.exists()) continue;
+
+          const vendor = vendorSnap.data();
+          const lastSeenTime = seenVendorsMap[vendorId] ? new Date(seenVendorsMap[vendorId]) : null;
+          const hasUnseenProduct = await checkForNewProducts(vendorId, lastSeenTime);
+
+          const card = document.createElement("div");
+          card.className = "vendor-card";
+
+          card.innerHTML = `
+            <a href="visit-visit-v.html?vendeurId=${vendorId}" class="vendor-info" data-id="${vendorId}">
+              <div class="avatar-wrapper">
+                <img src="${vendor.photoUrl || vendor.photo || DEFAULT_AVATAR}" class="vendor-avatar" alt="${vendor.nom || t.shop}">
+                ${hasUnseenProduct ? `
+                  <div class="new-badge-dot" title="${t.newProduct}">
+                    <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>
+                  </div>
+                ` : ''}
+              </div>
+              <div class="vendor-details">
+                <span class="shop-name">${vendor.nom || vendor.shopName || t.shop}</span>
+                <span class="shop-subtext ${hasUnseenProduct ? 'has-new' : ''}">
+                  ${hasUnseenProduct ? t.newProduct : t.shop}
+                </span>
+              </div>
+            </a>
+            <button class="subscribe-btn subscribed" data-id="${vendorId}">
+              ${t.subscribed}
+            </button>
+          `;
+
+          const vendorLink = card.querySelector(".vendor-info");
+          vendorLink.addEventListener("click", () => markAsSeen(vendorId));
+
+          const subBtn = card.querySelector(".subscribe-btn");
+          subBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleSubscription(vendorId, subBtn, vendorSnap.ref.parent.id);
+          });
+
+          container.appendChild(card);
+        }
+
+      } catch (err) {
+        console.error("Erreur abonnements :", err);
+        container.innerHTML = `<div class="empty-state">${t.errorLoading}</div>`;
+      }
+    }
+
+    async function checkForNewProducts(vendorId, lastSeenTime) {
+      try {
+        const q = query(
+          collection(db, "produits"),
+          where("vendeurId", "==", vendorId)
+        );
+        const querySnapshot = await getDocs(q);
+
+        const now = new Date();
+        let isNew = false;
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.createdAt) {
+            const createdAt = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+            const isRecent = ((now - createdAt) / (1000 * 60 * 60)) <= 48;
+
+            if (isRecent && (!lastSeenTime || createdAt > lastSeenTime)) {
+              isNew = true;
+            }
+          }
+        });
+
+        return isNew;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function markAsSeen(vendorId) {
+      if (!currentUser || !userDocRef) return;
+
+      const nowIso = new Date().toISOString();
+
+      try {
+        await updateDoc(userDocRef, {
+          [`seenVendors.${vendorId}`]: nowIso
+        });
+      } catch (e) {
+        localStorage.setItem(`seen_${vendorId}`, nowIso);
+      }
+    }
+
+    async function toggleSubscription(vendorId, button, collectionName) {
+      if (!currentUser || !userDocRef) return;
+
+      const isSubbed = button.classList.contains("subscribed");
+      const targetVendorRef = doc(db, collectionName || "vendeurs", vendorId);
+
+      if (isSubbed) {
+        button.classList.remove("subscribed");
+        button.classList.add("not-subscribed");
+        button.textContent = t.subscribe;
+
+        await updateDoc(userDocRef, {
+          abonnements: arrayRemove(vendorId)
+        }).catch(err => console.error(err));
+
+        await updateDoc(targetVendorRef, {
+          followersCount: increment(-1)
+        }).catch(err => console.error(err));
+
+        showToast(t.unsubscribedToast);
+
+      } else {
+        button.classList.remove("not-subscribed");
+        button.classList.add("subscribed");
+        button.textContent = t.subscribed;
+
+        await updateDoc(userDocRef, {
+          abonnements: arrayUnion(vendorId)
+        }).catch(err => console.error(err));
+
+        await updateDoc(targetVendorRef, {
+          followersCount: increment(1),
+          showToastCount: increment(1)
+        }).catch(err => console.error(err));
+
+        showToast(t.subscribedToast);
+      }
+    }
+  </script>
+</body>
+</html>

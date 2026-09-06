@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Préférences Vendeur - Catégories</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    /* Conteneur fluide sans bordure globale */
+    .content-wrapper {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .header-text {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header-text h2 {
+      font-size: 1.35rem;
+      color: #0f172a;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .header-text p {
+      font-size: 0.92rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* Grille des catégories */
+    .grid-categories {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    /* Scrollbar discrète */
+    .grid-categories::-webkit-scrollbar {
+      width: 6px;
+    }
+    .grid-categories::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .category-card {
+      position: relative;
+      height: 150px;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .category-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .category-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 12px;
+    }
+
+    .category-title {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Indice de sélection vert */
+    .checkmark {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .checkmark::after {
+      content: "✓";
+      color: #10b981; /* Vert */
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+
+    /* État sélectionné avec le vert (#10b981) */
+    .category-card.selected {
+      border-color: #10b981;
+    }
+
+    .category-card.selected .checkmark {
+      opacity: 1;
+      transform: scale(1);
+      background-color: #10b981;
+    }
+
+    .category-card.selected .checkmark::after {
+      color: #ffffff;
+    }
+
+    /* Bouton de validation */
+    .btn-submit {
+      background-color: #0077b6;
+      color: #ffffff;
+      border: none;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.25s ease;
+    }
+
+    /* État inactif (gris) */
+    .btn-submit:disabled {
+      background-color: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-submit:not(:disabled):hover {
+      background-color: #005b8e;
+    }
+
+    /* Toast notification */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      padding: 14px 20px;
+      position: fixed;
+      z-index: 1000;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s, bottom 0.3s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 40px;
+    }
+
+    #toast.error { background-color: #ef4444; }
+    #toast.success { background-color: #10b981; }
+  </style>
+</head>
+<body>
+
+  <div class="content-wrapper">
+    <div class="header-text">
+      <h2>Vos catégories de vente</h2>
+      <p>Ici vous nous dites vos préférences pour vous dégoter de bonnes opportunités selon ce que vous vendez (2 choix max).</p>
+    </div>
+
+    <!-- GRILLE DES CATÉGORIES -->
+    <div class="grid-categories" id="categories-grid">
+
+      <!-- Habillement / Habits -->
+      <div class="category-card" data-category="habits" onclick="toggleCategory(this)">
+        <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=500&q=80" alt="Habits">
+        <div class="checkmark"></div>
+        <div class="category-overlay">
+          <span class="category-title">Habits & Mode</span>
+        </div>
+      </div>
+
+      <!-- Meubles / Maison -->
+      <div class="category-card" data-category="meubles" onclick="toggleCategory(this)">
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=80" alt="Meubles">
+        <div class="checkmark"></div>
+        <div class="category-overlay">
+          <span class="category-title">Meubles</span>
+        </div>
+      </div>
+
+      <!-- Appareils / Électronique -->
+      <div class="category-card" data-category="appareils" onclick="toggleCategory(this)">
+        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=80" alt="Appareils">
+        <div class="checkmark"></div>
+        <div class="category-overlay">
+          <span class="category-title">Appareils</span>
+        </div>
+      </div>
+
+      <!-- Chaussures -->
+      <div class="category-card" data-category="chaussures" onclick="toggleCategory(this)">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80" alt="Chaussures">
+        <div class="checkmark"></div>
+        <div class="category-overlay">
+          <span class="category-title">Chaussures</span>
+        </div>
+      </div>
+
+      <!-- Électroménager -->
+      <div class="category-card" data-category="electromenager" onclick="toggleCategory(this)">
+        <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=500&q=80" alt="Électroménager">
+        <div class="checkmark"></div>
+        <div class="category-overlay">
+          <span class="category-title">Électroménager</span>
+        </div>
+      </div>
+
+      <!-- Accessoires & Bijoux -->
+      <div class="category-card" data-category="accessoires" onclick="toggleCategory(this)">
+        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=500&q=80" alt="Accessoires">
+        <div class="checkmark"></div>
+        <div class="category-overlay">
+          <span class="category-title">Accessoires</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bouton inactif par défaut -->
+    <button class="btn-submit" id="btn-save-pref" disabled>ENREGISTRER MES CHOIX</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- FIREBASE INTEGRATION -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        showToast("Session expirée, veuillez vous reconnecter.", "error");
+        setTimeout(() => {
+          window.location.href = "vendeur.html";
+        }, 2000);
+      }
+    });
+
+    document.getElementById('btn-save-pref').addEventListener('click', async () => {
+      const selectedCards = document.querySelectorAll('.category-card.selected');
+      const selectedCategories = Array.from(selectedCards).map(card => card.getAttribute('data-category'));
+
+      if (selectedCategories.length === 0 || selectedCategories.length > 2) {
+        showToast("Veuillez sélectionner entre 1 et 2 catégories.", "error");
+        return;
+      }
+
+      if (!currentUser) {
+        showToast("Utilisateur non identifié.", "error");
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, "vendeurs", currentUser.uid), {
+          productCategories: selectedCategories,
+          preferencesCompleted: true,
+          updatedAt: new Date()
+        });
+
+        showToast("Préférences enregistrées avec succès !", "success");
+
+        setTimeout(() => {
+          window.location.href = "dashboard-vendeur.html";
+        }, 1500);
+
+      } catch (error) {
+        console.error("Erreur d'enregistrement des catégories:", error);
+        showToast("Erreur lors de la sauvegarde de vos préférences.", "error");
+      }
+    });
+  </script>
+
+  <!-- SCRIPT D'INTERACTION LOCAL -->
+  <script>
+    function toggleCategory(card) {
+      const selectedCards = document.querySelectorAll('.category-card.selected');
+
+      // Si la carte n'est pas encore sélectionnée et qu'on a déjà 2 choix
+      if (!card.classList.contains('selected') && selectedCards.length >= 2) {
+        showToast("Vous ne pouvez choisir que 2 catégories maximum.", "error");
+        return;
+      }
+
+      card.classList.toggle('selected');
+      updateButtonState();
+    }
+
+    function updateButtonState() {
+      const selectedCards = document.querySelectorAll('.category-card.selected');
+      const submitBtn = document.getElementById('btn-save-pref');
+
+      // Activer le bouton si 1 ou 2 catégories sont cochées, sinon le désactiver
+      if (selectedCards.length > 0 && selectedCards.length <= 2) {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+    }
+
+    function showToast(message, type = "default") {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.className = `show ${type}`;
+
+      setTimeout(() => {
+        toast.className = toast.className.replace(`show ${type}`, "");
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

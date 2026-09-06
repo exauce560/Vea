@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portefeuille & Premium Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #0B0F19;
+      --card-bg: #151C2C;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: linear-gradient(135deg, #FFD700, #FFA500);
+      --accent-purple: linear-gradient(135deg, #6366F1, #8B5CF6);
+      --accent-green: #10B981;
+      --accent-red: #EF4444;
+      --text-white: #FFFFFF;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-white);
+      padding: 16px;
+      padding-bottom: 40px;
+      min-height: 100vh;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .back-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-white);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .security-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 6px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .virtual-card {
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      margin-bottom: 24px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-chip {
+      width: 38px;
+      height: 28px;
+      background: linear-gradient(135deg, #e0aa3e, #f9f295, #b8860b);
+      border-radius: 6px;
+    }
+
+    .card-brand {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .card-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .card-balance {
+      font-size: 2.4rem;
+      font-weight: 900;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-deposit {
+      background: var(--accent-purple);
+      color: #FFFFFF;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-withdraw {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-white);
+      border: 1px solid var(--card-border);
+    }
+
+    .active-status-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .status-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .status-card.vip {
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, var(--card-bg) 100%);
+    }
+
+    .status-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--card-border);
+    }
+
+    .status-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-timer {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #38BDF8;
+    }
+
+    .progress-bar {
+      height: 6px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-purple);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-fill.gold {
+      background: var(--accent-gold);
+    }
+
+    .section-header {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .section-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .plans-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .plan-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .plan-card.gold-border {
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.03) 0%, var(--card-bg) 100%);
+    }
+
+    .badge-vip {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: var(--accent-gold);
+      color: #000000;
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .plan-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .plan-info h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .plan-price {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #FFFFFF;
+    }
+
+    .plan-price span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .plan-features li {
+      font-size: 0.85rem;
+      color: #CBD5E1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .plan-features li i {
+      color: var(--accent-green);
+      font-size: 0.9rem;
+    }
+
+    .btn-buy-plan {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .btn-buy-gold {
+      background: var(--accent-gold);
+      color: #000000;
+    }
+
+    .btn-buy-standard {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
+      border: 1px solid var(--card-border);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #151C2C;
+      border-top: 1px solid var(--card-border);
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .payment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .payment-opt {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .payment-opt.active {
+      border-color: #6366F1;
+      background: rgba(99, 102, 241, 0.15);
+    }
+
+    .payment-opt i {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .payment-opt span {
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .input-box {
+      margin-bottom: 16px;
+    }
+
+    .input-box label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 14px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #FFFFFF;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .btn-submit-deposit {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent-purple);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .articles-select-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .article-item-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .article-item-card:hover, .article-item-card.selected {
+      border-color: #6366F1;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .article-item-card img {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .article-item-info {
+      flex: 1;
+    }
+
+    .article-item-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .article-item-price {
+      font-size: 0.8rem;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      left: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #1E293B;
+      color: var(--text-white);
+      padding: 14px 18px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent-purple);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .toast.success { border-color: var(--accent-green); }
+    .toast.error { border-color: var(--accent-red); }
+    .toast.info { border-color: #38BDF8; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .confirm-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .confirm-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .confirm-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .confirm-btn.yes { background: var(--accent-purple); color: #fff; }
+    .confirm-btn.no { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .trust-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast-container"></div>
+
+  <!-- Modal de confirmation -->
+  <div class="confirm-modal" id="customConfirm">
+    <div class="confirm-card">
+      <h3 id="confirmTitle" style="margin-bottom: 10px;">Confirmation</h3>
+      <p id="confirmMessage" style="font-size: 0.9rem; color: var(--text-muted);"></p>
+      <div class="confirm-actions">
+        <button class="confirm-btn no" id="confirmNoBtn">Annuler</button>
+        <button class="confirm-btn yes" id="confirmYesBtn">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- En-tête -->
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="header-title" data-i18n="header_title">Portefeuille & Boost</div>
+    <div class="security-badge">
+      <i class="fa-solid fa-shield-halved"></i> 256-bit
+    </div>
+  </div>
+
+  <!-- Carte Virtuelle -->
+  <div class="virtual-card">
+    <div class="card-top">
+      <div class="card-chip"></div>
+      <div class="card-brand" data-i18n="active_balance">SOLDE ACTIF</div>
+    </div>
+    <div class="card-label" data-i18n="available_in_account">Disponible dans le compte</div>
+    <div class="card-balance" id="userBalance">0.00 $</div>
+
+    <div class="card-actions">
+      <button class="btn-action btn-deposit" onclick="openDepositModal()">
+        <i class="fa-solid fa-plus-circle"></i> <span data-i18n="btn_recharge">Recharger</span>
+      </button>
+      <button class="btn-action btn-withdraw" onclick="showToast(getTranslation('withdraw_notice'), 'info')">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="btn_withdraw">Retirer</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Timers Actifs (Conteneur affichant les boosts et images) -->
+  <div class="active-status-container" id="activeStatusContainer"></div>
+
+  <!-- Offres -->
+  <div class="section-header">
+    <div class="section-title" data-i18n="boost_section_title">Boostez votre Visibilité</div>
+    <div class="section-subtitle" data-i18n="boost_section_sub">Choisissez une formule pour multiplier vos ventes</div>
+  </div>
+
+  <div class="plans-grid">
+    <div class="plan-card">
+      <div class="plan-top">
+        <div class="plan-info">
+          <h3 data-i18n="item_boost_title">Boost Article</h3>
+        </div>
+        <div class="plan-price">1.50 $ <span data-i18n="per_7days">/ 7 jours</span></div>
+      </div>
+      <ul class="plan-features">
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_boost_1">Positionné en tête de recherche</span></li>
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_boost_2">Badge "Sponsorisé" attractif</span></li>
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_boost_3">+300% de vues estimées</span></li>
+      </ul>
+      <button class="btn-buy-plan btn-buy-standard" onclick="startBoostProcess()" data-i18n="btn_boost_item">
+        Booster un article
+      </button>
+    </div>
+
+    <div class="plan-card gold-border">
+      <div class="badge-vip" data-i18n="badge_pro">RECOMMANDÉ PRO</div>
+      <div class="plan-top">
+        <div class="plan-info">
+          <h3 style="color: #FFD700;" data-i18n="vip_title">Vendeur VIP Premium</h3>
+        </div>
+        <div class="plan-price">5.00 $ <span data-i18n="per_month">/ mois</span></div>
+      </div>
+      <ul class="plan-features">
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_vip_1">Badge "Vendeur VIP" Doré</span></li>
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_vip_2">Publication d'articles en illimité</span></li>
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_vip_3">Accès au tableau de bord des vues</span></li>
+        <li><i class="fa-solid fa-circle-check"></i> <span data-i18n="feat_vip_4">Support WhatsApp prioritaire 24/7</span></li>
+      </ul>
+      <button class="btn-buy-plan btn-buy-gold" onclick="payService('vip_subscription', 5.00, 30)" data-i18n="btn_activate_vip">
+        Activer le Mode VIP
+      </button>
+    </div>
+  </div>
+
+  <div class="trust-footer" data-i18n="trust_text">
+    <i class="fa-solid fa-lock"></i> Transactions sécurisées par Mobile Money (M-Pesa, Airtel, Orange)
+  </div>
+
+  <!-- Modal de Sélection d'Article pour Boost -->
+  <div class="modal" id="boostArticleModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Choisissez un article à booster</div>
+        <button class="close-btn" onclick="closeBoostArticleModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+        Seuls vos articles non vendus sont affichés.
+      </p>
+      <div class="articles-select-list" id="articlesSelectList">
+        <!-- Rempli dynamiquement en JS -->
+      </div>
+      <button class="btn-submit-deposit" id="confirmBoostArticleBtn" onclick="confirmBoostSelectedArticle()" disabled>
+        Booster cet article (1.50 $)
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Recharge -->
+  <div class="modal" id="depositModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" data-i18n="modal_deposit_title">Recharger votre portefeuille</div>
+        <button class="close-btn" onclick="closeDepositModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="input-box">
+        <label data-i18n="select_operator">Sélectionnez l'opérateur</label>
+        <div class="payment-grid">
+          <div class="payment-opt active" onclick="selectOperator(this, 'airtel')">
+            <i class="fa-solid fa-mobile-retro" style="color: #EF4444;"></i>
+            <span>Airtel</span>
+          </div>
+          <div class="payment-opt" onclick="selectOperator(this, 'mpesa')">
+            <i class="fa-solid fa-mobile-retro" style="color: #10B981;"></i>
+            <span>M-Pesa</span>
+          </div>
+          <div class="payment-opt" onclick="selectOperator(this, 'orange')">
+            <i class="fa-solid fa-mobile-retro" style="color: #F97316;"></i>
+            <span>Orange</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-box">
+        <label data-i18n="phone_number">Numéro de Téléphone Mobile Money</label>
+        <input type="tel" id="phoneNumber" placeholder="ex: +243 *********">
+      </div>
+
+      <div class="input-box">
+        <label data-i18n="amount_usd">Montant à Déposer ($ USD)</label>
+        <input type="number" id="depositAmount" placeholder="ex: 5.00" min="1">
+      </div>
+
+      <button class="btn-submit-deposit" onclick="processDeposit()" data-i18n="btn_confirm_deposit">
+        Confirmer le Dépôt
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const translations = {
+      fr: {
+        header_title: "Portefeuille & Boost",
+        active_balance: "SOLDE ACTIF",
+        available_in_account: "Disponible dans le compte",
+        btn_recharge: "Recharger",
+        btn_withdraw: "Retirer",
+        boost_section_title: "Boostez votre Visibilité",
+        boost_section_sub: "Choisissez une formule pour multiplier vos ventes",
+        item_boost_title: "Boost Article",
+        per_7days: "/ 7 jours",
+        feat_boost_1: "Positionné en tête de recherche",
+        feat_boost_2: "Badge 'Sponsorisé' attractif",
+        feat_boost_3: "+300% de vues estimées",
+        btn_boost_item: "Booster un article",
+        badge_pro: "RECOMMANDÉ PRO",
+        vip_title: "Vendeur VIP Premium",
+        per_month: "/ mois",
+        feat_vip_1: "Badge 'Vendeur VIP' Doré",
+        feat_vip_2: "Publication d'articles en illimité",
+        feat_vip_3: "Accès au tableau de bord des vues",
+        feat_vip_4: "Support WhatsApp prioritaire 24/7",
+        btn_activate_vip: "Activer le Mode VIP",
+        trust_text: "Transactions sécurisées par Mobile Money (M-Pesa, Airtel, Orange)",
+        modal_deposit_title: "Recharger votre portefeuille",
+        select_operator: "Sélectionnez l'opérateur",
+        phone_number: "Numéro de Téléphone Mobile Money",
+        amount_usd: "Montant à Déposer ($ USD)",
+        btn_confirm_deposit: "Confirmer le Dépôt",
+        withdraw_notice: "Module de retrait sécurisé bientôt disponible.",
+        invalid_inputs: "Veuillez saisir un numéro valide et un montant supérieur à zéro.",
+        deposit_ussd_sent: "Demande envoyée. Veuillez valider le pop-up USSD sur votre téléphone.",
+        deposit_success: "Votre compte a été crédité avec succès !",
+        insufficient_balance: "Solde insuffisant ({balance}$). Vous avez besoin de {cost}$ pour cet achat.",
+        confirm_purchase: "Confirmez-vous le paiement de {cost}$ pour : {service} ?",
+        purchase_success: "Félicitations ! L'option '{service}' est maintenant active.",
+        transaction_error: "Erreur lors de la transaction.",
+        vip_status_title: "Compte VIP Premium",
+        boost_status_title: "Boost Actif",
+        days_short: "j",
+        hours_short: "h",
+        min_short: "m",
+        sec_short: "s",
+        expired: "Expiré"
+      },
+      en: {
+        header_title: "Wallet & Boost",
+        active_balance: "ACTIVE BALANCE",
+        available_in_account: "Available in account",
+        btn_recharge: "Top Up",
+        btn_withdraw: "Withdraw",
+        boost_section_title: "Boost Your Visibility",
+        boost_section_sub: "Choose a plan to multiply your sales",
+        item_boost_title: "Item Boost",
+        per_7days: "/ 7 days",
+        feat_boost_1: "Positioned at top of search",
+        feat_boost_2: "Attractive 'Sponsored' badge",
+        feat_boost_3: "+300% estimated views",
+        btn_boost_item: "Boost an item",
+        badge_pro: "PRO RECOMMENDED",
+        vip_title: "VIP Premium Seller",
+        per_month: "/ month",
+        feat_vip_1: "Golden 'VIP Seller' Badge",
+        feat_vip_2: "Unlimited item listings",
+        feat_vip_3: "Access to views dashboard",
+        feat_vip_4: "24/7 Priority WhatsApp support",
+        btn_activate_vip: "Activate VIP Mode",
+        trust_text: "Transactions secured by Mobile Money (M-Pesa, Airtel, Orange)",
+        modal_deposit_title: "Top up your wallet",
+        select_operator: "Select operator",
+        phone_number: "Mobile Money Phone Number",
+        amount_usd: "Amount to Deposit ($ USD)",
+        btn_confirm_deposit: "Confirm Deposit",
+        withdraw_notice: "Secure withdrawal module coming soon.",
+        invalid_inputs: "Please enter a valid phone number and amount greater than zero.",
+        deposit_ussd_sent: "Payment request sent. Please approve the USSD pop-up on your phone.",
+        deposit_success: "Your account has been credited successfully!",
+        insufficient_balance: "Insufficient balance ({balance}$). You need {cost}$ for this purchase.",
+        confirm_purchase: "Do you confirm payment of {cost}$ for: {service}?",
+        purchase_success: "Congratulations! '{service}' is now active.",
+        transaction_error: "An error occurred during transaction.",
+        vip_status_title: "VIP Premium Account",
+        boost_status_title: "Active Boost",
+        days_short: "d",
+        hours_short: "h",
+        min_short: "m",
+        sec_short: "s",
+        expired: "Expired"
+      }
+    };
+
+    const currentLang = localStorage.getItem('app_lang') || 'fr';
+
+    window.getTranslation = function(key, params = {}) {
+      let text = (translations[currentLang] && translations[currentLang][key]) ? translations[currentLang][key] : translations['fr'][key];
+      Object.keys(params).forEach(p => {
+        text = text.replace(`{${p}}`, params[p]);
+      });
+      return text;
+    };
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = window.getTranslation(key);
+      });
+    }
+
+    window.showToast = (message, type = 'info') => {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      let icon = 'fa-info-circle';
+      if(type === 'success') icon = 'fa-check-circle';
+      if(type === 'error') icon = 'fa-exclamation-circle';
+
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    };
+
+    window.customConfirm = (message) => {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('customConfirm');
+        const msgEl = document.getElementById('confirmMessage');
+        const yesBtn = document.getElementById('confirmYesBtn');
+        const noBtn = document.getElementById('confirmNoBtn');
+
+        msgEl.textContent = message;
+        modal.style.display = 'flex';
+
+        const handleYes = () => {
+          modal.style.display = 'none';
+          cleanup();
+          resolve(true);
+        };
+
+        const handleNo = () => {
+          modal.style.display = 'none';
+          cleanup();
+          resolve(false);
+        };
+
+        const cleanup = () => {
+          yesBtn.removeEventListener('click', handleYes);
+          noBtn.removeEventListener('click', handleNo);
+        };
+
+        yesBtn.addEventListener('click', handleYes);
+        noBtn.addEventListener('click', handleNo);
+      });
+    };
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let currentBalance = 0;
+    let timerInterval = null;
+    let userData = null;
+    let userRoleCollection = "vendeurs_clients";
+    let selectedArticleId = null;
+    let boostedArticlesList = [];
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+
+        let snap = await getDoc(doc(db, "vendeurs_clients", user.uid));
+        if (snap.exists()) {
+          userRoleCollection = "vendeurs_clients";
+        } else {
+          snap = await getDoc(doc(db, "vendeurs", user.uid));
+          if (snap.exists()) {
+            userRoleCollection = "vendeurs";
+          }
+        }
+
+        loadUserData();
+      }
+    });
+
+    async function loadUserData() {
+      try {
+        const userSnap = await getDoc(doc(db, userRoleCollection, currentUser.uid));
+        if (userSnap.exists()) {
+          userData = userSnap.data();
+          currentBalance = userData.solde || 0;
+          document.getElementById("userBalance").textContent = `${currentBalance.toFixed(2)} $`;
+
+          // Chargement des produits boostés
+          const q = query(
+            collection(db, "produits"),
+            where("vendeurId", "==", currentUser.uid),
+            where("isBoosted", "==", true)
+          );
+          const boostedSnaps = await getDocs(q);
+          boostedArticlesList = [];
+          boostedSnaps.forEach(docSnap => {
+            boostedArticlesList.push({ id: docSnap.id, ...docSnap.data() });
+          });
+
+          renderTimers();
+        }
+      } catch (err) {
+        console.error("Erreur de chargement des données :", err);
+      }
+    }
+
+    function renderTimers() {
+      const container = document.getElementById('activeStatusContainer');
+      container.innerHTML = '';
+
+      if (timerInterval) clearInterval(timerInterval);
+
+      let hasVip = userData && userData.isPremium && userData.premiumUntil;
+      let activeBoosts = boostedArticlesList.filter(item => {
+        if (!item.boostUntil) return false;
+        return new Date(item.boostUntil).getTime() > new Date().getTime();
+      });
+
+      if (!hasVip && activeBoosts.length === 0) return;
+
+      const updateClocks = () => {
+        const currentTime = new Date().getTime();
+        let html = '';
+
+        if (hasVip) {
+          const expiry = new Date(userData.premiumUntil).getTime();
+          const totalDuration = 30 * 24 * 60 * 60 * 1000;
+          const diff = expiry - currentTime;
+
+          if (diff > 0) {
+            const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
+            html += `
+              <div class="status-card vip">
+                <div class="status-header">
+                  <div class="status-title" style="color:#FFD700;">
+                    <i class="fa-solid fa-crown"></i> ${window.getTranslation('vip_status_title')}
+                  </div>
+                  <div class="status-timer">${formatTimeLeft(diff)}</div>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill gold" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }
+        }
+
+        activeBoosts.forEach(item => {
+          const expiry = new Date(item.boostUntil).getTime();
+          const totalDuration = 7 * 24 * 60 * 60 * 1000;
+          const diff = expiry - currentTime;
+          const imgUrl = (item.images && item.images.length > 0) ? item.images[0] : (item.image || 'https://via.placeholder.com/50');
+
+          if (diff > 0) {
+            const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
+            html += `
+              <div class="status-card">
+                <div class="status-main">
+                  <img src="${imgUrl}" alt="${item.nom || 'Article'}" class="status-thumb">
+                  <div class="status-info">
+                    <div class="status-header">
+                      <div class="status-title" style="color:#6366F1;">
+                        <i class="fa-solid fa-rocket"></i> ${item.nom || 'Article'}
+                      </div>
+                      <div class="status-timer">${formatTimeLeft(diff)}</div>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: ${pct}%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        container.innerHTML = html;
+      };
+
+      updateClocks();
+      timerInterval = setInterval(updateClocks, 1000);
+    }
+
+    function formatTimeLeft(ms) {
+      if (ms <= 0) return window.getTranslation('expired');
+      const seconds = Math.floor((ms / 1000) % 60);
+      const minutes = Math.floor((ms / (1000 * 60)) % 60);
+      const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+
+      return `${days}${window.getTranslation('days_short')} ${hours}${window.getTranslation('hours_short')} ${minutes}${window.getTranslation('min_short')} ${seconds}${window.getTranslation('sec_short')}`;
+    }
+
+    window.openDepositModal = () => document.getElementById("depositModal").style.display = "flex";
+    window.closeDepositModal = () => document.getElementById("depositModal").style.display = "none";
+
+    window.closeBoostArticleModal = () => {
+      document.getElementById("boostArticleModal").style.display = "none";
+      selectedArticleId = null;
+    };
+
+    window.selectOperator = (el, op) => {
+      document.querySelectorAll('.payment-opt').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+    };
+
+    window.processDeposit = async () => {
+      const amount = parseFloat(document.getElementById("depositAmount").value);
+      const phone = document.getElementById("phoneNumber").value;
+
+      if (!amount || amount <= 0 || !phone) {
+        window.showToast(window.getTranslation('invalid_inputs'), 'error');
+        return;
+      }
+
+      window.showToast(window.getTranslation('deposit_ussd_sent'), 'info');
+
+      try {
+        const userRef = doc(db, userRoleCollection, currentUser.uid);
+        await updateDoc(userRef, {
+          solde: increment(amount)
+        });
+
+        window.closeDepositModal();
+        await loadUserData();
+        window.showToast(window.getTranslation('deposit_success'), 'success');
+      } catch(e) {
+        window.showToast(window.getTranslation('transaction_error'), 'error');
+      }
+    };
+
+    window.startBoostProcess = async () => {
+      if (!currentUser) return;
+
+      const cost = 1.50;
+      if (currentBalance < cost) {
+        window.showToast(window.getTranslation('insufficient_balance', { balance: currentBalance.toFixed(2), cost: cost }), 'error');
+        window.openDepositModal();
+        return;
+      }
+
+      const listContainer = document.getElementById("articlesSelectList");
+      listContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center;">Chargement de vos articles...</div>';
+      document.getElementById("boostArticleModal").style.display = "flex";
+
+      try {
+        const q = query(collection(db, "produits"), where("vendeurId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+
+        const availableArticles = [];
+        querySnapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          if (!data.vendu && data.statut !== "vendu") {
+            availableArticles.push({ id: docSnap.id, ...data });
+          }
+        });
+
+        if (availableArticles.length === 0) {
+          listContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center;">Aucun article non vendu disponible à booster.</div>';
+          document.getElementById("confirmBoostArticleBtn").disabled = true;
+          return;
+        }
+
+        listContainer.innerHTML = "";
+        availableArticles.forEach(item => {
+          const imgUrl = (item.images && item.images.length > 0) ? item.images[0] : (item.image || 'https://via.placeholder.com/50');
+          const card = document.createElement("div");
+          card.className = "article-item-card";
+          card.onclick = () => {
+            document.querySelectorAll('.article-item-card').forEach(el => el.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedArticleId = item.id;
+            document.getElementById("confirmBoostArticleBtn").disabled = false;
+          };
+
+          card.innerHTML = `
+            <img src="${imgUrl}" alt="${item.nom || 'Article'}">
+            <div class="article-item-info">
+              <div class="article-item-title">${item.nom || 'Sans nom'}</div>
+              <div class="article-item-price">${item.prix} ${item.devise || '$'}</div>
+            </div>
+          `;
+          listContainer.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error("Erreur lors de la récupération des articles :", err);
+        listContainer.innerHTML = '<div style="color:var(--accent-red); text-align:center;">Erreur lors du chargement des articles.</div>';
+      }
+    };
+
+    window.confirmBoostSelectedArticle = async () => {
+      if (!selectedArticleId) return;
+      window.closeBoostArticleModal();
+      await payService('boost_item', 1.50, 7, selectedArticleId);
+    };
+
+    window.payService = async (serviceType, cost, durationDays, articleId = null) => {
+      if (!currentUser) return;
+
+      const serviceName = serviceType === 'vip_subscription' ? window.getTranslation('vip_title') : window.getTranslation('item_boost_title');
+
+      if (currentBalance < cost) {
+        window.showToast(window.getTranslation('insufficient_balance', { balance: currentBalance.toFixed(2), cost: cost }), 'error');
+        window.openDepositModal();
+        return;
+      }
+
+      const confirmed = await window.customConfirm(window.getTranslation('confirm_purchase', { cost: cost, service: serviceName }));
+
+      if (confirmed) {
+        try {
+          const userRef = doc(db, userRoleCollection, currentUser.uid);
+          const now = new Date();
+          const expiresAt = new Date(now.getTime() + (durationDays * 24 * 60 * 60 * 1000)).toISOString();
+
+          let updateData = { solde: increment(-cost) };
+
+          if (serviceType === 'vip_subscription') {
+            updateData.isPremium = true;
+            updateData.premiumUntil = expiresAt;
+          }
+
+          await updateDoc(userRef, updateData);
+
+          if (serviceType === 'boost_item' && articleId) {
+            const productRef = doc(db, "produits", articleId);
+            await updateDoc(productRef, {
+              isBoosted: true,
+              boostUntil: expiresAt
+            });
+          }
+
+          window.showToast(window.getTranslation('purchase_success', { service: serviceName }), 'success');
+          await loadUserData();
+        } catch (e) {
+          console.error(e);
+          window.showToast(window.getTranslation('transaction_error'), 'error');
+        }
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      applyTranslations();
+    });
+  </script>
+</body>
+</html>

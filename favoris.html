@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mes Favoris - Liste d'envies</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* Barre Supérieure */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .back-btn {
+      background: #f1f5f9;
+      border: none;
+      color: #0f172a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .back-btn:active {
+      background: #e2e8f0;
+    }
+
+    .top-bar-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+    }
+
+    .fav-subtitle-bar {
+      padding: 12px 16px 4px 16px;
+      font-size: 0.82rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Liste des Favoris */
+    .favoris-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 8px 16px 24px 16px;
+    }
+
+    .favori-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f1f5f9;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .favori-card:active {
+      transform: scale(0.99);
+    }
+
+    /* Image Miniature */
+    .thumb-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Badge Cœur avec le nombre exact */
+    .fav-badge {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      padding: 2px 6px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    .fav-badge svg {
+      width: 10px;
+      height: 10px;
+      fill: #ef4444;
+    }
+
+    /* Infos Produit */
+    .card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .shop-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-price {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0284c7;
+      margin-top: 2px;
+    }
+
+    /* Bouton Retirer */
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .remove-btn:hover {
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .remove-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* États vide et chargement */
+    .state-msg {
+      text-align: center;
+      padding: 50px 16px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      stroke: #cbd5e1;
+      fill: none;
+      stroke-width: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barre Supérieure Header -->
+  <div class="top-bar">
+    <button class="back-btn" onclick="window.location.href='acceuil.html'" aria-label="Retour">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <span class="top-bar-title">MES FAVORIS</span>
+    <div style="width: 38px;"></div>
+  </div>
+
+  <div id="favCounterLabel" class="fav-subtitle-bar">Mes articles enregistrés</div>
+
+  <!-- Conteneur des favoris -->
+  <div id="favorisContainer" class="favoris-list">
+    <div class="state-msg">Chargement de vos favoris...</div>
+  </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const favorisContainer = document.getElementById("favorisContainer");
+    const favCounterLabel = document.getElementById("favCounterLabel");
+    let currentUser = null;
+    let currentUserCollection = null;
+
+    // Écouteur Auth
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        loadUserFavorites(user.uid);
+      } else {
+        const localFavs = JSON.parse(localStorage.getItem("userFavorites") || "[]");
+        if (localFavs.length > 0) {
+          loadFavoritesByIds(localFavs);
+        } else {
+          showEmptyState("Veuillez vous connecter pour retrouver vos favoris.");
+        }
+      }
+    });
+
+    // Chargement des favoris selon le type d'utilisateur
+    async function loadUserFavorites(userId) {
+      try {
+        let favIds = [];
+        const collections = ["acheteurs", "vendeurs", "vendeurs_clients"];
+
+        for (const col of collections) {
+          const userSnap = await getDoc(doc(db, col, userId));
+          if (userSnap.exists()) {
+            currentUserCollection = col;
+            if (userSnap.data().favoris) {
+              favIds = userSnap.data().favoris;
+            }
+            break;
+          }
+        }
+
+        if (favIds.length === 0) {
+          favIds = JSON.parse(localStorage.getItem("userFavorites") || "[]");
+        }
+
+        if (!Array.isArray(favIds) || favIds.length === 0) {
+          showEmptyState("Votre liste de favoris est vide.");
+          return;
+        }
+
+        loadFavoritesByIds(favIds);
+
+      } catch (err) {
+        console.error("Erreur chargement favoris:", err);
+        showEmptyState("Impossible de charger vos favoris.");
+      }
+    }
+
+    // Affichage des articles
+    async function loadFavoritesByIds(idsList) {
+      favorisContainer.innerHTML = "";
+      let validItemsCount = 0;
+
+      for (const prodId of idsList) {
+        try {
+          const prodSnap = await getDoc(doc(db, "produits", prodId));
+          if (!prodSnap.exists()) continue;
+
+          validItemsCount++;
+          const prod = prodSnap.data();
+
+          // 1. Récupération du nombre de favoris
+          let exactFavCount = 0;
+          if (prod.favoris !== undefined) {
+            exactFavCount = Array.isArray(prod.favoris) ? prod.favoris.length : Number(prod.favoris);
+          } else if (prod.favorisCount !== undefined) {
+            exactFavCount = Number(prod.favorisCount);
+          } else if (prod.likes !== undefined) {
+            exactFavCount = Array.isArray(prod.likes) ? prod.likes.length : Number(prod.likes);
+          }
+
+          // 2. Recherche du Nom de la boutique
+          let shopName = prod.shopName || prod.vendeurNom || prod.nomBoutique || "";
+
+          if (!shopName && prod.vendeurId) {
+            try {
+              const vendorSnap = await getDoc(doc(db, "vendeurs", prod.vendeurId));
+              if (vendorSnap.exists()) {
+                const data = vendorSnap.data();
+                shopName = data.shopName || data.nomBoutique || data.nom || "";
+              } else {
+                const vendorClientSnap = await getDoc(doc(db, "vendeurs_clients", prod.vendeurId));
+                if (vendorClientSnap.exists()) {
+                  const data = vendorClientSnap.data();
+                  shopName = data.shopName || data.nomBoutique || data.nom || "";
+                }
+              }
+            } catch(e) {
+              console.error("Erreur récupération boutique:", e);
+            }
+          }
+
+          if (!shopName) shopName = "Boutique";
+
+          // 3. Infos Produit (Récupération dynamique du prix et de la devise)
+          const title = prod.nom || prod.title || prod.name || "Article";
+          const rawPrice = prod.prix || prod.price;
+          const currency = prod.devise || prod.currency || "FCFA"; // Récupération du champ devise
+
+          const price = rawPrice ? `${rawPrice} ${currency}` : "Prix non spécifié";
+          const imageUrl = prod.image || prod.imageUrl || prod.photo || "https://via.placeholder.com/150";
+
+          // 4. Élément Carte Marketplace
+          const card = document.createElement("div");
+          card.className = "favori-card";
+          card.id = `fav-card-${prodId}`;
+
+          card.innerHTML = `
+            <div class="thumb-box">
+              <img src="${imageUrl}" alt="${title}">
+              <div class="fav-badge">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>${exactFavCount}</span>
+              </div>
+            </div>
+
+            <div class="card-info" onclick="window.location.href='article.html?id=${prodId}'">
+              <span class="shop-name">${shopName}</span>
+              <span class="product-title">${title}</span>
+              <span class="product-price">${price}</span>
+            </div>
+
+            <button class="remove-btn" title="Retirer des favoris" onclick="removeFavorite('${prodId}', event)">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          `;
+
+          favorisContainer.appendChild(card);
+
+        } catch (e) {
+          console.error("Erreur lecture article:", e);
+        }
+      }
+
+      if (validItemsCount === 0) {
+        showEmptyState("Aucun article valide dans vos favoris.");
+      } else {
+        favCounterLabel.textContent = `${validItemsCount} article(s) dans votre liste d'envies`;
+      }
+    }
+
+    // Fonction pour retirer un article des favoris
+    window.removeFavorite = async function(prodId, event) {
+      event.stopPropagation();
+
+      const cardEl = document.getElementById(`fav-card-${prodId}`);
+      if (cardEl) cardEl.remove();
+
+      // Mettre à jour dans Firestore si connecté
+      if (currentUser && currentUserCollection) {
+        try {
+          await updateDoc(doc(db, currentUserCollection, currentUser.uid), {
+            favoris: arrayRemove(prodId)
+          });
+        } catch(e) {
+          console.error("Erreur suppression Firestore:", e);
+        }
+      }
+
+      // Mettre à jour dans le LocalStorage
+      let localFavs = JSON.parse(localStorage.getItem("userFavorites") || "[]");
+      localFavs = localFavs.filter(id => id !== prodId);
+      localStorage.setItem("userFavorites", JSON.stringify(localFavs));
+
+      // Mettre à jour le compteur
+      const remainingCards = favorisContainer.querySelectorAll('.favori-card').length;
+      if (remainingCards === 0) {
+        showEmptyState("Votre liste de favoris est vide.");
+      } else {
+        favCounterLabel.textContent = `${remainingCards} article(s) dans votre liste d'envies`;
+      }
+    };
+
+    function showEmptyState(message) {
+      favCounterLabel.textContent = "0 article enregistré";
+      favorisContainer.innerHTML = `
+        <div class="state-msg">
+          <svg class="empty-icon" viewBox="0 0 24 24">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <br>${message}
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

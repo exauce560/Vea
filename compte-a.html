@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VÉA Client - Mon Compte</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      padding-bottom: 80px; /* Espace pour le bouton retour fixe */
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Support Mode Clair */
+    body.light-mode {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* En-tête */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    body.light-mode .header {
+      border-bottom-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .app-logo {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cart-svg {
+      transform: rotate(-12deg);
+      transition: transform 0.3s ease;
+    }
+
+    .brand-logo-svg {
+      width: 140px;
+      height: auto;
+      fill: currentColor;
+    }
+
+    /* Profil Utilisateur */
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .profile-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: #2a2a2a;
+      border: 2px solid rgba(241, 245, 249, 0.9);
+      padding: 4px;
+      background-clip: content-box;
+    }
+    body.light-mode .profile-avatar {
+      border-color: #cbd5e1;
+    }
+
+    .avatar-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: #2563eb;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #121212;
+    }
+    body.light-mode .avatar-badge {
+      border-color: #f8fafc;
+    }
+
+    .avatar-badge svg {
+      width: 12px;
+      height: 12px;
+      fill: #fff;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .profile-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .profile-country {
+      font-size: 0.95rem;
+      color: #a0a0a0;
+    }
+
+    .profile-city {
+      font-size: 0.9rem;
+      color: #a0a0a0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    body.light-mode .profile-country,
+    body.light-mode .profile-city {
+      color: #64748b;
+    }
+
+    .location-icon {
+      width: 18px;
+      height: 18px;
+      stroke: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    /* Menu & Navigation */
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 8px;
+      text-decoration: none;
+      color: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      width: 100%;
+      text-align: left;
+    }
+    body.light-mode .menu-item {
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .menu-item:active {
+      opacity: 0.7;
+    }
+
+    .menu-item-logout {
+      color: #ef4444; /* Rouge pour la déconnexion */
+    }
+
+    .menu-value {
+      font-size: 0.9rem;
+      color: #3b82f6;
+      font-weight: 500;
+    }
+
+    /* Style du rond vert (nouveautés) */
+    .menu-item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .new-badge {
+      width: 10px;
+      height: 10px;
+      background-color: #22c55e; /* Vert vibrant */
+      border-radius: 50%;
+      display: none; /* Masqué par défaut */
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    }
+
+    /* Pied de page */
+    .app-footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #71717a;
+      letter-spacing: 0.5px;
+    }
+
+    /* Bouton retour */
+    .back-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #2a2a2a;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      z-index: 90;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .back-button:active {
+      transform: scale(0.95);
+    }
+    body.light-mode .back-button {
+      background: #ffffff;
+      border-color: rgba(0,0,0,0.15);
+      color: #0f172a;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .back-icon {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    /* Fenêtres Modales */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #1e1e1e;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    body.light-mode .modal-content {
+      background: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .modal-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      color: #a0a0a0;
+    }
+    body.light-mode .form-group label {
+      color: #64748b;
+    }
+
+    .modal-input, .modal-select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 1rem;
+    }
+    body.light-mode .modal-input,
+    body.light-mode .modal-select {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #444; color: #fff; }
+
+    /* Switch toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: #444; transition: .3s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px;
+      left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #2563eb; }
+    input:checked + .slider:before { transform: translateX(22px); }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- En-tête -->
+    <div class="header">
+      <div class="app-logo">
+        <svg class="cart-svg" version="1.0" xmlns="http://www.w3.org/2000/svg"
+            width="100%" height="100%" viewBox="0 0 1254.000000 1254.000000"
+            preserveAspectRatio="xMidYMid meet">
+          <g transform="translate(0.000000,1254.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none">
+            <path d="M6030 10989 c-447 -52 -834 -216 -1160 -494 -272 -232 -491 -592
+      -584 -964 -56 -219 -59 -264 -63 -873 l-5 -567 25 -25 c21 -21 37 -25 133 -32
+      60 -5 270 -9 467 -9 l359 0 19 24 c18 22 19 46 19 536 0 645 8 714 113 930 99
+      203 234 341 432 440 149 75 268 105 446 112 220 9 383 -26 566 -121 233 -121
+      416 -357 490 -631 l27 -100 6 -578 5 -579 24 -19 c22 -18 43 -19 319 -19 163
+      0 371 5 462 11 157 10 166 12 188 35 l22 25 0 505 c0 278 -5 560 -11 627 -61
+      700 -495 1307 -1137 1591 -203 89 -408 145 -630 171 -136 16 -409 18 -532 4z
+      m485 -119 c245 -27 458 -87 672 -190 499 -239 842 -656 978 -1190 48 -187 54
+      -290 55 -837 l0 -503 -37 0 c-21 0 -146 -5 -278 -11 -132 -6 -291 -8 -352 -4
+      l-113 7 0 466 c0 257 -5 508 -10 557 -50 473 -361 853 -801 979 -297 85 -639
+      54 -904 -82 -303 -156 -496 -418 -576 -780 -20 -91 -22 -131 -26 -618 l-5
+      -522 -97 -6 c-93 -7 -657 11 -673 20 -5 3 -8 227 -8 499 0 393 3 518 16 617
+      87 670 504 1208 1132 1459 154 62 336 110 487 128 50 6 101 13 115 15 56 8
+      341 5 425 -4z"/>
+            <path d="M3500 7977 c-14 -7 -33 -28 -43 -47 -16 -32 -17 -64 -15 -355 3 -283
+      5 -325 21 -360 14 -30 20 -83 28 -215 34 -638 112 -1411 195 -1940 172 -1100
+      398 -1823 722 -2315 155 -234 291 -363 487 -460 238 -118 470 -156 1072 -176
+      442 -14 963 5 1256 46 550 79 835 324 1119 963 219 495 388 1098 507 1809 92
+      548 169 1240 206 1848 8 138 17 284 19 325 3 41 13 93 23 115 15 35 18 80 21
+      360 4 448 16 431 -276 391 -474 -65 -857 -99 -1562 -138 -366 -20 -1701 -17
+      -2090 5 -610 35 -1123 81 -1508 138 -156 22 -150 22 -182 6z m220 -132 c310
+      -44 860 -95 1355 -125 791 -48 1956 -37 2795 25 363 28 874 82 1070 114 30 5
+      56 8 58 7 1 -2 3 -131 4 -289 1 -310 -2 -328 -54 -340 -952 -212 -2387 -288
+      -3778 -201 -717 44 -1536 161 -1592 226 -16 18 -18 49 -18 315 l0 295 28 -6
+      c15 -3 74 -12 132 -21z m90 -769 c96 -19 211 -40 255 -47 l80 -12 167 -211
+      c188 -239 308 -392 457 -584 l103 -132 -148 -278 c-148 -278 -422 -784 -429
+      -790 -1 -2 -55 68 -118 155 -63 87 -196 268 -294 402 l-180 244 -16 166 c-30
+      289 -87 1026 -87 1114 0 13 5 17 18 13 9 -3 96 -21 192 -40z m5146 -48 c-4
+      -51 -13 -194 -21 -318 -49 -738 -145 -1495 -265 -2105 -167 -843 -450 -1600
+      -730 -1948 -93 -117 -194 -198 -325 -262 -216 -106 -444 -144 -992 -165 -387
+      -14 -506 -13 -500 5 4 8 53 76 110 152 328 435 690 1004 1003 1575 206 377
+      503 992 696 1443 143 334 408 1004 563 1428 40 109 76 201 79 204 2 3 60 16
+      128 28 68 13 150 30 183 38 33 8 64 15 68 16 5 1 6 -41 3 -91z m-526 -23 c0
+      -8 -4 -24 -10 -37 -5 -13 -41 -111 -81 -218 -71 -195 -422 -1083 -438 -1108
+      -8 -14 -72 49 -371 363 -58 61 -221 230 -362 377 -142 146 -258 270 -258 276
+      0 14 102 226 112 233 5 3 80 9 167 12 328 14 982 75 1234 116 4 0 7 -6 7 -14z
+      m-3805 -45 c105 -10 296 -26 425 -36 129 -9 236 -17 237 -18 1 -1 -49 -103
+      -113 -226 -63 -124 -142 -280 -177 -347 -34 -68 -64 -123 -67 -123 -3 1 -45
+      53 -94 118 -50 64 -182 234 -295 377 -112 143 -209 266 -215 274 -9 12 -2 13
+      49 7 33 -4 146 -15 250 -26z m1728 -75 c290 0 527 -3 527 -7 0 -4 -72 -157
+      -160 -340 -562 -1167 -1243 -2352 -1957 -3403 -175 -258 -236 -344 -244 -345
+      -6 0 -77 119 -142 240 -146 272 -291 675 -377 1048 l-28 123 115 202 c334 586
+      902 1645 1178 2197 59 118 119 234 133 258 l25 43 201 -8 c110 -4 438 -8 729
+      -8z m658 -512 c85 -87 213 -219 284 -293 72 -74 223 -233 338 -352 114 -119
+      207 -221 207 -227 0 -17 -157 -374 -282 -641 -170 -365 -444 -894 -459 -888
+      -4 2 -96 107 -205 234 -244 284 -325 377 -576 666 -109 125 -198 231 -198 237
+      0 6 22 50 49 98 107 194 348 657 510 981 94 188 172 342 174 342 2 0 73 -71
+      158 -157z m-2992 -1181 l213 -293 -137 -247 c-76 -136 -144 -255 -151 -265
+      -12 -18 -12 -18 -18 0 -32 104 -186 1067 -186 1161 0 30 -16 51 279 -356z
+      m2273 -470 c376 -433 722 -834 736 -854 11 -16 3 -35 -64 -150 -217 -372 -487
+      -794 -664 -1038 -46 -63 -99 -137 -118 -164 -34 -47 -36 -47 -51 -28 -9 11
+      -178 201 -376 422 -198 222 -408 457 -467 523 l-107 120 35 55 c223 347 548
+      884 724 1192 94 166 109 190 115 190 2 0 109 -121 237 -268z m-977 -1497 c94
+      -104 265 -296 380 -425 115 -129 246 -276 292 -327 46 -51 83 -96 83 -101 0
+      -5 -24 -40 -52 -77 l-53 -68 -158 7 c-445 18 -726 75 -917 186 -118 69 -300
+      241 -287 273 3 7 31 48 62 92 32 44 128 184 213 310 85 127 173 256 194 288
+      34 50 42 56 55 45 9 -7 93 -98 188 -203z"/>
+          </g>
+        </svg>
+      </div>
+
+      <svg class="brand-logo-svg" version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1717.000000 916.000000" preserveAspectRatio="xMidYMid meet">
+        <g transform="translate(0.000000,916.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none">
+          <path d="M3815 7646 c-430 -72 -811 -328 -979 -656 -98 -191 -130 -330 -130 -565 0 -303 45 -427 162 -452 65 -14 311 -8 409 10 116 21 266 68 361 114 102 48 112 66 112 213 0 219 27 289 130 343 49 25 63 28 127 25 53 -2 79 -9 100 -24 70 -52 104 -156 85 -254 -21 -100 -73 -189 -160 -271 -212 -201 -516 -299 -925 -299 -198 0 -372 20 -608 70 -306 66 -387 70 -465 26 -81 -45 -104 -139 -104 -424 0 -186 16 -327 44 -380 37 -72 106 -99 336 -132 318 -45 559 -59 960 -55 412 3 519 13 763 66 558 122 925 425 1096 906 72 202 86 288 86 538 0 175 -4 237 -18 305 -42 191 -125 368 -236 500 -171 203 -349 311 -626 381 -104 26 -400 35 -520 15z m421 -101 c105 -17 245 -63 324 -108 281 -157 440 -363 528 -685 24 -90 26 -112 26 -302 1 -224 -8 -289 -66 -470 -156 -489 -536 -793 -1139 -909 -321 -61 -919 -68 -1376 -16 -349 40 -429 57 -460 95 -26 33 -38 146 -38 360 0 235 9 291 52 332 21 20 34 23 91 21 37 -1 123 -14 192 -28 69 -14 168 -35 220 -45 334 -66 720 -66 980 0 349 88 566 234 673 449 39 79 42 90 45 186 5 129 -12 194 -68 257 -90 103 -249 124 -392 52 -134 -68 -178 -169 -178 -411 l0 -113 -38 -25 c-82 -54 -294 -112 -493 -135 -97 -11 -224 2 -251 27 -28 25 -47 105 -60 245 -9 107 -8 145 6 240 35 248 117 424 275 591 196 208 507 364 796 400 77 10 269 5 351 -8z"/>
+          <path d="M7280 7304 c-141 -27 -268 -68 -317 -103 -41 -29 -63 -94 -143 -416 -100 -401 -156 -615 -272 -1040 -27 -99 -63 -229 -79 -290 -17 -60 -75 -256 -129 -435 -54 -179 -135 -449 -180 -600 -145 -486 -390 -1196 -515 -1490 -40 -97 -94 -175 -130 -192 -35 -16 -85 12 -151 87 -111 125 -216 311 -369 656 -48 107 -96 213 -106 236 -69 153 -184 421 -265 618 -184 445 -189 456 -249 481 -116 48 -474 12 -737 -73 -232 -75 -242 -127 -109 -517 355 -1034 645 -1742 822 -2006 163 -244 540 -464 858 -500 205 -23 640 -3 829 40 187 41 345 107 381 159 18 25 87 182 118 266 96 262 189 544 267 805 30 102 91 309 136 460 44 151 102 345 127 430 44 151 89 300 179 588 24 78 64 208 90 290 25 81 67 215 94 297 50 155 198 620 256 805 18 58 49 157 69 220 51 163 137 461 181 625 37 143 55 310 40 388 -10 54 -60 120 -109 145 -94 47 -190 64 -382 67 -99 2 -191 1 -205 -1z m440 -119 c148 -40 166 -66 157 -219 -8 -136 -99 -465 -350 -1271 -41 -132 -104 -334 -140 -450 -36 -115 -110 -354 -166 -530 -55 -176 -111 -358 -125 -405 -14 -47 -74 -249 -134 -450 -61 -201 -145 -482 -187 -625 -161 -543 -324 -1023 -406 -1191 -33 -67 -36 -70 -109 -107 -135 -67 -327 -105 -648 -127 -243 -17 -391 -3 -565 51 -253 80 -514 269 -637 460 -169 263 -480 1031 -795 1962 -95 280 -95 311 -1 345 73 27 293 79 411 97 121 18 261 19 295 2 31 -15 73 -97 144 -282 58 -149 97 -241 181 -425 29 -63 101 -221 160 -350 169 -372 337 -707 404 -807 69 -104 143 -175 216 -209 59 -28 85 -30 131 -8 74 35 129 130 240 411 178 451 317 862 569 1678 184 597 327 1114 529 1920 52 209 101 398 109 420 19 54 56 77 168 103 132 30 135 30 319 27 118 -2 184 -8 230 -20z"/>
+          <path d="M14065 5643 c-80 -5 -161 -25 -204 -50 -74 -43 -91 -108 -111 -433 -7 -102 -13 -186 -14 -187 -1 -2 -56 2 -122 8 -169 16 -461 6 -604 -21 -220 -40 -463 -138 -623 -251 -79 -56 -217 -186 -217 -205 0 -7 -16 -32 -37 -56 -101 -120 -229 -358 -291 -544 -46 -138 -90 -325 -107 -457 -17 -136 -20 -398 -5 -548 12 -119 58 -316 96 -410 137 -339 367 -571 675 -683 174 -63 235 -71 509 -70 319 1 435 16 794 107 29 7 63 25 81 42 28 26 33 39 40 98 13 127 -19 399 -65 544 -26 82 -62 127 -116 143 -22 6 -147 16 -279 20 -325 12 -429 32 -534 100 -54 34 -130 111 -158 160 -33 55 -64 168 -70 255 -16 225 64 456 214 615 95 101 157 142 273 181 251 84 545 21 626 -133 38 -72 45 -146 54 -563 9 -431 18 -540 66 -775 86 -420 201 -615 425 -720 105 -49 192 -63 349 -57 282 11 490 97 490 203 0 53 -24 90 -124 194 -235 245 -303 353 -356 560 -90 356 -90 714 1 1835 24 296 32 454 33 655 1 259 0 266 -23 313 -29 59 -69 81 -183 101 -134 24 -355 36 -483 29z m435 -113 c101 -17 130 -29 142 -58 6 -15 13 -93 16 -174 5 -149 -3 -310 -39 -768 -27 -356 -37 -499 -44 -615 -3 -55 -8 -122 -10 -150 -2 -27 -7 -151 -11 -275 -15 -534 59 -918 222 -1146 25 -36 108 -131 185 -212 76 -81 139 -155 139 -165 0 -41 -126 -87 -308 -114 -135 -19 -257 -10 -354 27 -325 125 -478 626 -478 1573 0 344 -12 415 -88 515 -39 52 -112 99 -198 128 -64 21 -104 27 -210 31 -145 6 -223 -4 -335 -42 -294 -99 -506 -410 -526 -770 -10 -188 23 -330 105 -453 52 -78 116 -134 207 -179 126 -63 181 -72 510 -82 169 -5 269 -13 286 -21 14 -6 33 -27 42 -45 58 -123 101 -516 63 -571 -35 -50 -420 -123 -736 -139 -450 -24 -774 113 -1017 428 -273 354 -332 1013 -143 1587 99 299 219 501 408 681 149 144 286 225 491 293 236 79 516 103 850 75 174 -15 165 -24 175 178 8 160 31 368 45 405 13 35 41 55 91 67 56 13 429 7 520 -9z"/>
+          <path d="M9675 5341 c-139 -25 -288 -73 -420 -135 -147 -70 -236 -128 -329 -217 -183 -173 -264 -379 -238 -605 17 -146 40 -172 187 -205 94 -22 419 -19 517 4 112 26 128 45 157 181 29 143 48 179 99 194 101 30 211 0 244 -68 20 -40 23 -106 7 -165 -47 -172 -326 -268 -681 -236 -163 15 -281 38 -484 96 -168 48 -246 62 -288 51 -42 -10 -106 -75 -131 -132 -46 -103 -85 -358 -85 -546 1 -135 11 -176 52 -211 42 -36 175 -107 254 -138 61 -23 62 -23 47 -46 -58 -88 -58 -404 -1 -612 51 -186 135 -331 272 -467 137 -135 273 -219 476 -292 406 -146 1063 -174 1423 -59 85 27 125 60 138 112 19 81 22 304 6 427 -23 174 -64 238 -153 238 -24 0 -118 -16 -209 -35 -293 -62 -501 -69 -670 -25 -105 28 -168 63 -236 131 -87 85 -130 181 -173 388 l-24 111 22 4 c11 3 64 9 116 15 108 12 339 67 450 106 109 39 286 125 371 180 312 201 475 447 534 804 26 151 17 390 -19 519 -87 316 -310 544 -606 622 -121 32 -476 38 -625 11z m569 -100 c333 -88 560 -358 598 -711 31 -292 -50 -598 -213 -806 -215 -272 -622 -472 -1099 -538 -128 -18 -367 -21 -508 -6 -196 21 -463 102 -595 182 -101 61 -101 60 -94 246 8 222 46 414 96 487 38 56 71 57 259 6 82 -22 211 -52 288 -68 127 -25 158 -28 364 -28 204 0 233 2 310 23 123 33 202 73 261 132 79 79 107 164 94 285 -9 86 -43 138 -115 173 -49 24 -67 27 -155 27 -115 0 -180 -19 -218 -64 -15 -19 -31 -63 -46 -127 -36 -157 -41 -167 -86 -182 -22 -7 -94 -18 -160 -24 -123 -12 -233 -4 -354 24 -66 15 -81 41 -88 147 -15 233 118 458 372 628 100 67 365 164 540 197 126 24 131 25 305 21 127 -2 183 -8 244 -24z m-1329 -2134 c82 -15 139 -21 307 -33 115 -7 120 -11 136 -106 19 -104 60 -236 99 -318 75 -156 226 -262 423 -296 75 -13 136 -15 290 -11 174 4 215 9 377 42 100 21 189 35 197 32 43 -17 72 -197 63 -396 -3 -69 -9 -136 -12 -148 -5 -15 -24 -29 -59 -41 -210 -78 -543 -99 -886 -56 -154 19 -166 21 -305 56 -277 68 -473 175 -637 346 -123 129 -182 230 -229 395 -57 197 -60 480 -6 546 14 16 117 11 242 -12z"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Profil -->
+    <div class="profile-card">
+      <div class="avatar-wrapper" onclick="triggerFileInput()" title="Changer la photo">
+        <img id="userAvatar" class="profile-avatar" src="https://via.placeholder.com/150" alt="Avatar">
+        <div class="avatar-badge">
+          <svg viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+      </div>
+      <div class="profile-info">
+        <span id="userName" class="profile-name">Chargement...</span>
+        <span id="userCountry" class="profile-country">---</span>
+        <span class="profile-city">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="location-icon">
+            <path d="M15 22a1 1 0 0 1-1-1v-4a1 1 0 0 1 .445-.832l3-2a1 1 0 0 1 1.11 0l3 2A1 1 0 0 1 22 17v4a1 1 0 0 1-1 1z"/>
+            <path d="M18 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 .601.2"/>
+            <path d="M18 22v-3"/>
+            <circle cx="10" cy="10" r="3"/>
+          </svg>
+          <span id="userCity">---</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Menu Principal -->
+    <div class="menu-list">
+      <button type="button" class="menu-item" onclick="openAddressModal()">
+        <span>MODIFIER MON ADRESSE</span>
+        <span id="currentAddressValue" class="menu-value">&rsaquo;</span>
+      </button>
+
+      <!-- Lien Abonnement avec le badge vert -->
+      <a href="abonnement.html" class="menu-item" id="abonnementLink">
+        <span>ABONNEMENT</span>
+        <div class="menu-item-right">
+          <span id="newArticleBadge" class="new-badge" title="Nouveau contenu disponible"></span>
+          <span>&rsaquo;</span>
+        </div>
+      </a>
+
+      <a href="favoris.html" class="menu-item">
+        <span>FAVORIS</span>
+        <span>&rsaquo;</span>
+      </a>
+
+      <a href="confidentialite.html" class="menu-item">
+        <span>CONFIDENTIALITÉ</span>
+        <span>&rsaquo;</span>
+      </a>
+
+      <button type="button" class="menu-item" onclick="openLangModal()">
+        <span>LANGUE & MODE</span>
+        <span id="currentLangLabel" class="menu-value">FR / Sombre</span>
+      </button>
+
+      <button type="button" class="menu-item" onclick="openPhoneModal()">
+        <span>NUM WHATSAPP</span>
+        <span id="userPhoneDisplay" class="menu-value">Non défini</span>
+      </button>
+
+      <!-- Bouton Déconnexion -->
+      <button type="button" class="menu-item menu-item-logout" id="logoutBtn">
+        <span>DÉCONNEXION</span>
+        <span>&rsaquo;</span>
+      </button>
+    </div>
+
+    <!-- Pied de page -->
+    <footer class="app-footer">
+      vea market 2026
+    </footer>
+  </div>
+
+  <!-- Bouton de retour -->
+  <button class="back-button" onclick="history.back()" title="Retour">
+    <svg class="back-icon" viewBox="0 0 24 24">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+  </button>
+
+  <!-- Modales... -->
+  <div class="modal-overlay" id="addressModal">
+    <div class="modal-content">
+      <div class="modal-title">Modifier mon adresse</div>
+
+      <div class="form-group">
+        <label for="addressCountry">Pays</label>
+        <input type="text" id="addressCountry" class="modal-input" placeholder="ex: RDC">
+      </div>
+
+      <div class="form-group">
+        <label for="addressProvince">Province / Région</label>
+        <input type="text" id="addressProvince" class="modal-input" placeholder="ex: Nord-Kivu">
+      </div>
+
+      <div class="form-group">
+        <label for="addressCity">Ville</label>
+        <input type="text" id="addressCity" class="modal-input" placeholder="ex: Goma">
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeAddressModal()">Annuler</button>
+        <button class="btn btn-primary" id="saveAddressBtn" onclick="updateAddress()">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="langModal">
+    <div class="modal-content">
+      <div class="modal-title">Langue & Apparence</div>
+
+      <div class="modal-option">
+        <span>Langue</span>
+        <select id="langSelect" class="modal-select">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="sw">Swahili</option>
+          <option value="ln">Lingala</option>
+        </select>
+      </div>
+
+      <div class="modal-option">
+        <span>Mode Sombre</span>
+        <label class="switch">
+          <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="saveLangSettings()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="phoneModal">
+    <div class="modal-content">
+      <div class="modal-title">Modifier le Numéro WhatsApp</div>
+      <input type="tel" id="phoneInput" class="modal-input" placeholder="+243900000000">
+
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closePhoneModal()">Annuler</button>
+        <button class="btn btn-primary" id="savePhoneBtn" onclick="updatePhoneNumber()">Mettre à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connexion Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      projectId: "v-ea-fb4c4",
+      storageBucket: "v-ea-fb4c4.firebasestorage.app",
+      messagingSenderId: "357462139035",
+      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+      measurementId: "G-WEG1X65STP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let currentUserCollection = "acheteurs";
+
+    // Déconnexion
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "index.html";
+      } catch (error) {
+        console.error("Erreur de déconnexion :", error);
+        window.location.href = "index.html";
+      }
+    });
+
+    // Synchronisation en temps réel avec Firebase pour les nouveaux articles
+    async function checkNewArticlesFirebase(userUid) {
+      const badge = document.getElementById("newArticleBadge");
+
+      try {
+        const userSnap = await getDoc(doc(db, "acheteurs", userUid));
+        if (!userSnap.exists()) return;
+
+        const userData = userSnap.data();
+        const abonnements = userData.abonnements || [];
+        const seenVendorsMap = userData.seenVendors || {};
+
+        if (abonnements.length === 0) {
+          badge.style.display = "none";
+          localStorage.setItem("has_new_article", "false");
+          return;
+        }
+
+        let hasAnyNewProduct = false;
+        const now = new Date();
+
+        for (const vendorId of abonnements) {
+          const lastSeenTime = seenVendorsMap[vendorId] ? new Date(seenVendorsMap[vendorId]) : null;
+
+          const q = query(
+            collection(db, "produits"),
+            where("vendeurId", "==", vendorId)
+          );
+          const querySnapshot = await getDocs(q);
+
+          querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.createdAt) {
+              const createdAt = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+              const isRecent = ((now - createdAt) / (1000 * 60 * 60)) <= 48; // Moins de 48 heures
+
+              if (isRecent && (!lastSeenTime || createdAt > lastSeenTime)) {
+                hasAnyNewProduct = true;
+              }
+            }
+          });
+
+          if (hasAnyNewProduct) break;
+        }
+
+        if (hasAnyNewProduct) {
+          badge.style.display = "inline-block";
+          localStorage.setItem("has_new_article", "true");
+        } else {
+          badge.style.display = "none";
+          localStorage.setItem("has_new_article", "false");
+        }
+
+      } catch (err) {
+        console.error("Erreur de détection des nouveaux articles :", err);
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+
+        // Lancer la vérification des nouveaux articles
+        checkNewArticlesFirebase(user.uid);
+
+        try {
+          let userRef = doc(db, "acheteurs", user.uid);
+          let userSnap = await getDoc(userRef);
+
+          if (!userSnap.exists()) {
+            userRef = doc(db, "vendeurs", user.uid);
+            userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              currentUserCollection = "vendeurs";
+            }
+          }
+
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+
+            document.getElementById("userName").textContent = data.nom || data.displayName || "Client";
+
+            const addr = data.address || {};
+            const country = addr.country || data.country || data.pays || "RDC";
+            const province = addr.province || data.province || "";
+            const city = addr.city || data.city || data.ville || "Goma";
+
+            document.getElementById("userCountry").textContent = country;
+            document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
+
+            document.getElementById("addressCountry").value = country;
+            document.getElementById("addressProvince").value = province;
+            document.getElementById("addressCity").value = city;
+
+            const photo = data.photoUrl || data.photoURL || data.avatar;
+            if (photo) {
+              document.getElementById("userAvatar").src = photo;
+            }
+
+            const phone = data.telephone || data.whatsapp || data.phone || "";
+            document.getElementById("userPhoneDisplay").textContent = phone || "Ajouter";
+            document.getElementById("phoneInput").value = phone;
+          }
+        } catch (err) {
+          console.error("Erreur de récupération Firestore :", err);
+        }
+      } else {
+        document.getElementById("userName").textContent = "Non connecté";
+      }
+    });
+
+    window.uploadAvatar = async function(event) {
+      const file = event.target.files[0];
+      if (!file || !currentUser) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64Image = e.target.result;
+        document.getElementById("userAvatar").src = base64Image;
+
+        try {
+          const userRef = doc(db, currentUserCollection, currentUser.uid);
+          await updateDoc(userRef, {
+            photoUrl: base64Image,
+            avatar: base64Image
+          });
+          alert("Photo de profil mise à jour !");
+        } catch (error) {
+          console.error("Erreur mise à jour photo :", error);
+          alert("Erreur lors de la sauvegarde de la photo.");
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.updateAddress = async function() {
+      if (!currentUser) {
+        alert("Vous devez être connecté.");
+        return;
+      }
+
+      const country = document.getElementById("addressCountry").value.trim();
+      const province = document.getElementById("addressProvince").value.trim();
+      const city = document.getElementById("addressCity").value.trim();
+
+      const saveBtn = document.getElementById("saveAddressBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Sauvegarde...";
+
+      try {
+        const userRef = doc(db, currentUserCollection, currentUser.uid);
+
+        await updateDoc(userRef, {
+          pays: country,
+          province: province,
+          ville: city,
+          "address.country": country,
+          "address.province": province,
+          "address.city": city
+        });
+
+        document.getElementById("userCountry").textContent = country || "RDC";
+        document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
+
+        closeAddressModal();
+        alert("Adresse mise à jour avec succès !");
+      } catch (error) {
+        console.error("Erreur de mise à jour adresse :", error);
+        alert("Erreur lors de la mise à jour de l'adresse.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Sauvegarder";
+      }
+    };
+
+    window.updatePhoneNumber = async function() {
+      const newPhone = document.getElementById("phoneInput").value.trim();
+      if (!currentUser) {
+        alert("Vous devez être connecté.");
+        return;
+      }
+
+      const saveBtn = document.getElementById("savePhoneBtn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Sauvegarde...";
+
+      try {
+        const userRef = doc(db, currentUserCollection, currentUser.uid);
+        await updateDoc(userRef, { telephone: newPhone, whatsapp: newPhone });
+
+        document.getElementById("userPhoneDisplay").textContent = newPhone || "Non défini";
+        closePhoneModal();
+        alert("Numéro mis à jour avec succès !");
+      } catch (error) {
+        console.error("Erreur de mise à jour du numéro :", error);
+        alert("Erreur lors de la mise à jour.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Mettre à jour";
+      }
+    };
+  </script>
+
+  <!-- Script d'interface & Détection des Nouveautés -->
+  <script>
+    function triggerFileInput() {
+      document.getElementById("avatarFileInput").click();
+    }
+
+    function openAddressModal() {
+      document.getElementById("addressModal").style.display = "flex";
+    }
+
+    function closeAddressModal() {
+      document.getElementById("addressModal").style.display = "none";
+    }
+
+    function openLangModal() {
+      document.getElementById("langModal").style.display = "flex";
+    }
+
+    function saveLangSettings() {
+      const lang = document.getElementById("langSelect").value;
+      const isDark = document.getElementById("darkModeToggle").checked;
+
+      localStorage.setItem("app_lang", lang);
+      localStorage.setItem("app_theme", isDark ? "dark" : "light");
+
+      updateLangLabelDisplay(lang, isDark);
+      document.getElementById("langModal").style.display = "none";
+    }
+
+    function updateLangLabelDisplay(lang, isDark) {
+      const langMap = { fr: "FR", en: "EN", sw: "SW", ln: "LN" };
+      const labelLang = langMap[lang] || lang.toUpperCase();
+      const labelTheme = isDark ? "Sombre" : "Clair";
+      document.getElementById("currentLangLabel").textContent = `${labelLang} / ${labelTheme}`;
+    }
+
+    function toggleDarkMode(isDark) {
+      if (isDark) {
+        document.body.classList.remove("light-mode");
+      } else {
+        document.body.classList.add("light-mode");
+      }
+    }
+
+    function openPhoneModal() {
+      document.getElementById("phoneModal").style.display = "flex";
+    }
+
+    function closePhoneModal() {
+      document.getElementById("phoneModal").style.display = "none";
+    }
+
+    // Effacer le badge lorsque l'utilisateur clique sur Abonnement
+    document.getElementById("abonnementLink").addEventListener("click", () => {
+      localStorage.setItem("has_new_article", "false");
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("app_theme");
+      const isDark = savedTheme !== "light";
+      if (!isDark) {
+        document.body.classList.add("light-mode");
+        document.getElementById("darkModeToggle").checked = false;
+      }
+
+      const savedLang = localStorage.getItem("app_lang") || "fr";
+      document.getElementById("langSelect").value = savedLang;
+
+      updateLangLabelDisplay(savedLang, isDark);
+
+      // Vérification immédiate du cache local
+      const hasNewArticle = localStorage.getItem("has_new_article");
+      const badge = document.getElementById("newArticleBadge");
+      if (hasNewArticle === "true") {
+        badge.style.display = "inline-block";
+      }
+    });
+  </script>
+</body>
+</html>
