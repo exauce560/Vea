@@ -271,6 +271,75 @@
   stroke-width: 3;
 }
 
+.offline-banner {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  width: calc(100% - 24px);
+  max-width: 430px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 15px;
+
+  background: rgba(15, 23, 42, 0.96);
+  color: #fff;
+
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+
+  z-index: 9999;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.offline-banner.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.offline-icon {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.offline-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.offline-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.offline-text strong {
+  font-size: 0.88rem;
+}
+
+.offline-text span {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
     .badge-pro {
       display: inline-flex;
       align-items: center;
@@ -818,7 +887,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, getDocs, getDocsFromServer, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -869,6 +938,9 @@
     };
 
     let allProducts = [];
+    let currentFeedProducts = [];
+    const FEED_SIZE = 20;
+    let lastFeedBatchIds = new Set();
     let currentUser = null;
     let userFavorites = [];
     let searchHistory = [];
@@ -882,6 +954,17 @@
     const storedLang = localStorage.getItem("app_lang") || "fr";
     let currentI18n = i18n[storedLang] || i18n.fr;
     let searchDebounceTimeout = null;
+    // ==========================================
+    // 🧠 MÉMOIRE DU FEED VEA
+    // ==========================================
+
+    let feedSeenProducts = {};
+
+    const RECENTLY_SEEN_TIME = 24 * 60 * 60 * 1000;
+    const LONG_AGO_TIME = 7 * 24 * 60 * 60 * 1000;
+
+    let feedSeenSaveTimeout = null;
+    let userCollectionName = "acheteurs";
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -919,6 +1002,7 @@
 
           if (userSnap.exists()) {
             const userData = userSnap.data();
+            feedSeenProducts = userData.feedSeenProducts || {};
             const addr = userData.address || {};
 
             userCity = addr.city || userData.city || userData.ville || "";
@@ -926,6 +1010,14 @@
             userCountry = addr.country || userData.country || userData.pays || "";
 
             document.getElementById("cityName").textContent = userCity || "--";
+
+            if (userRole === "vendeurs") {
+                userCollectionName = "vendeurs";
+            } else if (userRole === "vendeurs_clients") {
+                userCollectionName = "vendeurs_clients";
+            } else {
+                userCollectionName = "acheteurs";
+            }
 
             const photoUrl = userData.photoUrl || userData.photo || user.photoUrl;
             if (photoUrl) {
@@ -962,18 +1054,238 @@
 
         loadProducts(preferences);
       } else {
-        window.location.href = "acheteur.html";
+        window.location.href = "index.html";
       }
     });
 
-    document.getElementById("refreshLocationBtn").addEventListener("click", async () => {
-      const btn = document.getElementById("refreshLocationBtn");
-      btn.classList.add("refreshing");
-      await loadProducts(userPreferencesCache);
-      setTimeout(() => {
-        btn.classList.remove("refreshing");
-      }, 600);
+
+function scheduleFeedSeenSave() {
+
+    clearTimeout(feedSeenSaveTimeout);
+
+    feedSeenSaveTimeout = setTimeout(async () => {
+
+        if (!currentUser) return;
+
+        try {
+
+            await updateDoc(
+                doc(db, userCollectionName, currentUser.uid),
+                {
+                    feedSeenProducts
+                }
+            );
+
+            console.log("🧠 Historique du feed sauvegardé");
+
+        } catch (error) {
+
+            console.error(
+                "Erreur sauvegarde historique feed :",
+                error
+            );
+        }
+
+    }, 3000);
+}
+
+// ==========================================
+// 🧠 SCORE INTELLIGENT DU FEED VEA
+// ==========================================
+
+function calculateFeedScore(product) {
+
+    let score = 0;
+
+    const pType = String(product.type || "").toLowerCase().trim();
+    const pName = String(product.nom || "").toLowerCase().trim();
+
+    const pCity = String(product.city || "").toLowerCase().trim();
+    const pProvince = String(product.province || "").toLowerCase().trim();
+    const pCountry = String(product.country || "").toLowerCase().trim();
+
+    const city = String(userCity || "").toLowerCase().trim();
+    const province = String(userProvince || "").toLowerCase().trim();
+    const country = String(userCountry || "").toLowerCase().trim();
+
+    // ==========================================
+    // 🚀 BOOST COMPTE +1000
+    // ==========================================
+
+    if (product.isAccountBoosted) {
+        score += 1000;
+    }
+
+    // ==========================================
+    // 🚀 BOOST ARTICLE +700
+    // ==========================================
+
+    if (product.isItemBoosted) {
+        score += 700;
+    }
+
+    // ==========================================
+    // ❤️ PRÉFÉRENCE +100
+    // ==========================================
+
+    let preferenceMatch = false;
+
+    userPreferencesCache.forEach(pref => {
+
+        const preference =
+            String(pref).toLowerCase().trim();
+
+        if (!preference) return;
+
+        if (
+            pType === preference ||
+            pType.includes(preference) ||
+            preference.includes(pType) ||
+            pName.includes(preference)
+        ) {
+            preferenceMatch = true;
+        }
     });
+
+    if (preferenceMatch) {
+        score += 100;
+    }
+
+    // ==========================================
+    // 📍 VILLE +80
+    // ==========================================
+
+    if (city && pCity === city) {
+        score += 80;
+    }
+
+    // ==========================================
+    // 🏙️ PROVINCE +50
+    // ==========================================
+
+    if (province && pProvince === province) {
+        score += 50;
+    }
+
+    // ==========================================
+    // 🌍 PAYS +30
+    // ==========================================
+
+    if (country && pCountry === country) {
+        score += 30;
+    }
+
+    // ==========================================
+    // 🔎 HISTORIQUE DE RECHERCHE
+    // ==========================================
+
+    searchHistory.forEach(term => {
+
+        const searchTerm =
+            String(term).toLowerCase().trim();
+
+        if (!searchTerm) return;
+
+        if (
+            pName.includes(searchTerm) ||
+            pType.includes(searchTerm)
+        ) {
+            score += 2;
+        }
+    });
+
+    // ==========================================
+    // 🧠 HISTORIQUE DE VUE
+    // ==========================================
+
+    const seenAt = feedSeenProducts[product.id];
+
+    if (!seenAt) {
+
+        // 🆕 JAMAIS VU
+        score += 300;
+
+    } else {
+
+        const timeSinceSeen =
+            Date.now() - seenAt;
+
+        if (timeSinceSeen < RECENTLY_SEEN_TIME) {
+
+            // 👀 VU RÉCEMMENT
+            score -= 500;
+
+        } else if (timeSinceSeen < LONG_AGO_TIME) {
+
+            // 🕐 VU IL Y A LONGTEMPS
+            score -= 50;
+        }
+    }
+
+    return score;
+}
+
+document
+.getElementById("refreshLocationBtn")
+.addEventListener("click", async () => {
+
+    const btn =
+        document.getElementById(
+            "refreshLocationBtn"
+        );
+
+    if (
+        btn.classList.contains("refreshing")
+    ) {
+        return;
+    }
+
+    btn.classList.add("refreshing");
+
+    try {
+
+        // Sauvegarde immédiatement
+        // ce qui vient d'être vu
+
+        if (currentUser) {
+
+            await updateDoc(
+                doc(
+                    db,
+                    userCollectionName,
+                    currentUser.uid
+                ),
+                {
+                    feedSeenProducts
+                }
+            );
+        }
+
+        // 🔥 NOUVEAU FEED
+
+        await loadProducts(
+            userPreferencesCache,
+            true
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Erreur actualisation :",
+            error
+        );
+
+    } finally {
+
+        setTimeout(() => {
+
+            btn.classList.remove(
+                "refreshing"
+            );
+
+        }, 700);
+    }
+});
 
     function checkAndShowAd(userData) {
       const lastAdShown = userData.lastAdShown ? new Date(userData.lastAdShown) : null;
@@ -1014,151 +1326,405 @@
       document.getElementById("adToastOverlay").classList.remove("show");
     };
 
-    async function loadProducts(userPreferences) {
-      try {
-        const q = query(collection(db, "produits"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
+async function loadProducts(userPreferences, forceRefresh = false) {
+
+    try {
+
+        const q = query(
+            collection(db, "produits"),
+            orderBy("createdAt", "desc")
+        );
+
+        const querySnapshot = forceRefresh
+            ? await getDocsFromServer(q)
+            : await getDocs(q);
 
         const fetchedProducts = [];
+
         const vendeurCache = new Map();
+
         const now = new Date();
+
         let hasNewUnreadArticles = false;
 
+        // ==========================================
+        // 📦 RÉCUPÉRATION DES PRODUITS
+        // ==========================================
+
         for (const docSnap of querySnapshot.docs) {
-          const product = { id: docSnap.id, ...docSnap.data() };
 
-          if (product.createdAt) {
-            const createdDate = product.createdAt.toDate ? product.createdAt.toDate() : new Date(product.createdAt);
-            const hoursDiff = Math.abs(now - createdDate) / 36e5;
-            if (hoursDiff < 24) {
-              hasNewUnreadArticles = true;
+            const product = {
+                id: docSnap.id,
+                ...docSnap.data()
+            };
+
+            // ==========================================
+            // 🆕 NOUVEAUTÉS
+            // ==========================================
+
+            if (product.createdAt) {
+
+                const createdDate =
+                    product.createdAt.toDate
+                        ? product.createdAt.toDate()
+                        : new Date(product.createdAt);
+
+                const hoursDiff =
+                    Math.abs(now - createdDate) / 36e5;
+
+                if (hoursDiff < 24) {
+                    hasNewUnreadArticles = true;
+                }
             }
-          }
 
-          if (product.vendu === true || product.statut === "vendu") {
-            product.isSold = true;
-          } else {
-            product.isSold = false;
-          }
+            // ==========================================
+            // ❌ PRODUIT VENDU
+            // ==========================================
 
-          if (product.vendeurId) {
-            try {
-              let vData = vendeurCache.get(product.vendeurId);
+            product.isSold =
+                product.vendu === true ||
+                product.statut === "vendu";
 
-              if (!vData) {
-                let vendeurSnap = await getDoc(doc(db, "vendeurs", product.vendeurId));
-                if (!vendeurSnap.exists()) {
-                  vendeurSnap = await getDoc(doc(db, "vendeurs_clients", product.vendeurId));
+            // ==========================================
+            // 👤 VENDEUR
+            // ==========================================
+
+            if (product.vendeurId) {
+
+                try {
+
+                    let vData =
+                        vendeurCache.get(product.vendeurId);
+
+                    if (!vData) {
+
+                        let vendeurSnap =
+                            await getDoc(
+                                doc(
+                                    db,
+                                    "vendeurs",
+                                    product.vendeurId
+                                )
+                            );
+
+                        if (!vendeurSnap.exists()) {
+
+                            vendeurSnap =
+                                await getDoc(
+                                    doc(
+                                        db,
+                                        "vendeurs_clients",
+                                        product.vendeurId
+                                    )
+                                );
+                        }
+
+                        if (vendeurSnap.exists()) {
+
+                            vData =
+                                vendeurSnap.data();
+
+                            vendeurCache.set(
+                                product.vendeurId,
+                                vData
+                            );
+                        }
+                    }
+
+                    if (vData) {
+
+                        const vAddr =
+                            vData.address || {};
+
+                        product.shopName =
+                            vData.shopName ||
+                            vData.displayName ||
+                            vData.nom ||
+                            "Boutique";
+
+                        product.city =
+                            vAddr.city ||
+                            vData.city ||
+                            vData.ville ||
+                            "";
+
+                        product.province =
+                            vAddr.province ||
+                            vData.province ||
+                            "";
+
+                        product.country =
+                            vAddr.country ||
+                            vData.country ||
+                            vData.pays ||
+                            "";
+
+                        // ==========================================
+                        // 🚀 BOOST COMPTE
+                        // ==========================================
+
+                        product.vendeurIsPremium =
+                            vData.isPremium === true &&
+                            vData.premiumUntil &&
+                            new Date(vData.premiumUntil) > now;
+
+                    }
+
+                } catch (err) {
+
+                    console.error(
+                        "Erreur vendeur :",
+                        err
+                    );
+
+                    product.shopName = "Boutique";
                 }
+            }
 
-                if (vendeurSnap.exists()) {
-                  vData = vendeurSnap.data();
-                  vendeurCache.set(product.vendeurId, vData);
-                }
-              }
+            // ==========================================
+            // 🚀 BOOST ARTICLE
+            // ==========================================
 
-              if (vData) {
-                const vAddr = vData.address || {};
+            product.isItemBoosted =
+                product.isBoosted === true &&
+                product.boostUntil &&
+                new Date(product.boostUntil) > now;
 
-                product.shopName = vData.shopName || vData.displayName || vData.nom || "Boutique";
-                product.city = vAddr.city || vData.city || vData.ville || "";
-                product.province = vAddr.province || vData.province || "";
-                product.country = vAddr.country || vData.country || vData.pays || "";
+            // ==========================================
+            // 🚀 BOOST COMPTE
+            // ==========================================
 
-                if (vData.isPremium && vData.premiumUntil && new Date(vData.premiumUntil) > now) {
-                  product.vendeurIsPremium = true;
+            product.isAccountBoosted =
+                product.vendeurIsPremium === true;
+
+            // ==========================================
+            // ⭐ STYLE BOOST
+            // ==========================================
+
+            product.hasBoostStyle =
+                product.isItemBoosted ||
+                product.isAccountBoosted;
+
+            // ==========================================
+            // 🌍 VISIBILITÉ BOOST
+            // ==========================================
+
+            let isBoostedForCurrentUser = false;
+
+            if (product.hasBoostStyle) {
+
+                const isSameCountry =
+                    userCountry &&
+                    product.country &&
+                    userCountry
+                        .toLowerCase()
+                        .trim() ===
+                    product.country
+                        .toLowerCase()
+                        .trim();
+
+                if (isSameCountry) {
+
+                    isBoostedForCurrentUser = true;
+
                 } else {
-                  product.vendeurIsPremium = false;
+
+                    // 1% pour les boosts étrangers
+                    isBoostedForCurrentUser =
+                        Math.random() < 0.01;
                 }
-              }
-            } catch (err) {
-              product.shopName = "Boutique";
             }
-          }
 
-          // 1. On vérifie si l'article est réellement boosté dans la base de données
-          const isItemBoosted =
-            product.isBoosted === true &&
-            product.boostUntil &&
-            new Date(product.boostUntil) > now;
+            product.isBoostedActive =
+                isBoostedForCurrentUser;
 
-          const isAccountBoosted =
-            product.vendeurIsPremium === true;
-
-          product.isItemBoosted = isItemBoosted;
-          product.isAccountBoosted = isAccountBoosted;
-
-          product.hasBoostStyle = isItemBoosted || isAccountBoosted;
-
-          // 3. Logique de visibilité prioritaire (remontée en haut de liste)
-          let isBoostedForCurrentUser = false;
-          if (product.hasBoostStyle) {
-            const isSameCountry = userCountry && product.country && (userCountry.toLowerCase().trim() === product.country.toLowerCase().trim());
-            if (isSameCountry) {
-                isBoostedForCurrentUser = true;
-            } else {
-              // 1 chance sur 100 pour les articles/comptes boostés d'un autre pays
-              isBoostedForCurrentUser = Math.random() < 0.01;
-            }
-          }
-
-          product.isBoostedActive = isBoostedForCurrentUser;
-
-          fetchedProducts.push(product);
+            fetchedProducts.push(product);
         }
 
-        const profileBadge = document.getElementById("profileBadge");
-        const tabBadge = document.getElementById("tabBadge");
+        // ==========================================
+        // 🔴 BADGES NOUVEAUTÉS
+        // ==========================================
+
+        const profileBadge =
+            document.getElementById("profileBadge");
+
+        const tabBadge =
+            document.getElementById("tabBadge");
+
         if (hasNewUnreadArticles) {
-          if (profileBadge) profileBadge.style.display = "block";
-          if (tabBadge) tabBadge.style.display = "block";
-        }
 
-        allProducts = fetchedProducts.sort((a, b) => {
-          const calculateScore = (p) => {
-            let score = 0;
-            const pType = (p.type || "").toLowerCase();
-            const pCity = (p.city || "").toLowerCase();
-            const pProvince = (p.province || "").toLowerCase();
-            const pCountry = (p.country || "").toLowerCase();
-
-            const isPref = userPreferences.some(pref => pref.toLowerCase() === pType);
-            const isCityMatch = userCity && pCity === userCity.toLowerCase();
-            const isProvinceMatch = userProvince && pProvince === userProvince.toLowerCase();
-            const isCountryMatch = userCountry && pCountry === userCountry.toLowerCase();
-
-            if (p.isBoostedActive) {
-              score += 1000;
+            if (profileBadge) {
+                profileBadge.style.display = "block";
             }
 
-            if (isPref && isCityMatch) score += 100;
-            else if (isPref && isProvinceMatch) score += 80;
-            else if (isPref && isCountryMatch) score += 60;
-            else if (isPref) score += 40;
-            else if (isCityMatch) score += 20;
+            if (tabBadge) {
+                tabBadge.style.display = "block";
+            }
+        }
 
-            const pNom = (p.nom || "").toLowerCase();
-            searchHistory.forEach(term => {
-              const lowerTerm = term.toLowerCase();
-              if (pNom.includes(lowerTerm) || pType.includes(lowerTerm)) score += 2;
-            });
+        // ==========================================
+        // 🧠 MOTEUR DE FEED VEA
+        // ==========================================
 
-            return score;
-          };
+        // 1️⃣ On récupère TOUS les produits
+        allProducts = fetchedProducts;
 
-          return calculateScore(b) - calculateScore(a);
-        });
+// 2️⃣ On calcule le score de chaque produit
+        allProducts = buildPersonalizedFeed(allProducts);
 
-        renderProducts(allProducts);
+// 3️⃣ On sélectionne seulement 20 produits
+        currentFeedProducts = selectFeedBatch(allProducts);
 
-      } catch (e) {
-        console.error("Erreur chargement articles:", e);
-      }
+        console.log(
+          "🔥 FEED VEA :",
+          currentFeedProducts.map(p => ({
+              id: p.id,
+              nom: p.nom,
+              score: Math.round(p.feedScore),
+              boostCompte: p.isAccountBoosted,
+              boostArticle: p.isItemBoosted,
+              vu: !!feedSeenProducts[p.id]
+          }))
+        );
+
+        // ==========================================
+        // 🎯 AFFICHAGE
+        // ==========================================
+
+        // IMPORTANT : on affiche le lot de 20,
+        // pas tous les produits.
+        renderProducts(currentFeedProducts);
+
+    } catch (e) {
+
+        console.error(
+            "Erreur chargement articles:",
+            e
+        );
     }
+}
+
+function buildPersonalizedFeed(products) {
+
+    return products
+        .map(product => ({
+            ...product,
+            feedScore: calculateFeedScore(product)
+        }))
+        .sort((a, b) => {
+
+            if (b.feedScore !== a.feedScore) {
+                return b.feedScore - a.feedScore;
+            }
+
+            const getDate = (p) => {
+
+                if (!p.createdAt) {
+                    return 0;
+                }
+
+                return p.createdAt.toDate
+                    ? p.createdAt.toDate().getTime()
+                    : new Date(p.createdAt).getTime();
+            };
+
+            return getDate(b) - getDate(a);
+        });
+}
+
+function selectFeedBatch(products) {
+    const now = Date.now();
+
+    // Les produits sont déjà classés par score
+    const ranked = [...products];
+
+    // Si la base contient moins ou exactement 20 produits, on affiche tout sans filtrer
+    if (ranked.length <= FEED_SIZE) {
+        lastFeedBatchIds = new Set(ranked.map(p => p.id));
+        return ranked;
+    }
+
+    // 1️⃣ Éviter les produits du dernier lot
+    let candidates = ranked.filter(product => {
+        return !lastFeedBatchIds.has(product.id);
+    });
+
+    // 2️⃣ Éviter les produits vus récemment (< 24h)
+    let notRecentlySeen = candidates.filter(product => {
+        const seenAt = feedSeenProducts[product.id];
+        if (!seenAt) return true;
+        return (now - seenAt) >= RECENTLY_SEEN_TIME;
+    });
+
+    // 3️⃣ Si on a assez de produits "jamais vus" ou "pas vus récemment"
+    if (notRecentlySeen.length >= FEED_SIZE) {
+        candidates = notRecentlySeen;
+    }
+    // 4️⃣ Si on n'a pas assez de produits non vus, on complète avec les produits déjà vus récemment
+    // mais en gardant la priorité aux produits non vus en premier
+    else {
+        const seenCandidates = candidates.filter(product => {
+            return !notRecentlySeen.some(p => p.id === product.id);
+        });
+        candidates = [...notRecentlySeen, ...seenCandidates];
+    }
+
+    // 5️⃣ Si malgré tout on n'atteint toujours pas 20 produits (ex: peu de produits au total),
+    // on va repêcher dans le dernier lot affiché pour compléter la grille
+    if (candidates.length < FEED_SIZE) {
+        const remainingFromLastBatch = ranked.filter(product => {
+            return !candidates.some(c => c.id === product.id);
+        });
+        candidates.push(...remainingFromLastBatch);
+    }
+
+    // 6️⃣ On prend exactement 20 produits maximum
+    const batch = candidates.slice(0, FEED_SIZE);
+
+    // 7️⃣ Mémoriser ce lot
+    lastFeedBatchIds = new Set(batch.map(product => product.id));
+
+    return batch;
+}
+
+function markProductAsSeen(productId) {
+  if (!productId || !currentUser) return;
+
+  feedSeenProducts[productId] = Date.now();
+
+  scheduleFeedSeenSave();
+}
 
 function renderProducts(products) {
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
+  const feedObserver =
+    new IntersectionObserver(
+        (entries) => {
+
+            entries.forEach(entry => {
+
+                if (!entry.isIntersecting) {
+                    return;
+                }
+
+                const productId =
+                    entry.target.dataset.productId;
+
+                if (productId) {
+                    markProductAsSeen(productId);
+                }
+
+                feedObserver.unobserve(
+                    entry.target
+                );
+            });
+
+        },
+        {
+            threshold: 0.5
+        }
+    );
 
   const term = document.getElementById("searchInput").value.toLowerCase().trim();
 
@@ -1226,12 +1792,14 @@ function renderProducts(products) {
     }
 
     const card = document.createElement("div");
+    card.dataset.productId = p.id;
     card.className = `product-card ${boostClass}`;
     card.onclick = (e) => {
       if (!e.target.closest('.fav-btn')) {
         window.location.href = `article.html?id=${p.id}`;
       }
     };
+
     // 2. BADGE PRO (Affiché pour le vendeur Premium)
     let proBadgeHtml = '';
     if (p.vendeurIsPremium) {
@@ -1307,6 +1875,12 @@ function renderProducts(products) {
     }
 
     grid.appendChild(card);
+    if (
+        activeFilter === "all" &&
+        !term
+    ) {
+        feedObserver.observe(card);
+    }
   });
 }
 
@@ -1363,7 +1937,12 @@ function applyFilters() {
 
   const now = new Date();
 
-  const filtered = allProducts.filter(p => {
+  const sourceProducts =
+    activeFilter === "all" && !term
+        ? currentFeedProducts
+        : allProducts;
+
+  const filtered = sourceProducts.filter(p => {
 
     // Ne pas afficher les articles vendus
     if (p.isSold) return false;
@@ -1590,6 +2169,30 @@ function applyFilters() {
         console.error("Erreur de mise à jour des favoris:", e);
       }
     };
+
+const offlineBanner = document.getElementById("offlineBanner");
+
+function updateConnectionStatus() {
+
+    if (!offlineBanner) return;
+
+    if (!navigator.onLine) {
+        offlineBanner.classList.add("show");
+    } else {
+        offlineBanner.classList.remove("show");
+    }
+}
+
+window.addEventListener("offline", () => {
+    updateConnectionStatus();
+});
+
+window.addEventListener("online", () => {
+    updateConnectionStatus();
+});
+
+// Vérification au démarrage
+updateConnectionStatus();
   </script>
 </body>
 </html>
