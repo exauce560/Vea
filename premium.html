@@ -729,688 +729,3013 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, onSnapshot, getDoc, updateDoc, increment, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+<script type="module">
+  // ============================================================
+  // IMPORTS FIREBASE
+  // ============================================================
 
-    const translations = {
-      fr: {
-        header_title: "Portefeuille & Boost",
-        active_balance: "SOLDE ACTIF",
-        available_in_account: "Disponible dans le compte",
-        btn_recharge: "Recharger",
-        btn_withdraw: "Retirer",
-        boost_section_title: "Boostez votre Visibilité",
-        boost_section_sub: "Choisissez une formule pour multiplier vos ventes",
-        item_boost_title: "Boost Article",
-        per_7days: "/ 7 jours",
-        feat_boost_1: "Positionné en tête de recherche",
-        feat_boost_2: "Badge 'Sponsorisé' attractif",
-        feat_boost_3: "+300% de vues estimées",
-        btn_boost_item: "Booster un article",
-        badge_pro: "RECOMMANDÉ PRO",
-        vip_title: "Vendeur VIP Premium",
-        per_month: "/ mois",
-        feat_vip_1: "Badge 'Vendeur VIP' Doré",
-        feat_vip_2: "Publication d'articles en illimité",
-        feat_vip_3: "Accès au tableau de bord des vues",
-        feat_vip_4: "Support WhatsApp prioritaire 24/7",
-        btn_activate_vip: "Activer le Mode VIP",
-        trust_text: "Transactions sécurisées par Mobile Money (M-Pesa, Airtel, Orange)",
-        modal_deposit_title: "Recharger votre portefeuille",
-        select_operator: "Sélectionnez l'opérateur",
-        phone_number: "Numéro de Téléphone Mobile Money",
-        amount_usd: "Montant à Déposer ($ USD)",
-        btn_confirm_deposit: "Confirmer le Dépôt",
-        withdraw_notice: "Module de retrait sécurisé bientôt disponible.",
-        invalid_inputs: "Veuillez saisir un numéro valide et un montant supérieur à zéro.",
-        deposit_ussd_sent: "Demande envoyée. Veuillez valider le pop-up USSD sur votre téléphone.",
-        deposit_success: "Votre compte a été crédité avec succès !",
-        insufficient_balance: "Solde insuffisant ({balance}$). Vous avez besoin de {cost}$ pour cet achat.",
-        confirm_purchase: "Confirmez-vous le paiement de {cost}$ pour : {service} ?",
-        purchase_success: "Félicitations ! L'option '{service}' est maintenant active.",
-        transaction_error: "Erreur lors de la transaction.",
-        vip_status_title: "Compte VIP Premium",
-        boost_status_title: "Boost Article Actif",
-        days_short: "j",
-        hours_short: "h",
-        min_short: "m",
-        sec_short: "s",
-        expired: "Expiré"
-      },
-      en: {
-        header_title: "Wallet & Boost",
-        active_balance: "ACTIVE BALANCE",
-        available_in_account: "Available in account",
-        btn_recharge: "Top Up",
-        btn_withdraw: "Withdraw",
-        boost_section_title: "Boost Your Visibility",
-        boost_section_sub: "Choose a plan to multiply your sales",
-        item_boost_title: "Item Boost",
-        per_7days: "/ 7 days",
-        feat_boost_1: "Positioned at top of search",
-        feat_boost_2: "Attractive 'Sponsored' badge",
-        feat_boost_3: "+300% estimated views",
-        btn_boost_item: "Boost an item",
-        badge_pro: "PRO RECOMMENDED",
-        vip_title: "VIP Premium Seller",
-        per_month: "/ month",
-        feat_vip_1: "Golden 'VIP Seller' Badge",
-        feat_vip_2: "Unlimited item listings",
-        feat_vip_3: "Access to views dashboard",
-        feat_vip_4: "24/7 Priority WhatsApp support",
-        btn_activate_vip: "Activate VIP Mode",
-        trust_text: "Transactions secured by Mobile Money (M-Pesa, Airtel, Orange)",
-        modal_deposit_title: "Top up your wallet",
-        select_operator: "Select operator",
-        phone_number: "Mobile Money Phone Number",
-        amount_usd: "Amount to Deposit ($ USD)",
-        btn_confirm_deposit: "Confirm Deposit",
-        withdraw_notice: "Secure withdrawal module coming soon.",
-        invalid_inputs: "Please enter a valid phone number and amount greater than zero.",
-        deposit_ussd_sent: "Payment request sent. Please approve the USSD pop-up on your phone.",
-        deposit_success: "Your account has been credited successfully!",
-        insufficient_balance: "Insufficient balance ({balance}$). You need {cost}$ for this purchase.",
-        confirm_purchase: "Do you confirm payment of {cost}$ for: {service}?",
-        purchase_success: "Congratulations! '{service}' is now active.",
-        transaction_error: "An error occurred during transaction.",
-        vip_status_title: "VIP Premium Account",
-        boost_status_title: "Item Boost Active",
-        days_short: "d",
-        hours_short: "h",
-        min_short: "m",
-        sec_short: "s",
-        expired: "Expired"
-      }
-    };
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 
-    const currentLang = localStorage.getItem('app_lang') || 'fr';
+  import {
+    getFirestore,
+    doc,
+    onSnapshot,
+    getDoc,
+    updateDoc,
+    collection,
+    query,
+    where,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    window.getTranslation = function(key, params = {}) {
-      let text = (translations[currentLang] && translations[currentLang][key]) ? translations[currentLang][key] : translations['fr'][key];
-      Object.keys(params).forEach(p => {
-        text = text.replace(`{${p}}`, params[p]);
-      });
-      return text;
-    };
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    function applyTranslations() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = window.getTranslation(key);
-      });
+
+  // ============================================================
+  // TRADUCTIONS
+  // ============================================================
+
+  const translations = {
+
+    fr: {
+      header_title: "Portefeuille & Boost",
+      active_balance: "SOLDE ACTIF",
+      available_in_account: "Disponible dans le compte",
+      btn_recharge: "Recharger",
+      btn_withdraw: "Retirer",
+
+      boost_section_title: "Boostez votre Visibilité",
+      boost_section_sub: "Choisissez une formule pour multiplier vos ventes",
+
+      item_boost_title: "Boost Article",
+      per_7days: "/ 7 jours",
+
+      feat_boost_1: "Positionné en tête de recherche",
+      feat_boost_2: "Badge 'Sponsorisé' attractif",
+      feat_boost_3: "+300% de vues estimées",
+
+      btn_boost_item: "Booster un article",
+
+      badge_pro: "RECOMMANDÉ PRO",
+      vip_title: "Vendeur VIP Premium",
+      per_month: "/ mois",
+
+      feat_vip_1: "Badge 'Vendeur VIP' Doré",
+      feat_vip_2: "Publication d'articles en illimité",
+      feat_vip_3: "Accès au tableau de bord des vues",
+      feat_vip_4: "Support WhatsApp prioritaire 24/7",
+
+      btn_activate_vip: "Activer le Mode VIP",
+
+      trust_text:
+        "Transactions sécurisées par Mobile Money (M-Pesa, Airtel, Orange)",
+
+      modal_deposit_title:
+        "Recharger votre portefeuille",
+
+      select_operator:
+        "Sélectionnez l'opérateur",
+
+      phone_number:
+        "Numéro de Téléphone Mobile Money",
+
+      amount_usd:
+        "Montant à Déposer ($ USD)",
+
+      btn_confirm_deposit:
+        "Confirmer le Dépôt",
+
+      withdraw_notice:
+        "Module de retrait sécurisé bientôt disponible.",
+
+      invalid_inputs:
+        "Veuillez saisir un numéro valide et un montant supérieur à zéro.",
+
+      deposit_ussd_sent:
+        "Demande envoyée. Veuillez valider le pop-up USSD sur votre téléphone.",
+
+      deposit_success:
+        "Votre compte a été crédité avec succès !",
+
+      insufficient_balance:
+        "Solde insuffisant ({balance}$). Vous avez besoin de {cost}$ pour cet achat.",
+
+      confirm_purchase:
+        "Confirmez-vous le paiement de {cost}$ pour : {service} ?",
+
+      purchase_success:
+        "Félicitations ! L'option '{service}' est maintenant active.",
+
+      transaction_error:
+        "Erreur lors de la transaction.",
+
+      vip_status_title:
+        "Compte VIP Premium",
+
+      boost_status_title:
+        "Boost Article Actif",
+
+      days_short: "j",
+      hours_short: "h",
+      min_short: "m",
+      sec_short: "s",
+
+      expired: "Expiré"
+    },
+
+    en: {
+      header_title: "Wallet & Boost",
+      active_balance: "ACTIVE BALANCE",
+      available_in_account: "Available in account",
+      btn_recharge: "Top Up",
+      btn_withdraw: "Withdraw",
+
+      boost_section_title: "Boost Your Visibility",
+      boost_section_sub:
+        "Choose a plan to multiply your sales",
+
+      item_boost_title: "Item Boost",
+      per_7days: "/ 7 days",
+
+      feat_boost_1: "Positioned at top of search",
+      feat_boost_2: "Attractive 'Sponsored' badge",
+      feat_boost_3: "+300% estimated views",
+
+      btn_boost_item: "Boost an item",
+
+      badge_pro: "PRO RECOMMENDED",
+      vip_title: "VIP Premium Seller",
+      per_month: "/ month",
+
+      feat_vip_1: "Golden 'VIP Seller' Badge",
+      feat_vip_2: "Unlimited item listings",
+      feat_vip_3: "Access to views dashboard",
+      feat_vip_4: "24/7 Priority WhatsApp support",
+
+      btn_activate_vip: "Activate VIP Mode",
+
+      trust_text:
+        "Transactions secured by Mobile Money (M-Pesa, Airtel, Orange)",
+
+      modal_deposit_title:
+        "Top up your wallet",
+
+      select_operator:
+        "Select operator",
+
+      phone_number:
+        "Mobile Money Phone Number",
+
+      amount_usd:
+        "Amount to Deposit ($ USD)",
+
+      btn_confirm_deposit:
+        "Confirm Deposit",
+
+      withdraw_notice:
+        "Secure withdrawal module coming soon.",
+
+      invalid_inputs:
+        "Please enter a valid phone number and amount greater than zero.",
+
+      deposit_ussd_sent:
+        "Payment request sent. Please approve the USSD pop-up on your phone.",
+
+      deposit_success:
+        "Your account has been credited successfully!",
+
+      insufficient_balance:
+        "Insufficient balance ({balance}$). You need {cost}$ for this purchase.",
+
+      confirm_purchase:
+        "Do you confirm payment of {cost}$ for: {service}?",
+
+      purchase_success:
+        "Congratulations! '{service}' is now active.",
+
+      transaction_error:
+        "An error occurred during transaction.",
+
+      vip_status_title:
+        "VIP Premium Account",
+
+      boost_status_title:
+        "Item Boost Active",
+
+      days_short: "d",
+      hours_short: "h",
+      min_short: "m",
+      sec_short: "s",
+
+      expired: "Expired"
     }
-
-    window.showToast = (message, type = 'info') => {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-
-      let icon = 'fa-info-circle';
-      if(type === 'success') icon = 'fa-check-circle';
-      if(type === 'error') icon = 'fa-exclamation-circle';
-
-      toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-10px)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    };
-
-    window.customConfirm = (message) => {
-      return new Promise((resolve) => {
-        const modal = document.getElementById('customConfirm');
-        const msgEl = document.getElementById('confirmMessage');
-        const yesBtn = document.getElementById('confirmYesBtn');
-        const noBtn = document.getElementById('confirmNoBtn');
-
-        msgEl.textContent = message;
-        modal.style.display = 'flex';
-
-        const handleYes = () => {
-          modal.style.display = 'none';
-          cleanup();
-          resolve(true);
-        };
-
-        const handleNo = () => {
-          modal.style.display = 'none';
-          cleanup();
-          resolve(false);
-        };
-
-        const cleanup = () => {
-          yesBtn.removeEventListener('click', handleYes);
-          noBtn.removeEventListener('click', handleNo);
-        };
-
-        yesBtn.addEventListener('click', handleYes);
-        noBtn.addEventListener('click', handleNo);
-      });
-    };
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
-      authDomain: "v-ea-fb4c4.firebaseapp.com",
-      projectId: "v-ea-fb4c4",
-      storageBucket: "v-ea-fb4c4.firebasestorage.app",
-      messagingSenderId: "357462139035",
-      appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
-      measurementId: "G-WEG1X65STP"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    let currentUser = null;
-    let currentBalance = 0;
-    let timerInterval = null;
-    let userData = null;
-    let userRoleCollection = "vendeurs_clients";
-    let selectedArticleId = null;
-
-    onAuthStateChanged(getAuth(app), async (user) => {
-      if (user) {
-        currentUser = user;
-
-        let snap = await getDoc(doc(db, "vendeurs_clients", user.uid));
-        if (snap.exists()) {
-          userRoleCollection = "vendeurs_clients";
-        } else {
-          snap = await getDoc(doc(db, "vendeurs", user.uid));
-          if (snap.exists()) {
-            userRoleCollection = "vendeurs";
-          }
-        }
-
-        loadUserData();
-      }
-    });
-
-// Variable globale pour stocker l'écouteur en temps réel des produits
-let productsUnsubscribe = null;
-let boostedProductsData = {};
-
-async function loadUserData() {
-  try {
-    const userSnap = await getDoc(doc(db, userRoleCollection, currentUser.uid));
-    if (userSnap.exists()) {
-      userData = userSnap.data();
-      currentBalance = userData.solde || 0;
-      document.getElementById("userBalance").textContent = `${currentBalance.toFixed(2)} $`;
-
-      // Lancer la surveillance des articles boostés
-      listenToBoostedArticles();
-    }
-  } catch (err) {
-    console.error("Erreur chargement profil :", err);
-  }
-}
-
-// 1. Écouter les changements sur les articles de l'utilisateur en temps réel
-function listenToBoostedArticles() {
-  if (productsUnsubscribe) productsUnsubscribe();
-
-  const q = query(collection(db, "produits"), where("vendeurId", "==", currentUser.uid));
-
-  // onSnapshot permet de détecter instantanément si un article est vendu
-  productsUnsubscribe = onSnapshot(q, (snapshot) => {
-    boostedProductsData = {};
-    snapshot.forEach((docSnap) => {
-      boostedProductsData[docSnap.id] = docSnap.data();
-    });
-
-    // Mettre à jour l'affichage et vérifier le statut des boosts
-    renderTimers();
-  });
-}
-
-function renderTimers() {
-  const container = document.getElementById('activeStatusContainer');
-  container.innerHTML = '';
-
-  if (timerInterval) clearInterval(timerInterval);
-
-  let hasVip = userData && userData.isPremium && userData.premiumUntil;
-  let activeBoosts = (userData && userData.boosts) ? userData.boosts : [];
-
-  if (!hasVip && activeBoosts.length === 0) return;
-
-  const updateClocks = async () => {
-    const currentTime = new Date().getTime();
-    let html = '';
-    let validBoostsForUser = [];
-    let hasBoostsChanged = false;
-
-    // 1. Affichage du statut VIP
-    if (hasVip) {
-      const expiry = new Date(userData.premiumUntil).getTime();
-      const totalDuration = 30 * 24 * 60 * 60 * 1000;
-      const diff = expiry - currentTime;
-
-      if (diff > 0) {
-        const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
-        html += `
-          <div class="status-card vip">
-            <div class="status-header">
-              <div class="status-title" style="color:#FFD700;">
-                <i class="fa-solid fa-crown"></i> ${window.getTranslation('vip_status_title')}
-              </div>
-              <div class="status-timer">${formatTimeLeft(diff)}</div>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill gold" style="width: ${pct}%"></div>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    // 2. Vérification et affichage des boosts
-    for (const boost of activeBoosts) {
-      const expiry = new Date(boost.boostUntil).getTime();
-      const diff = expiry - currentTime;
-
-      // Récupération des données en temps réel de l'article lié
-      const articleData = boost.articleId ? boostedProductsData[boost.articleId] : null;
-      const isSold = articleData && (articleData.vendu === true || articleData.statut === "vendu");
-
-      // SI L'ARTICLE EST VENDU OU LE BOOST A EXPIRÉ
-      if (isSold || diff <= 0) {
-        hasBoostsChanged = true;
-
-        // Si le produit existe encore et qu'il était marqué 'boosté', on désactive le boost
-        if (boost.articleId) {
-          try {
-            const productRef = doc(db, "produits", boost.articleId);
-            await updateDoc(productRef, {
-              isBoosted: false,
-              boostUntil: null
-            });
-          } catch (e) {
-            console.error("Erreur lors de la désactivation du boost sur l'article :", e);
-          }
-        }
-        // On ne l'ajoute PAS à validBoostsForUser (ce qui le supprime de la liste)
-        continue;
-      }
-
-      // SI L'ARTICLE EST TOUJOURS EN VENTE ET BOOST ACTIF
-      validBoostsForUser.push(boost);
-
-      const totalDuration = 7 * 24 * 60 * 60 * 1000;
-      const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
-      const imgHtml = boost.boostedArticleImage
-        ? `<img src="${boost.boostedArticleImage}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">`
-        : '';
-
-      html += `
-        <div class="status-card">
-          <div class="status-header" style="display:flex; align-items:center; gap:10px;">
-            ${imgHtml}
-            <div style="flex:1;">
-              <div class="status-title" style="color:#6366F1;">
-                <i class="fa-solid fa-rocket"></i> ${window.getTranslation('boost_status_title')}
-              </div>
-            </div>
-            <div class="status-timer">${formatTimeLeft(diff)}</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${pct}%"></div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Si des boosts ont été retirés (car vendus ou expirés), mise à jour dans Firestore de l'utilisateur
-    if (hasBoostsChanged) {
-      userData.boosts = validBoostsForUser;
-      const userRef = doc(db, userRoleCollection, currentUser.uid);
-      await updateDoc(userRef, {
-        boosts: validBoostsForUser,
-        isBoosted: validBoostsForUser.length > 0
-      });
-    }
-
-    container.innerHTML = html;
   };
 
-  updateClocks();
-  timerInterval = setInterval(updateClocks, 1000);
-}
 
-    function formatTimeLeft(ms) {
-      if (ms <= 0) return window.getTranslation('expired');
-      const seconds = Math.floor((ms / 1000) % 60);
-      const minutes = Math.floor((ms / (1000 * 60)) % 60);
-      const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  // ============================================================
+  // LANGUE
+  // ============================================================
 
-      return `${days}${window.getTranslation('days_short')} ${hours}${window.getTranslation('hours_short')} ${minutes}${window.getTranslation('min_short')} ${seconds}${window.getTranslation('sec_short')}`;
+  const currentLang =
+    localStorage.getItem("app_lang") || "fr";
+
+
+  window.getTranslation = function (
+    key,
+    params = {}
+  ) {
+
+    let text =
+      translations[currentLang]?.[key] ??
+      translations.fr?.[key] ??
+      key;
+
+    Object.keys(params).forEach((param) => {
+
+      text = text.replace(
+        new RegExp(`\\{${param}\\}`, "g"),
+        params[param]
+      );
+
+    });
+
+    return text;
+  };
+
+
+  function applyTranslations() {
+
+    document
+      .querySelectorAll("[data-i18n]")
+      .forEach((element) => {
+
+        const key =
+          element.getAttribute("data-i18n");
+
+        element.textContent =
+          window.getTranslation(key);
+
+      });
+
+  }
+
+
+  // ============================================================
+  // TOAST
+  // ============================================================
+
+  window.showToast = function (
+    message,
+    type = "info"
+  ) {
+
+    const container =
+      document.getElementById("toast-container");
+
+    if (!container) return;
+
+    const toast =
+      document.createElement("div");
+
+    toast.className =
+      `toast ${type}`;
+
+    let icon = "fa-info-circle";
+
+    if (type === "success") {
+      icon = "fa-check-circle";
     }
 
-    window.openDepositModal = () => document.getElementById("depositModal").style.display = "flex";
-    window.closeDepositModal = () => document.getElementById("depositModal").style.display = "none";
+    if (type === "error") {
+      icon = "fa-exclamation-circle";
+    }
 
-    window.closeBoostArticleModal = () => {
-      document.getElementById("boostArticleModal").style.display = "none";
-      selectedArticleId = null;
-    };
+    toast.innerHTML = `
+      <i class="fa-solid ${icon}"></i>
+      <span>${message}</span>
+    `;
 
-    window.selectOperator = (el, op) => {
-      document.querySelectorAll('.payment-opt').forEach(item => item.classList.remove('active'));
-      el.classList.add('active');
-    };
+    container.appendChild(toast);
 
-    window.processDeposit = async () => {
-      const amount = parseFloat(document.getElementById("depositAmount").value);
-      const phone = document.getElementById("phoneNumber").value;
+    setTimeout(() => {
 
-      if (!amount || amount <= 0 || !phone) {
-        window.showToast(window.getTranslation('invalid_inputs'), 'error');
+      toast.style.opacity = "0";
+      toast.style.transform =
+        "translateY(-10px)";
+      toast.style.transition =
+        "all 0.3s ease";
+
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+
+    }, 3500);
+
+  };
+
+
+  // ============================================================
+  // CONFIRMATION PERSONNALISÉE
+  // ============================================================
+
+  window.customConfirm = function (
+    message
+  ) {
+
+    return new Promise((resolve) => {
+
+      const modal =
+        document.getElementById(
+          "customConfirm"
+        );
+
+      const messageElement =
+        document.getElementById(
+          "confirmMessage"
+        );
+
+      const yesButton =
+        document.getElementById(
+          "confirmYesBtn"
+        );
+
+      const noButton =
+        document.getElementById(
+          "confirmNoBtn"
+        );
+
+      if (
+        !modal ||
+        !messageElement ||
+        !yesButton ||
+        !noButton
+      ) {
+        resolve(
+          window.confirm(message)
+        );
         return;
       }
 
-      window.showToast(window.getTranslation('deposit_ussd_sent'), 'info');
+      messageElement.textContent =
+        message;
 
-      try {
-        const userRef = doc(db, userRoleCollection, currentUser.uid);
-        await updateDoc(userRef, {
-          solde: increment(amount)
-        });
+      modal.style.display =
+        "flex";
 
-        window.closeDepositModal();
-        await loadUserData();
-        window.showToast(window.getTranslation('deposit_success'), 'success');
-      } catch(e) {
-        window.showToast(window.getTranslation('transaction_error'), 'error');
-      }
-    };
+      const handleYes = () => {
 
-window.startBoostProcess = async () => {
-  if (!currentUser) return;
+        modal.style.display =
+          "none";
 
-  const cost = 1.50;
-  if (currentBalance < cost) {
-    window.showToast(window.getTranslation('insufficient_balance', { balance: currentBalance.toFixed(2), cost: cost }), 'error');
-    window.openDepositModal();
-    return;
-  }
+        cleanup();
 
-  const listContainer = document.getElementById("articlesSelectList");
-  listContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center;">Chargement de vos articles...</div>';
-  document.getElementById("boostArticleModal").style.display = "flex";
-
-  try {
-    const q = query(collection(db, "produits"), where("vendeurId", "==", currentUser.uid));
-    const querySnapshot = await getDocs(q);
-
-    const nowTime = new Date().getTime();
-
-    const availableArticles = [];
-    querySnapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      const articleId = docSnap.id;
-
-      // Vérification si le produit est encore en boost sur sa fiche ou dans le tableau utilisateur
-      let boostExpiry = null;
-
-      if (data.boostUntil) {
-        if (typeof data.boostUntil.toDate === "function") {
-          boostExpiry = data.boostUntil.toDate().getTime();
-        } else {
-          boostExpiry = new Date(data.boostUntil).getTime();
-        }
-      }
-
-      const isCurrentlyBoosted =
-        data.isBoosted === true &&
-        Number.isFinite(boostExpiry) &&
-        boostExpiry > nowTime;
-
-      if (!data.vendu && data.statut !== "vendu" && !isCurrentlyBoosted) {
-        availableArticles.push({ id: articleId, ...data });
-      }
-    });
-
-    if (availableArticles.length === 0) {
-      listContainer.innerHTML = '<div style="color:var(--text-muted); text-align:center;">Aucun article disponible à booster (tous vos articles sont soit vendus, soit déjà en cours de boost).</div>';
-      document.getElementById("confirmBoostArticleBtn").disabled = true;
-      return;
-    }
-
-    listContainer.innerHTML = "";
-    availableArticles.forEach(item => {
-      const imgUrl = (item.images && item.images.length > 0) ? item.images[0] : (item.image || '');
-      const card = document.createElement("div");
-      card.className = "article-item-card";
-      card.onclick = () => {
-        document.querySelectorAll('.article-item-card').forEach(el => el.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedArticleId = item.id;
-        card.dataset.imgUrl = imgUrl;
-        document.getElementById("confirmBoostArticleBtn").disabled = false;
+        resolve(true);
       };
 
-      card.innerHTML = `
-        <img src="${imgUrl}" alt="${item.nom || 'Article'}">
-        <div class="article-item-info">
-          <div class="article-item-title">${item.nom || 'Sans nom'}</div>
-          <div class="article-item-price">${item.prix} ${item.devise || '$'}</div>
-        </div>
-      `;
-      listContainer.appendChild(card);
+      const handleNo = () => {
+
+        modal.style.display =
+          "none";
+
+        cleanup();
+
+        resolve(false);
+      };
+
+      const cleanup = () => {
+
+        yesButton.removeEventListener(
+          "click",
+          handleYes
+        );
+
+        noButton.removeEventListener(
+          "click",
+          handleNo
+        );
+
+      };
+
+      yesButton.addEventListener(
+        "click",
+        handleYes
+      );
+
+      noButton.addEventListener(
+        "click",
+        handleNo
+      );
+
     });
 
-  } catch (err) {
-    console.error("Erreur récupération articles:", err);
-    listContainer.innerHTML = '<div style="color:var(--accent-red); text-align:center;">Erreur lors du chargement des articles.</div>';
-  }
-};
+  };
 
-window.confirmBoostSelectedArticle = async () => {
-  if (!selectedArticleId) return;
 
-  try {
-    // On sauvegarde immédiatement l'ID sélectionné
-    const articleIdToBoost = selectedArticleId;
+  // ============================================================
+  // CONFIGURATION FIREBASE
+  // ============================================================
 
-    // Vérification DIRECTE dans Firebase
-    const productRef = doc(db, "produits", articleIdToBoost);
-    const productSnap = await getDoc(productRef);
+  const firebaseConfig = {
 
-    if (!productSnap.exists()) {
-      window.showToast("Cet article n'existe plus.", "error");
-      window.closeBoostArticleModal();
-      return;
-    }
+    apiKey:
+      "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
 
-    const productData = productSnap.data();
+    authDomain:
+      "v-ea-fb4c4.firebaseapp.com",
 
-    // Vérification vendu
-    const isSold =
-      productData.vendu === true ||
-      productData.statut === "vendu";
+    projectId:
+      "v-ea-fb4c4",
 
-    if (isSold) {
-      window.showToast(
-        "❌ Cet article est déjà vendu et ne peut pas être boosté.",
-        "error"
-      );
-      window.closeBoostArticleModal();
-      return;
-    }
+    storageBucket:
+      "v-ea-fb4c4.firebasestorage.app",
 
-    // Récupération de la date de fin du boost
-    let boostExpiry = null;
+    messagingSenderId:
+      "357462139035",
 
-    if (productData.boostUntil) {
-      if (typeof productData.boostUntil.toDate === "function") {
-        boostExpiry = productData.boostUntil.toDate().getTime();
-      } else {
-        boostExpiry = new Date(productData.boostUntil).getTime();
-      }
-    }
+    appId:
+      "1:357462139035:web:7aa2ee50350d88a843a63e",
 
-    // Vérification du boost actuel
-    const isCurrentlyBoosted =
-      productData.isBoosted === true &&
-      Number.isFinite(boostExpiry) &&
-      boostExpiry > Date.now();
+    measurementId:
+      "G-WEG1X65STP"
+  };
 
-    if (isCurrentlyBoosted) {
-      window.showToast(
-        "🚀 Cet article est déjà en cours de boost. Attendez la fin du boost actuel.",
-        "error"
-      );
-      window.closeBoostArticleModal();
-      return;
-    }
 
-    // Image
-    const selectedCard =
-      document.querySelector('.article-item-card.selected');
+  const app =
+    initializeApp(firebaseConfig);
 
-    const imgUrl =
-      selectedCard?.dataset.imgUrl || productData.images?.[0] || productData.image || '';
+  const db =
+    getFirestore(app);
 
-    // On ferme la modal
-    window.closeBoostArticleModal();
+  const auth =
+    getAuth(app);
 
-    // IMPORTANT : on utilise articleIdToBoost
-    await payService(
-      'boost_item',
-      1.50,
-      7,
-      articleIdToBoost,
-      imgUrl
-    );
 
-  } catch (error) {
-    console.error("Erreur vérification boost :", error);
+  // ============================================================
+  // CONFIGURATION CLOUDFLARE WORKER
+  // ============================================================
 
-    window.showToast(
-      "Impossible de vérifier le statut de cet article.",
-      "error"
-    );
-  }
-};
+  const PAYMENT_WORKER_URL =
+    "https://vea-payment-worker.vea-payment.workers.dev";
 
-    window.payService = async (serviceType, cost, durationDays, articleId = null, articleImg = null) => {
-      if (!currentUser) return;
+  const CREATE_PAYMENT_URL =
+    `${PAYMENT_WORKER_URL}/api/payment`;
 
-      const serviceName = serviceType === 'vip_subscription' ? window.getTranslation('vip_title') : window.getTranslation('item_boost_title');
+  const CHECK_PAYMENT_URL =
+    `${PAYMENT_WORKER_URL}/api/status`;
 
-      if (currentBalance < cost) {
-        window.showToast(window.getTranslation('insufficient_balance', { balance: currentBalance.toFixed(2), cost: cost }), 'error');
-        window.openDepositModal();
+  const PAYMENT_TIMEOUT =
+    180000;
+
+
+  // ============================================================
+  // VARIABLES
+  // ============================================================
+
+  let currentUser = null;
+  let currentBalance = 0;
+  let timerInterval = null;
+  let userData = null;
+
+  let userRoleCollection =
+    "vendeurs_clients";
+
+  let selectedArticleId = null;
+
+  let selectedOperator =
+    "airtel";
+
+  let productsUnsubscribe =
+    null;
+
+  let boostedProductsData = {};
+
+
+  // ============================================================
+  // AUTHENTIFICATION FIREBASE
+  // ============================================================
+
+  onAuthStateChanged(
+    auth,
+    async (user) => {
+
+      if (!user) {
+
+        currentUser = null;
+
         return;
       }
 
-      const confirmed = await window.customConfirm(window.getTranslation('confirm_purchase', { cost: cost, service: serviceName }));
+      try {
 
-      if (confirmed) {
-        try {
-          const userRef = doc(db, userRoleCollection, currentUser.uid);
-          const now = new Date();
+        currentUser = user;
 
-          let updateData = { solde: increment(-cost) };
+        let userSnap =
+          await getDoc(
+            doc(
+              db,
+              "vendeurs_clients",
+              user.uid
+            )
+          );
 
-          if (serviceType === 'vip_subscription') {
-            updateData.isPremium = true;
-            let baseDate = now;
-            if (userData && userData.isPremium && userData.premiumUntil) {
-              const currentExpiry = new Date(userData.premiumUntil);
-              if (currentExpiry.getTime() > now.getTime()) {
-                baseDate = currentExpiry;
-              }
-            }
-            const expiresAt = new Date(baseDate.getTime() + (durationDays * 24 * 60 * 60 * 1000)).toISOString();
-            updateData.premiumUntil = expiresAt;
-          } else if (serviceType === 'boost_item') {
+        if (userSnap.exists()) {
 
-            // 🔒 DERNIÈRE VÉRIFICATION DIRECTE DANS FIREBASE
-            if (!articleId) {
-                window.showToast("Article invalide.", "error");
-                return;
-            }
+          userRoleCollection =
+            "vendeurs_clients";
 
-            const productRef = doc(db, "produits", articleId);
-            const productSnap = await getDoc(productRef);
+        } else {
 
-            if (!productSnap.exists()) {
-                window.showToast("Cet article n'existe plus.", "error");
-                return;
-            }
+          userSnap =
+            await getDoc(
+              doc(
+                db,
+                "vendeurs",
+                user.uid
+              )
+            );
 
-            const productData = productSnap.data();
+          if (userSnap.exists()) {
 
-            // Gestion Timestamp Firebase ou date ISO
-            let existingBoostUntil = null;
+            userRoleCollection =
+              "vendeurs";
 
-            if (productData.boostUntil) {
-                if (typeof productData.boostUntil.toDate === "function") {
-                    existingBoostUntil = productData.boostUntil.toDate().getTime();
-                } else {
-                    existingBoostUntil = new Date(productData.boostUntil).getTime();
-                }
-            }
+          } else {
 
-            // 🚫 BLOQUER SI LE BOOST EST TOUJOURS ACTIF
-            if (
-                productData.isBoosted === true &&
-                Number.isFinite(existingBoostUntil) &&
-                existingBoostUntil > Date.now()
-            ) {
-                window.showToast(
-                    "🚀 Cet article est déjà en cours de boost. Attendez la fin du boost actuel.",
-                    "error"
-                );
-                return;
-            }
+            console.warn(
+              "Profil utilisateur introuvable dans Firestore."
+            );
 
-            const expiresAt = new Date(
-                Date.now() + (durationDays * 24 * 60 * 60 * 1000)
-            ).toISOString();
+          }
 
-            const newBoost = {
-                articleId: articleId,
-                boostUntil: expiresAt,
-                boostedArticleImage: articleImg || ''
-            };
-
-            updateData.isBoosted = true;
-            updateData.boostUntil = expiresAt;
-            updateData.boostedArticleImage = articleImg || '';
-            updateData.boosts = arrayUnion(newBoost);
-
-            // Activation du boost sur l'article
-            await updateDoc(productRef, {
-                isBoosted: true,
-                boostUntil: expiresAt
-            });
         }
 
-          await updateDoc(userRef, updateData);
+        await loadUserData();
 
-          window.showToast(window.getTranslation('purchase_success', { service: serviceName }), 'success');
-          await loadUserData();
-        } catch (e) {
-          console.error(e);
-          window.showToast(window.getTranslation('transaction_error'), 'error');
-        }
+      } catch (error) {
+
+        console.error(
+          "Erreur authentification :",
+          error
+        );
+
+        window.showToast(
+          "Impossible de charger votre compte.",
+          "error"
+        );
+
       }
+
+    }
+  );
+
+
+  // ============================================================
+  // CHARGER LES DONNÉES UTILISATEUR
+  // ============================================================
+
+  async function loadUserData() {
+
+    if (!currentUser) return;
+
+    try {
+
+      const userRef =
+        doc(
+          db,
+          userRoleCollection,
+          currentUser.uid
+        );
+
+      const userSnap =
+        await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+
+        console.warn(
+          "Document utilisateur introuvable."
+        );
+
+        return;
+      }
+
+      userData =
+        userSnap.data();
+
+      currentBalance =
+        Number(userData.solde) || 0;
+
+      const balanceElement =
+        document.getElementById(
+          "userBalance"
+        );
+
+      if (balanceElement) {
+
+        balanceElement.textContent =
+          `${currentBalance.toFixed(2)} $`;
+
+      }
+
+      listenToBoostedArticles();
+
+    } catch (error) {
+
+      console.error(
+        "Erreur chargement profil :",
+        error
+      );
+
+    }
+
+  }
+
+
+  // ============================================================
+  // TOKEN FIREBASE
+  // Utilisé lorsque le Worker aura besoin d'authentifier
+  // la requête.
+  // ============================================================
+
+  async function getFirebaseAuthHeaders() {
+
+    if (!currentUser) {
+
+      throw new Error(
+        "Utilisateur non connecté."
+      );
+
+    }
+
+    const idToken =
+      await currentUser.getIdToken();
+
+    return {
+
+      "Content-Type":
+        "application/json",
+
+      "Authorization":
+        `Bearer ${idToken}`
+
     };
 
-    document.addEventListener("DOMContentLoaded", () => {
+  }
+
+
+  // ============================================================
+  // NORMALISER NUMÉRO RDC
+  // ============================================================
+
+  function normalizeMobileMoneyPhone(
+    value
+  ) {
+
+    let phone =
+      String(value || "")
+        .trim()
+        .replace(/\s+/g, "")
+        .replace(/-/g, "");
+
+    if (
+      phone.startsWith("+243")
+    ) {
+
+      phone =
+        "0" +
+        phone.substring(4);
+
+    }
+
+    if (
+      phone.startsWith("243")
+    ) {
+
+      phone =
+        "0" +
+        phone.substring(3);
+
+    }
+
+    return phone;
+  }
+
+
+  // ============================================================
+  // VALIDER NUMÉRO WONYA
+  // ============================================================
+
+  function isValidWonyaPhone(
+    phone
+  ) {
+
+    return /^0\d{9}$/.test(
+      phone
+    );
+
+  }
+
+
+  // ============================================================
+  // CRÉER UN PAIEMENT WONYA PAY
+  // ============================================================
+
+async function createRealPayment(amount, phoneNumber, userId, type) {
+    const CREATE_PAYMENT_URL = "https://vea-payment-worker.vea-payment.workers.dev/api/payment";
+
+    try {
+        const response = await fetch(CREATE_PAYMENT_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                amount: amount,
+                phone: phoneNumber,
+                userId: userId,
+                type: type // Ex: "deposit" ou "boost_item"
+            })
+        });
+
+        const data = await response.json();
+        console.log("Réponse création paiement WonyaPay :", data);
+
+        if (data.success) {
+            // Le paiement a été initié avec succès
+            // Tu peux récupérer refTransa pour vérifier le statut ensuite
+            const refTransa = data.refTransa;
+            waitForPaymentConfirmation(refTransa);
+        } else {
+            alert("Erreur lors du paiement : " + (data.error || "Échec de l'opération"));
+        }
+    } catch (error) {
+        console.error("Erreur réseau ou serveur :", error);
+        alert("Impossible de contacter le serveur de paiement.");
+    }
+}
+
+// 2. PLACE LES ÉCOUTEURS DE BOUTONS ICI :
+  document.addEventListener("DOMContentLoaded", () => {
+
+      // Écouteur pour le bouton Dépôt
+      const btnDepot = document.getElementById("btn-depot");
+      if (btnDepot) {
+          btnDepot.addEventListener("click", () => {
+              const montant = document.getElementById("input-montant").value;
+              const phone = document.getElementById("input-phone").value;
+              const user = firebase.auth().currentUser;
+
+              if (!user) {
+                  alert("Veuillez vous connecter d'abord.");
+                  return;
+              }
+
+              createRealPayment(montant, phone, user.uid, "deposit");
+          });
+      }
+
+      // Écouteur pour le bouton Boost
+      const btnBoost = document.getElementById("btn-boost");
+      if (btnBoost) {
+          btnBoost.addEventListener("click", () => {
+              const phone = document.getElementById("input-phone").value;
+              const user = firebase.auth().currentUser;
+
+              if (!user) {
+                  alert("Veuillez vous connecter d'abord.");
+                  return;
+              }
+
+              // Exemple pour un boost à 1.50$
+              createRealPayment(1.50, phone, user.uid, "boost_item");
+          });
+      }
+
+  });
+
+  // ============================================================
+  // EXTRAIRE LE STATUT WONYA PAY
+  // ============================================================
+
+  function extractPaymentStatus(
+    result
+  ) {
+
+    const wonya =
+      result?.wonyaResponse || {};
+
+    const data =
+      wonya?.data || {};
+
+    const rawStatus =
+
+      data?.status ||
+
+      data?.Status ||
+
+      data?.StatutWonya ||
+
+      data?.Statut ||
+
+      data?.statut ||
+
+      wonya?.status ||
+
+      wonya?.Status ||
+
+      wonya?.StatutWonya ||
+
+      wonya?.Statut ||
+
+      wonya?.statut ||
+
+      result?.status ||
+
+      result?.Status ||
+
+      result?.StatutWonya ||
+
+      result?.Statut ||
+
+      result?.statut ||
+
+      "";
+
+
+    return String(
+      rawStatus
+    )
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .toLowerCase()
+      .trim();
+
+  }
+
+
+  // ============================================================
+  // VÉRIFIER LE STATUT WONYA PAY
+  // ============================================================
+
+  async function checkRealPayment(
+    refTransa
+  ) {
+
+    if (!refTransa) {
+
+      throw new Error(
+        "Référence de transaction manquante."
+      );
+
+    }
+
+
+    const response =
+      await fetch(
+
+        `${CHECK_PAYMENT_URL}?ref=${encodeURIComponent(refTransa)}`,
+
+        {
+
+          method: "GET",
+
+          headers: {
+
+            "Accept":
+              "application/json"
+
+          }
+
+        }
+
+      );
+
+
+    let result;
+
+    try {
+
+      result =
+        await response.json();
+
+    } catch {
+
+      throw new Error(
+        "Réponse invalide du serveur de statut."
+      );
+
+    }
+
+
+    console.log(
+      "Réponse statut complète :",
+      result
+    );
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.error ||
+        result.message ||
+        "Impossible de vérifier la transaction."
+      );
+
+    }
+
+
+    const status =
+      extractPaymentStatus(
+        result
+      );
+
+
+    console.log(
+      "Statut WonyaPay détecté :",
+      status
+    );
+
+
+    const completedStatuses = [
+
+      "completed",
+      "success",
+      "successful",
+      "succes",
+      "recu",
+      "reussi",
+      "réussi"
+
+    ];
+
+
+    const failedStatuses = [
+
+      "failed",
+      "failure",
+      "cancelled",
+      "canceled",
+      "rejected",
+      "echec",
+      "échoué",
+      "refused",
+      "refuse"
+
+    ];
+
+
+    const pendingStatuses = [
+
+      "pending",
+      "processing",
+      "en_attente",
+      "en attente",
+      "initie",
+      "initiee",
+      "initiated"
+
+    ];
+
+
+    return {
+
+      success: true,
+
+      refTransa:
+        result.refTransa ||
+        refTransa,
+
+      status,
+
+      completed:
+        completedStatuses.includes(
+          status
+        ),
+
+      failed:
+        failedStatuses.includes(
+          status
+        ),
+
+      pending:
+        pendingStatuses.includes(
+          status
+        ),
+
+      raw:
+        result
+
+    };
+
+  }
+
+
+  // ============================================================
+  // ATTENDRE CONFIRMATION PAIEMENT
+  // ============================================================
+
+  async function waitForPaymentConfirmation(
+    refTransa
+  ) {
+
+    const startTime =
+      Date.now();
+
+
+    while (
+      Date.now() -
+      startTime <
+      PAYMENT_TIMEOUT
+    ) {
+
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            3000
+          )
+      );
+
+
+      const status =
+        await checkRealPayment(
+          refTransa
+        );
+
+
+      console.log(
+        "Vérification transaction :",
+        status
+      );
+
+
+      if (
+        status.completed
+      ) {
+
+        return {
+
+          success: true,
+
+          status:
+            "completed",
+
+          refTransa
+
+        };
+
+      }
+
+
+      if (
+        status.failed
+      ) {
+
+        return {
+
+          success: false,
+
+          status:
+            "failed",
+
+          refTransa,
+
+          raw:
+            status.raw
+
+        };
+
+      }
+
+    }
+
+
+    return {
+
+      success: false,
+
+      status:
+        "timeout",
+
+      refTransa
+
+    };
+
+  }
+
+
+  // ============================================================
+  // SURVEILLANCE DES ARTICLES
+  // ============================================================
+
+  function listenToBoostedArticles() {
+
+    if (
+      productsUnsubscribe
+    ) {
+
+      productsUnsubscribe();
+
+    }
+
+
+    if (!currentUser) {
+      return;
+    }
+
+
+    const productsQuery =
+      query(
+
+        collection(
+          db,
+          "produits"
+        ),
+
+        where(
+          "vendeurId",
+          "==",
+          currentUser.uid
+        )
+
+      );
+
+
+    productsUnsubscribe =
+      onSnapshot(
+
+        productsQuery,
+
+        (snapshot) => {
+
+          boostedProductsData =
+            {};
+
+          snapshot.forEach(
+            (docSnap) => {
+
+              boostedProductsData[
+                docSnap.id
+              ] =
+                docSnap.data();
+
+            }
+          );
+
+
+          renderTimers();
+
+        },
+
+        (error) => {
+
+          console.error(
+            "Erreur écoute produits :",
+            error
+          );
+
+        }
+
+      );
+
+  }
+
+
+  // ============================================================
+  // AFFICHER LES TIMERS
+  // ============================================================
+
+  function renderTimers() {
+
+    const container =
+      document.getElementById(
+        "activeStatusContainer"
+      );
+
+    if (!container) {
+      return;
+    }
+
+
+    container.innerHTML =
+      "";
+
+
+    if (timerInterval) {
+
+      clearInterval(
+        timerInterval
+      );
+
+      timerInterval =
+        null;
+
+    }
+
+
+    const hasVip =
+      Boolean(
+        userData &&
+        userData.isPremium &&
+        userData.premiumUntil
+      );
+
+
+    const activeBoosts =
+      Array.isArray(
+        userData?.boosts
+      )
+        ? userData.boosts
+        : [];
+
+
+    if (
+      !hasVip &&
+      activeBoosts.length === 0
+    ) {
+
+      return;
+
+    }
+
+
+    const updateClocks =
+      async () => {
+
+        const currentTime =
+          Date.now();
+
+        let html =
+          "";
+
+        const validBoostsForUser =
+          [];
+
+        let hasBoostsChanged =
+          false;
+
+
+        // ------------------------------------------------------
+        // VIP
+        // ------------------------------------------------------
+
+        if (hasVip) {
+
+          const expiry =
+            new Date(
+              userData.premiumUntil
+            ).getTime();
+
+          const totalDuration =
+            30 *
+            24 *
+            60 *
+            60 *
+            1000;
+
+          const diff =
+            expiry -
+            currentTime;
+
+
+          if (
+            diff > 0
+          ) {
+
+            const pct =
+              Math.max(
+                0,
+                Math.min(
+                  100,
+                  (
+                    diff /
+                    totalDuration
+                  ) *
+                  100
+                )
+              );
+
+
+            html += `
+
+              <div class="status-card vip">
+
+                <div class="status-header">
+
+                  <div
+                    class="status-title"
+                    style="color:#FFD700;"
+                  >
+
+                    <i
+                      class="fa-solid fa-crown"
+                    ></i>
+
+                    ${window.getTranslation(
+                      "vip_status_title"
+                    )}
+
+                  </div>
+
+                  <div class="status-timer">
+
+                    ${formatTimeLeft(
+                      diff
+                    )}
+
+                  </div>
+
+                </div>
+
+                <div class="progress-bar">
+
+                  <div
+                    class="progress-fill gold"
+                    style="width:${pct}%"
+                  ></div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+
+        }
+
+
+        // ------------------------------------------------------
+        // BOOSTS
+        // ------------------------------------------------------
+
+        for (
+          const boost of activeBoosts
+        ) {
+
+          const expiry =
+            new Date(
+              boost.boostUntil
+            ).getTime();
+
+          const diff =
+            expiry -
+            currentTime;
+
+
+          const articleData =
+            boost.articleId
+              ? boostedProductsData[
+                  boost.articleId
+                ]
+              : null;
+
+
+          const isSold =
+            articleData &&
+            (
+              articleData.vendu === true ||
+              articleData.statut === "vendu"
+            );
+
+
+          if (
+            isSold ||
+            diff <= 0
+          ) {
+
+            hasBoostsChanged =
+              true;
+
+
+            if (
+              boost.articleId
+            ) {
+
+              try {
+
+                const productRef =
+                  doc(
+                    db,
+                    "produits",
+                    boost.articleId
+                  );
+
+
+                await updateDoc(
+                  productRef,
+                  {
+
+                    isBoosted:
+                      false,
+
+                    boostUntil:
+                      null
+
+                  }
+                );
+
+              } catch (error) {
+
+                console.error(
+                  "Erreur désactivation boost :",
+                  error
+                );
+
+              }
+
+            }
+
+
+            continue;
+
+          }
+
+
+          validBoostsForUser.push(
+            boost
+          );
+
+
+          const totalDuration =
+            7 *
+            24 *
+            60 *
+            60 *
+            1000;
+
+
+          const pct =
+            Math.max(
+              0,
+              Math.min(
+                100,
+                (
+                  diff /
+                  totalDuration
+                ) *
+                100
+              )
+            );
+
+
+          const imgHtml =
+            boost.boostedArticleImage
+              ? `
+
+                <img
+                  src="${boost.boostedArticleImage}"
+                  style="
+                    width:40px;
+                    height:40px;
+                    border-radius:8px;
+                    object-fit:cover;
+                  "
+                >
+
+              `
+              : "";
+
+
+          html += `
+
+            <div class="status-card">
+
+              <div
+                class="status-header"
+                style="
+                  display:flex;
+                  align-items:center;
+                  gap:10px;
+                "
+              >
+
+                ${imgHtml}
+
+                <div
+                  style="flex:1;"
+                >
+
+                  <div
+                    class="status-title"
+                    style="color:#6366F1;"
+                  >
+
+                    <i
+                      class="fa-solid fa-rocket"
+                    ></i>
+
+                    ${window.getTranslation(
+                      "boost_status_title"
+                    )}
+
+                  </div>
+
+                </div>
+
+                <div
+                  class="status-timer"
+                >
+
+                  ${formatTimeLeft(
+                    diff
+                  )}
+
+                </div>
+
+              </div>
+
+              <div class="progress-bar">
+
+                <div
+                  class="progress-fill"
+                  style="width:${pct}%"
+                ></div>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+
+
+        // ------------------------------------------------------
+        // NETTOYAGE BOOSTS EXPIRÉS
+        // ------------------------------------------------------
+
+        if (
+          hasBoostsChanged
+        ) {
+
+          userData.boosts =
+            validBoostsForUser;
+
+
+          try {
+
+            const userRef =
+              doc(
+                db,
+                userRoleCollection,
+                currentUser.uid
+              );
+
+
+            await updateDoc(
+              userRef,
+              {
+
+                boosts:
+                  validBoostsForUser,
+
+                isBoosted:
+                  validBoostsForUser.length > 0
+
+              }
+            );
+
+          } catch (error) {
+
+            console.error(
+              "Erreur mise à jour boosts :",
+              error
+            );
+
+          }
+
+        }
+
+
+        container.innerHTML =
+          html;
+
+      };
+
+
+    updateClocks();
+
+
+    timerInterval =
+      setInterval(
+        updateClocks,
+        1000
+      );
+
+  }
+
+
+  // ============================================================
+  // FORMAT TIMER
+  // ============================================================
+
+  function formatTimeLeft(
+    ms
+  ) {
+
+    if (
+      ms <= 0
+    ) {
+
+      return window.getTranslation(
+        "expired"
+      );
+
+    }
+
+
+    const seconds =
+      Math.floor(
+        (ms / 1000) % 60
+      );
+
+    const minutes =
+      Math.floor(
+        (ms / (1000 * 60)) % 60
+      );
+
+    const hours =
+      Math.floor(
+        (ms / (1000 * 60 * 60)) % 24
+      );
+
+    const days =
+      Math.floor(
+        ms /
+        (1000 * 60 * 60 * 24)
+      );
+
+
+    return `
+
+      ${days}${window.getTranslation(
+        "days_short"
+      )}
+
+      ${hours}${window.getTranslation(
+        "hours_short"
+      )}
+
+      ${minutes}${window.getTranslation(
+        "min_short"
+      )}
+
+      ${seconds}${window.getTranslation(
+        "sec_short"
+      )}
+
+    `.replace(/\s+/g, " ").trim();
+
+  }
+
+
+  // ============================================================
+  // MODALE RECHARGE
+  // ============================================================
+
+  window.openDepositModal =
+    () => {
+
+      const modal =
+        document.getElementById(
+          "depositModal"
+        );
+
+      if (modal) {
+
+        modal.style.display =
+          "flex";
+
+      }
+
+    };
+
+
+  window.closeDepositModal =
+    () => {
+
+      const modal =
+        document.getElementById(
+          "depositModal"
+        );
+
+      if (modal) {
+
+        modal.style.display =
+          "none";
+
+      }
+
+    };
+
+
+  // ============================================================
+  // MODALE BOOST
+  // ============================================================
+
+  window.closeBoostArticleModal =
+    () => {
+
+      const modal =
+        document.getElementById(
+          "boostArticleModal"
+        );
+
+      if (modal) {
+
+        modal.style.display =
+          "none";
+
+      }
+
+
+      selectedArticleId =
+        null;
+
+
+      const button =
+        document.getElementById(
+          "confirmBoostArticleBtn"
+        );
+
+      if (button) {
+
+        button.disabled =
+          true;
+
+      }
+
+    };
+
+
+  // ============================================================
+  // SÉLECTION OPÉRATEUR
+  // ============================================================
+
+  window.selectOperator =
+    (element, operator) => {
+
+      document
+        .querySelectorAll(
+          ".payment-opt"
+        )
+        .forEach(
+          item =>
+            item.classList.remove(
+              "active"
+            )
+        );
+
+
+      if (element) {
+
+        element.classList.add(
+          "active"
+        );
+
+      }
+
+
+      selectedOperator =
+        operator;
+
+      console.log(
+        "Opérateur sélectionné :",
+        selectedOperator
+      );
+
+    };
+
+
+  // ============================================================
+  // RECHARGE PORTEFEUILLE
+  // ============================================================
+
+  window.processDeposit =
+    async () => {
+
+      if (!currentUser) {
+
+        window.showToast(
+          "Vous devez être connecté.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const amount =
+        parseFloat(
+          document.getElementById(
+            "depositAmount"
+          )?.value
+        );
+
+
+      const rawPhone =
+        document.getElementById(
+          "phoneNumber"
+        )?.value;
+
+
+      const phone =
+        normalizeMobileMoneyPhone(
+          rawPhone
+        );
+
+
+      if (
+        !amount ||
+        amount <= 0 ||
+        !isValidWonyaPhone(
+          phone
+        )
+      ) {
+
+        window.showToast(
+          "Entrez un numéro Mobile Money valide et un montant supérieur à zéro.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (
+        amount < 1
+      ) {
+
+        window.showToast(
+          "Le montant minimum est de 1 USD.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        window.showToast(
+          "Préparation du paiement Mobile Money...",
+          "info"
+        );
+
+
+        const payment =
+          await createRealPayment({
+
+            type:
+              "wallet_deposit",
+
+            amount,
+
+            phone
+
+          });
+
+
+        const refTransa =
+          payment.refTransa;
+
+
+        console.log(
+          "Transaction WonyaPay créée :",
+          refTransa
+        );
+
+
+        window.showToast(
+          "Demande envoyée. Validez le paiement sur votre téléphone.",
+          "info"
+        );
+
+
+        const finalStatus =
+          await waitForPaymentConfirmation(
+            refTransa
+          );
+
+
+        if (
+          finalStatus.success &&
+          finalStatus.status ===
+            "completed"
+        ) {
+
+          window.closeDepositModal();
+
+
+          const amountInput =
+            document.getElementById(
+              "depositAmount"
+            );
+
+          const phoneInput =
+            document.getElementById(
+              "phoneNumber"
+            );
+
+
+          if (amountInput) {
+            amountInput.value =
+              "";
+          }
+
+          if (phoneInput) {
+            phoneInput.value =
+              "";
+          }
+
+
+          /*
+           IMPORTANT :
+
+           Le Worker doit maintenant créditer Firestore
+           côté serveur après confirmation WonyaPay.
+
+           Le navigateur ne crédite PAS le solde.
+          */
+
+          await loadUserData();
+
+
+          window.showToast(
+
+            `Paiement confirmé ! Transaction ${refTransa}.`,
+
+            "success"
+
+          );
+
+
+          return;
+
+        }
+
+
+        if (
+          finalStatus.status ===
+          "failed"
+        ) {
+
+          window.showToast(
+            "Le paiement Mobile Money a échoué ou a été refusé.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        window.showToast(
+          "Le paiement est toujours en attente de confirmation.",
+          "info"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur paiement réel :",
+          error
+        );
+
+
+        window.showToast(
+          error.message ||
+          "Impossible de lancer le paiement.",
+          "error"
+        );
+
+      }
+
+    };
+
+
+  // ============================================================
+  // DÉMARRER BOOST
+  // ============================================================
+
+  window.startBoostProcess =
+    async () => {
+
+      if (!currentUser) {
+
+        window.showToast(
+          "Vous devez être connecté.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const cost =
+        1.50;
+
+
+      /*
+       Le contrôle de solde ici est seulement UX.
+       Le serveur devra refaire le contrôle.
+      */
+
+      if (
+        currentBalance <
+        cost
+      ) {
+
+        window.showToast(
+
+          window.getTranslation(
+            "insufficient_balance",
+            {
+
+              balance:
+                currentBalance.toFixed(2),
+
+              cost:
+                cost.toFixed(2)
+
+            }
+          ),
+
+          "error"
+
+        );
+
+
+        window.openDepositModal();
+
+        return;
+
+      }
+
+
+      const listContainer =
+        document.getElementById(
+          "articlesSelectList"
+        );
+
+
+      const confirmButton =
+        document.getElementById(
+          "confirmBoostArticleBtn"
+        );
+
+
+      if (!listContainer) {
+        return;
+      }
+
+
+      listContainer.innerHTML = `
+
+        <div
+          style="
+            color:var(--text-muted);
+            text-align:center;
+          "
+        >
+          Chargement de vos articles...
+        </div>
+
+      `;
+
+
+      if (confirmButton) {
+
+        confirmButton.disabled =
+          true;
+
+      }
+
+
+      document.getElementById(
+        "boostArticleModal"
+      ).style.display =
+        "flex";
+
+
+      try {
+
+        const productsQuery =
+          query(
+
+            collection(
+              db,
+              "produits"
+            ),
+
+            where(
+              "vendeurId",
+              "==",
+              currentUser.uid
+            )
+
+          );
+
+
+        const querySnapshot =
+          await getDocs(
+            productsQuery
+          );
+
+
+        const nowTime =
+          Date.now();
+
+
+        const availableArticles =
+          [];
+
+
+        querySnapshot.forEach(
+          (docSnap) => {
+
+            const data =
+              docSnap.data();
+
+            const articleId =
+              docSnap.id;
+
+
+            let boostExpiry =
+              null;
+
+
+            if (
+              data.boostUntil
+            ) {
+
+              if (
+                typeof data.boostUntil.toDate ===
+                "function"
+              ) {
+
+                boostExpiry =
+                  data.boostUntil
+                    .toDate()
+                    .getTime();
+
+              } else {
+
+                boostExpiry =
+                  new Date(
+                    data.boostUntil
+                  ).getTime();
+
+              }
+
+            }
+
+
+            const isCurrentlyBoosted =
+
+              data.isBoosted === true &&
+
+              Number.isFinite(
+                boostExpiry
+              ) &&
+
+              boostExpiry >
+                nowTime;
+
+
+            if (
+
+              !data.vendu &&
+
+              data.statut !== "vendu" &&
+
+              !isCurrentlyBoosted
+
+            ) {
+
+              availableArticles.push({
+
+                id:
+                  articleId,
+
+                ...data
+
+              });
+
+            }
+
+          }
+        );
+
+
+        if (
+          availableArticles.length ===
+          0
+        ) {
+
+          listContainer.innerHTML = `
+
+            <div
+              style="
+                color:var(--text-muted);
+                text-align:center;
+              "
+            >
+              Aucun article disponible à booster.
+            </div>
+
+          `;
+
+          return;
+
+        }
+
+
+        listContainer.innerHTML =
+          "";
+
+
+        availableArticles.forEach(
+          (item) => {
+
+            const imgUrl =
+
+              Array.isArray(
+                item.images
+              ) &&
+              item.images.length > 0
+
+                ? item.images[0]
+
+                : (
+                    item.image ||
+                    ""
+                  );
+
+
+            const card =
+              document.createElement(
+                "div"
+              );
+
+
+            card.className =
+              "article-item-card";
+
+
+            card.dataset.articleId =
+              item.id;
+
+
+            card.dataset.imgUrl =
+              imgUrl;
+
+
+            card.onclick =
+              () => {
+
+                document
+                  .querySelectorAll(
+                    ".article-item-card"
+                  )
+                  .forEach(
+                    el =>
+                      el.classList.remove(
+                        "selected"
+                      )
+                  );
+
+
+                card.classList.add(
+                  "selected"
+                );
+
+
+                selectedArticleId =
+                  item.id;
+
+
+                if (
+                  confirmButton
+                ) {
+
+                  confirmButton.disabled =
+                    false;
+
+                }
+
+              };
+
+
+            card.innerHTML = `
+
+              <img
+                src="${imgUrl}"
+                alt="${item.nom || "Article"}"
+              >
+
+              <div
+                class="article-item-info"
+              >
+
+                <div
+                  class="article-item-title"
+                >
+                  ${item.nom || "Sans nom"}
+                </div>
+
+                <div
+                  class="article-item-price"
+                >
+                  ${item.prix ?? ""}
+                  ${item.devise || "$"}
+                </div>
+
+              </div>
+
+            `;
+
+
+            listContainer.appendChild(
+              card
+            );
+
+          }
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur récupération articles :",
+          error
+        );
+
+
+        listContainer.innerHTML = `
+
+          <div
+            style="
+              color:var(--accent-red);
+              text-align:center;
+            "
+          >
+            Erreur lors du chargement des articles.
+          </div>
+
+        `;
+
+      }
+
+    };
+
+
+  // ============================================================
+  // CONFIRMER ARTICLE À BOOSTER
+  // ============================================================
+
+  window.confirmBoostSelectedArticle =
+    async () => {
+
+      if (
+        !selectedArticleId
+      ) {
+
+        return;
+
+      }
+
+
+      try {
+
+        const articleIdToBoost =
+          selectedArticleId;
+
+
+        const productRef =
+          doc(
+            db,
+            "produits",
+            articleIdToBoost
+          );
+
+
+        const productSnap =
+          await getDoc(
+            productRef
+          );
+
+
+        if (
+          !productSnap.exists()
+        ) {
+
+          window.showToast(
+            "Cet article n'existe plus.",
+            "error"
+          );
+
+          window.closeBoostArticleModal();
+
+          return;
+
+        }
+
+
+        const productData =
+          productSnap.data();
+
+
+        const isSold =
+
+          productData.vendu === true ||
+
+          productData.statut ===
+            "vendu";
+
+
+        if (
+          isSold
+        ) {
+
+          window.showToast(
+            "Cet article est déjà vendu et ne peut pas être boosté.",
+            "error"
+          );
+
+          window.closeBoostArticleModal();
+
+          return;
+
+        }
+
+
+        let boostExpiry =
+          null;
+
+
+        if (
+          productData.boostUntil
+        ) {
+
+          if (
+            typeof productData.boostUntil.toDate ===
+            "function"
+          ) {
+
+            boostExpiry =
+              productData.boostUntil
+                .toDate()
+                .getTime();
+
+          } else {
+
+            boostExpiry =
+              new Date(
+                productData.boostUntil
+              ).getTime();
+
+          }
+
+        }
+
+
+        const isCurrentlyBoosted =
+
+          productData.isBoosted === true &&
+
+          Number.isFinite(
+            boostExpiry
+          ) &&
+
+          boostExpiry >
+            Date.now();
+
+
+        if (
+          isCurrentlyBoosted
+        ) {
+
+          window.showToast(
+            "Cet article est déjà en cours de boost.",
+            "error"
+          );
+
+          window.closeBoostArticleModal();
+
+          return;
+
+        }
+
+
+        const selectedCard =
+          document.querySelector(
+            ".article-item-card.selected"
+          );
+
+
+        const imgUrl =
+
+          selectedCard?.dataset.imgUrl ||
+
+          productData.images?.[0] ||
+
+          productData.image ||
+
+          "";
+
+
+        window.closeBoostArticleModal();
+
+
+        await window.payService(
+
+          "boost_item",
+
+          1.50,
+
+          7,
+
+          articleIdToBoost,
+
+          imgUrl
+
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur vérification boost :",
+          error
+        );
+
+
+        window.showToast(
+          "Impossible de vérifier cet article.",
+          "error"
+        );
+
+      }
+
+    };
+
+
+  // ============================================================
+  // ACHAT VIP / BOOST PAR MOBILE MONEY
+  // ============================================================
+
+  window.payService =
+    async (
+      serviceType,
+      cost,
+      durationDays,
+      articleId = null,
+      articleImg = null
+    ) => {
+
+      if (!currentUser) {
+
+        window.showToast(
+          "Vous devez être connecté.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const serviceName =
+
+        serviceType ===
+        "vip_subscription"
+
+          ? window.getTranslation(
+              "vip_title"
+            )
+
+          : window.getTranslation(
+              "item_boost_title"
+            );
+
+
+      // --------------------------------------------------------
+      // CONFIRMATION
+      // --------------------------------------------------------
+
+      const confirmed =
+        await window.customConfirm(
+
+          window.getTranslation(
+
+            "confirm_purchase",
+
+            {
+
+              cost:
+                Number(cost).toFixed(2),
+
+              service:
+                serviceName
+
+            }
+
+          )
+
+        );
+
+
+      if (
+        !confirmed
+      ) {
+
+        return;
+
+      }
+
+
+      // --------------------------------------------------------
+      // VÉRIFICATION ARTICLE
+      // --------------------------------------------------------
+
+      if (
+        serviceType ===
+        "boost_item"
+      ) {
+
+        if (
+          !articleId
+        ) {
+
+          window.showToast(
+            "Article invalide.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        try {
+
+          const productRef =
+            doc(
+              db,
+              "produits",
+              articleId
+            );
+
+
+          const productSnap =
+            await getDoc(
+              productRef
+            );
+
+
+          if (
+            !productSnap.exists()
+          ) {
+
+            window.showToast(
+              "Cet article n'existe plus.",
+              "error"
+            );
+
+            return;
+
+          }
+
+
+          const productData =
+            productSnap.data();
+
+
+          const isSold =
+
+            productData.vendu === true ||
+
+            productData.statut ===
+              "vendu";
+
+
+          if (
+            isSold
+          ) {
+
+            window.showToast(
+              "Cet article est déjà vendu.",
+              "error"
+            );
+
+            return;
+
+          }
+
+
+          let boostExpiry =
+            null;
+
+
+          if (
+            productData.boostUntil
+          ) {
+
+            if (
+              typeof productData.boostUntil.toDate ===
+              "function"
+            ) {
+
+              boostExpiry =
+                productData.boostUntil
+                  .toDate()
+                  .getTime();
+
+            } else {
+
+              boostExpiry =
+                new Date(
+                  productData.boostUntil
+                ).getTime();
+
+            }
+
+          }
+
+
+          if (
+
+            productData.isBoosted === true &&
+
+            Number.isFinite(
+              boostExpiry
+            ) &&
+
+            boostExpiry >
+              Date.now()
+
+          ) {
+
+            window.showToast(
+              "Cet article est déjà boosté.",
+              "error"
+            );
+
+            return;
+
+          }
+
+
+        } catch (error) {
+
+          console.error(
+            "Erreur vérification article :",
+            error
+          );
+
+
+          window.showToast(
+            "Impossible de vérifier cet article.",
+            "error"
+          );
+
+
+          return;
+
+        }
+
+      }
+
+
+      // --------------------------------------------------------
+      // NUMÉRO MOBILE MONEY
+      // --------------------------------------------------------
+
+      const rawPhone =
+        window.prompt(
+          "Entrez votre numéro Mobile Money :"
+        );
+
+
+      if (
+        rawPhone === null
+      ) {
+
+        return;
+
+      }
+
+
+      const phone =
+        normalizeMobileMoneyPhone(
+          rawPhone
+        );
+
+
+      if (
+        !isValidWonyaPhone(
+          phone
+        )
+      ) {
+
+        window.showToast(
+          "Numéro Mobile Money invalide.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        window.showToast(
+          "Préparation du paiement Mobile Money...",
+          "info"
+        );
+
+
+        // ------------------------------------------------------
+        // CRÉATION TRANSACTION WONYA
+        // ------------------------------------------------------
+
+        const payment =
+          await createRealPayment({
+
+            type:
+              serviceType,
+
+            amount:
+              Number(cost),
+
+            phone,
+
+            articleId
+
+          });
+
+
+        const refTransa =
+          payment.refTransa;
+
+
+        console.log(
+          "Transaction service créée :",
+          refTransa
+        );
+
+
+        window.showToast(
+          "Demande envoyée. Validez le paiement sur votre téléphone.",
+          "info"
+        );
+
+
+        // ------------------------------------------------------
+        // ATTENTE CONFIRMATION
+        // ------------------------------------------------------
+
+        const finalStatus =
+          await waitForPaymentConfirmation(
+            refTransa
+          );
+
+
+        // ------------------------------------------------------
+        // PAIEMENT CONFIRMÉ
+        // ------------------------------------------------------
+
+        if (
+
+          finalStatus.success &&
+
+          finalStatus.status ===
+            "completed"
+
+        ) {
+
+          /*
+           IMPORTANT :
+
+           Le paiement est confirmé par WonyaPay.
+
+           L'activation réelle du service doit être effectuée
+           par le Cloudflare Worker côté serveur.
+
+           On ne modifie PAS Firestore directement ici.
+          */
+
+          await loadUserData();
+
+
+          window.showToast(
+
+            window.getTranslation(
+
+              "purchase_success",
+
+              {
+
+                service:
+                  serviceName
+
+              }
+
+            ),
+
+            "success"
+
+          );
+
+
+          return;
+
+        }
+
+
+        // ------------------------------------------------------
+        // PAIEMENT ÉCHOUÉ
+        // ------------------------------------------------------
+
+        if (
+          finalStatus.status ===
+          "failed"
+        ) {
+
+          window.showToast(
+            "Le paiement a échoué ou a été refusé.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        // ------------------------------------------------------
+        // TIMEOUT
+        // ------------------------------------------------------
+
+        window.showToast(
+          "Paiement toujours en attente de confirmation.",
+          "info"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur achat :",
+          error
+        );
+
+
+        window.showToast(
+
+          error.message ||
+
+          window.getTranslation(
+            "transaction_error"
+          ),
+
+          "error"
+
+        );
+
+      }
+
+    };
+
+
+  // ============================================================
+  // DOM READY
+  // ============================================================
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
       applyTranslations();
-    });
-  </script>
+
+    }
+  );
+
+</script>
 </body>
 </html>
