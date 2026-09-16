@@ -1468,11 +1468,11 @@ async function createRealPayment(amount, phoneNumber, userId, type) {
             const refTransa = data.refTransa;
             waitForPaymentConfirmation(refTransa);
         } else {
-            alert("Erreur lors du paiement : " + (data.error || "Échec de l'opération"));
+            window.showToast("Erreur lors du paiement : " + (data.error || "Échec de l'opération"));
         }
     } catch (error) {
         console.error("Erreur réseau ou serveur :", error);
-        alert("Impossible de contacter le serveur de paiement.");
+        window.showToast("Impossible de contacter le serveur de paiement.");
     }
 }
 
@@ -1488,7 +1488,7 @@ async function createRealPayment(amount, phoneNumber, userId, type) {
               const user = firebase.auth().currentUser;
 
               if (!user) {
-                  alert("Veuillez vous connecter d'abord.");
+                  window.showToast("Veuillez vous connecter d'abord.");
                   return;
               }
 
@@ -1504,7 +1504,7 @@ async function createRealPayment(amount, phoneNumber, userId, type) {
               const user = firebase.auth().currentUser;
 
               if (!user) {
-                  alert("Veuillez vous connecter d'abord.");
+                  window.showToast("Veuillez vous connecter d'abord.");
                   return;
               }
 
