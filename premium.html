@@ -610,12 +610,7 @@
     <div class="card-balance" id="userBalance">0.00 $</div>
 
     <div class="card-actions">
-      <button class="btn-action btn-deposit" onclick="openDepositModal()">
-        <i class="fa-solid fa-plus-circle"></i> <span data-i18n="btn_recharge">Recharger</span>
-      </button>
-      <button class="btn-action btn-withdraw" onclick="showToast(getTranslation('withdraw_notice'), 'info')">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="btn_withdraw">Retirer</span>
-      </button>
+
     </div>
   </div>
 
@@ -759,2983 +754,741 @@
   // ============================================================
 
   const translations = {
-
     fr: {
       header_title: "Portefeuille & Boost",
       active_balance: "SOLDE ACTIF",
       available_in_account: "Disponible dans le compte",
       btn_recharge: "Recharger",
       btn_withdraw: "Retirer",
-
       boost_section_title: "Boostez votre Visibilité",
       boost_section_sub: "Choisissez une formule pour multiplier vos ventes",
-
       item_boost_title: "Boost Article",
       per_7days: "/ 7 jours",
-
       feat_boost_1: "Positionné en tête de recherche",
       feat_boost_2: "Badge 'Sponsorisé' attractif",
       feat_boost_3: "+300% de vues estimées",
-
       btn_boost_item: "Booster un article",
-
       badge_pro: "RECOMMANDÉ PRO",
       vip_title: "Vendeur VIP Premium",
       per_month: "/ mois",
-
       feat_vip_1: "Badge 'Vendeur VIP' Doré",
       feat_vip_2: "Publication d'articles en illimité",
       feat_vip_3: "Accès au tableau de bord des vues",
       feat_vip_4: "Support WhatsApp prioritaire 24/7",
-
       btn_activate_vip: "Activer le Mode VIP",
-
-      trust_text:
-        "Transactions sécurisées par Mobile Money (M-Pesa, Airtel, Orange)",
-
-      modal_deposit_title:
-        "Recharger votre portefeuille",
-
-      select_operator:
-        "Sélectionnez l'opérateur",
-
-      phone_number:
-        "Numéro de Téléphone Mobile Money",
-
-      amount_usd:
-        "Montant à Déposer ($ USD)",
-
-      btn_confirm_deposit:
-        "Confirmer le Dépôt",
-
-      withdraw_notice:
-        "Module de retrait sécurisé bientôt disponible.",
-
-      invalid_inputs:
-        "Veuillez saisir un numéro valide et un montant supérieur à zéro.",
-
-      deposit_ussd_sent:
-        "Demande envoyée. Veuillez valider le pop-up USSD sur votre téléphone.",
-
-      deposit_success:
-        "Votre compte a été crédité avec succès !",
-
-      insufficient_balance:
-        "Solde insuffisant ({balance}$). Vous avez besoin de {cost}$ pour cet achat.",
-
-      confirm_purchase:
-        "Confirmez-vous le paiement de {cost}$ pour : {service} ?",
-
-      purchase_success:
-        "Félicitations ! L'option '{service}' est maintenant active.",
-
-      transaction_error:
-        "Erreur lors de la transaction.",
-
-      vip_status_title:
-        "Compte VIP Premium",
-
-      boost_status_title:
-        "Boost Article Actif",
-
+      trust_text: "Transactions sécurisées par Mobile Money (M-Pesa, Airtel, Orange)",
+      modal_deposit_title: "Recharger votre portefeuille",
+      select_operator: "Sélectionnez l'opérateur",
+      phone_number: "Numéro de Téléphone Mobile Money",
+      amount_usd: "Montant à Déposer ($ USD)",
+      btn_confirm_deposit: "Confirmer le Dépôt",
+      withdraw_notice: "Module de retrait sécurisé bientôt disponible.",
+      invalid_inputs: "Veuillez saisir un numéro valide et un montant supérieur à zéro.",
+      deposit_ussd_sent: "Demande envoyée. Veuillez valider le pop-up USSD sur votre téléphone.",
+      deposit_success: "Votre compte a été crédité avec succès !",
+      insufficient_balance: "Solde insuffisant ({balance}$). Vous avez besoin de {cost}$ pour cet achat.",
+      confirm_purchase: "Confirmez-vous le paiement de {cost}$ pour : {service} ?",
+      purchase_success: "Félicitations ! L'option '{service}' est maintenant active.",
+      transaction_error: "Erreur lors de la transaction.",
+      vip_status_title: "Compte VIP Premium",
+      boost_status_title: "Boost Article Actif",
       days_short: "j",
       hours_short: "h",
       min_short: "m",
       sec_short: "s",
-
       expired: "Expiré"
     },
-
     en: {
       header_title: "Wallet & Boost",
       active_balance: "ACTIVE BALANCE",
       available_in_account: "Available in account",
       btn_recharge: "Top Up",
       btn_withdraw: "Withdraw",
-
       boost_section_title: "Boost Your Visibility",
-      boost_section_sub:
-        "Choose a plan to multiply your sales",
-
+      boost_section_sub: "Choose a plan to multiply your sales",
       item_boost_title: "Item Boost",
       per_7days: "/ 7 days",
-
       feat_boost_1: "Positioned at top of search",
       feat_boost_2: "Attractive 'Sponsored' badge",
       feat_boost_3: "+300% estimated views",
-
       btn_boost_item: "Boost an item",
-
       badge_pro: "PRO RECOMMENDED",
       vip_title: "VIP Premium Seller",
       per_month: "/ month",
-
       feat_vip_1: "Golden 'VIP Seller' Badge",
       feat_vip_2: "Unlimited item listings",
       feat_vip_3: "Access to views dashboard",
       feat_vip_4: "24/7 Priority WhatsApp support",
-
       btn_activate_vip: "Activate VIP Mode",
-
-      trust_text:
-        "Transactions secured by Mobile Money (M-Pesa, Airtel, Orange)",
-
-      modal_deposit_title:
-        "Top up your wallet",
-
-      select_operator:
-        "Select operator",
-
-      phone_number:
-        "Mobile Money Phone Number",
-
-      amount_usd:
-        "Amount to Deposit ($ USD)",
-
-      btn_confirm_deposit:
-        "Confirm Deposit",
-
-      withdraw_notice:
-        "Secure withdrawal module coming soon.",
-
-      invalid_inputs:
-        "Please enter a valid phone number and amount greater than zero.",
-
-      deposit_ussd_sent:
-        "Payment request sent. Please approve the USSD pop-up on your phone.",
-
-      deposit_success:
-        "Your account has been credited successfully!",
-
-      insufficient_balance:
-        "Insufficient balance ({balance}$). You need {cost}$ for this purchase.",
-
-      confirm_purchase:
-        "Do you confirm payment of {cost}$ for: {service}?",
-
-      purchase_success:
-        "Congratulations! '{service}' is now active.",
-
-      transaction_error:
-        "An error occurred during transaction.",
-
-      vip_status_title:
-        "VIP Premium Account",
-
-      boost_status_title:
-        "Item Boost Active",
-
+      trust_text: "Transactions secured by Mobile Money (M-Pesa, Airtel, Orange)",
+      modal_deposit_title: "Top up your wallet",
+      select_operator: "Select operator",
+      phone_number: "Mobile Money Phone Number",
+      amount_usd: "Amount to Deposit ($ USD)",
+      btn_confirm_deposit: "Confirm Deposit",
+      withdraw_notice: "Secure withdrawal module coming soon.",
+      invalid_inputs: "Please enter a valid phone number and amount greater than zero.",
+      deposit_ussd_sent: "Payment request sent. Please approve the USSD pop-up on your phone.",
+      deposit_success: "Your account has been credited successfully!",
+      insufficient_balance: "Insufficient balance ({balance}$). You need {cost}$ for this purchase.",
+      confirm_purchase: "Do you confirm payment of {cost}$ for: {service}?",
+      purchase_success: "Congratulations! '{service}' is now active.",
+      transaction_error: "An error occurred during transaction.",
+      vip_status_title: "VIP Premium Account",
+      boost_status_title: "Item Boost Active",
       days_short: "d",
       hours_short: "h",
       min_short: "m",
       sec_short: "s",
-
       expired: "Expired"
     }
   };
 
-
   // ============================================================
-  // LANGUE
+  // LANGUE & TRADUCTION
   // ============================================================
 
-  const currentLang =
-    localStorage.getItem("app_lang") || "fr";
+  const currentLang = localStorage.getItem("app_lang") || "fr";
 
-
-  window.getTranslation = function (
-    key,
-    params = {}
-  ) {
-
-    let text =
-      translations[currentLang]?.[key] ??
-      translations.fr?.[key] ??
-      key;
-
+  window.getTranslation = function (key, params = {}) {
+    let text = translations[currentLang]?.[key] ?? translations.fr?.[key] ?? key;
     Object.keys(params).forEach((param) => {
-
-      text = text.replace(
-        new RegExp(`\\{${param}\\}`, "g"),
-        params[param]
-      );
-
+      text = text.replace(new RegExp(`\\{${param}\\}`, "g"), params[param]);
     });
-
     return text;
   };
 
-
   function applyTranslations() {
-
-    document
-      .querySelectorAll("[data-i18n]")
-      .forEach((element) => {
-
-        const key =
-          element.getAttribute("data-i18n");
-
-        element.textContent =
-          window.getTranslation(key);
-
-      });
-
+    document.querySelectorAll("[data-i18n]").forEach((element) => {
+      const key = element.getAttribute("data-i18n");
+      element.textContent = window.getTranslation(key);
+    });
   }
 
-
   // ============================================================
-  // TOAST
+  // TOAST NOTIFICATIONS
   // ============================================================
 
-  window.showToast = function (
-    message,
-    type = "info"
-  ) {
-
-    const container =
-      document.getElementById("toast-container");
-
+  window.showToast = function (message, type = "info") {
+    const container = document.getElementById("toast-container");
     if (!container) return;
 
-    const toast =
-      document.createElement("div");
-
-    toast.className =
-      `toast ${type}`;
-
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
     let icon = "fa-info-circle";
+    if (type === "success") icon = "fa-check-circle";
+    if (type === "error") icon = "fa-exclamation-circle";
 
-    if (type === "success") {
-      icon = "fa-check-circle";
-    }
-
-    if (type === "error") {
-      icon = "fa-exclamation-circle";
-    }
-
-    toast.innerHTML = `
-      <i class="fa-solid ${icon}"></i>
-      <span>${message}</span>
-    `;
-
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
-
       toast.style.opacity = "0";
-      toast.style.transform =
-        "translateY(-10px)";
-      toast.style.transition =
-        "all 0.3s ease";
-
-      setTimeout(() => {
-        toast.remove();
-      }, 300);
-
+      toast.style.transform = "translateY(-10px)";
+      toast.style.transition = "all 0.3s ease";
+      setTimeout(() => toast.remove(), 300);
     }, 3500);
-
   };
-
 
   // ============================================================
   // CONFIRMATION PERSONNALISÉE
   // ============================================================
 
-  window.customConfirm = function (
-    message
-  ) {
-
+  window.customConfirm = function (message) {
     return new Promise((resolve) => {
+      const modal = document.getElementById("customConfirm");
+      const messageElement = document.getElementById("confirmMessage");
+      const yesButton = document.getElementById("confirmYesBtn");
+      const noButton = document.getElementById("confirmNoBtn");
 
-      const modal =
-        document.getElementById(
-          "customConfirm"
-        );
-
-      const messageElement =
-        document.getElementById(
-          "confirmMessage"
-        );
-
-      const yesButton =
-        document.getElementById(
-          "confirmYesBtn"
-        );
-
-      const noButton =
-        document.getElementById(
-          "confirmNoBtn"
-        );
-
-      if (
-        !modal ||
-        !messageElement ||
-        !yesButton ||
-        !noButton
-      ) {
-        resolve(
-          window.confirm(message)
-        );
+      if (!modal || !messageElement || !yesButton || !noButton) {
+        resolve(window.confirm(message));
         return;
       }
 
-      messageElement.textContent =
-        message;
-
-      modal.style.display =
-        "flex";
+      messageElement.textContent = message;
+      modal.style.display = "flex";
 
       const handleYes = () => {
-
-        modal.style.display =
-          "none";
-
+        modal.style.display = "none";
         cleanup();
-
         resolve(true);
       };
 
       const handleNo = () => {
-
-        modal.style.display =
-          "none";
-
+        modal.style.display = "none";
         cleanup();
-
         resolve(false);
       };
 
       const cleanup = () => {
-
-        yesButton.removeEventListener(
-          "click",
-          handleYes
-        );
-
-        noButton.removeEventListener(
-          "click",
-          handleNo
-        );
-
+        yesButton.removeEventListener("click", handleYes);
+        noButton.removeEventListener("click", handleNo);
       };
 
-      yesButton.addEventListener(
-        "click",
-        handleYes
-      );
-
-      noButton.addEventListener(
-        "click",
-        handleNo
-      );
-
+      yesButton.addEventListener("click", handleYes);
+      noButton.addEventListener("click", handleNo);
     });
-
   };
 
-
   // ============================================================
-  // CONFIGURATION FIREBASE
+  // FIREBASE & WORKER CONFIG
   // ============================================================
 
   const firebaseConfig = {
-
-    apiKey:
-      "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
-
-    authDomain:
-      "v-ea-fb4c4.firebaseapp.com",
-
-    projectId:
-      "v-ea-fb4c4",
-
-    storageBucket:
-      "v-ea-fb4c4.firebasestorage.app",
-
-    messagingSenderId:
-      "357462139035",
-
-    appId:
-      "1:357462139035:web:7aa2ee50350d88a843a63e",
-
-    measurementId:
-      "G-WEG1X65STP"
+    apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+    authDomain: "v-ea-fb4c4.firebaseapp.com",
+    projectId: "v-ea-fb4c4",
+    storageBucket: "v-ea-fb4c4.firebasestorage.app",
+    messagingSenderId: "357462139035",
+    appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+    measurementId: "G-WEG1X65STP"
   };
 
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-  const app =
-    initializeApp(firebaseConfig);
-
-  const db =
-    getFirestore(app);
-
-  const auth =
-    getAuth(app);
-
+  const PAYMENT_WORKER_URL = "https://vea-payment-worker.vea-payment.workers.dev";
+  const CREATE_PAYMENT_URL = `${PAYMENT_WORKER_URL}/api/payment`;
+  const CHECK_PAYMENT_URL = `${PAYMENT_WORKER_URL}/api/status`;
+  const PAYMENT_TIMEOUT = 180000;
 
   // ============================================================
-  // CONFIGURATION CLOUDFLARE WORKER
-  // ============================================================
-
-  const PAYMENT_WORKER_URL =
-    "https://vea-payment-worker.vea-payment.workers.dev";
-
-  const CREATE_PAYMENT_URL =
-    `${PAYMENT_WORKER_URL}/api/payment`;
-
-  const CHECK_PAYMENT_URL =
-    `${PAYMENT_WORKER_URL}/api/status`;
-
-  const PAYMENT_TIMEOUT =
-    180000;
-
-
-  // ============================================================
-  // VARIABLES
+  // VARIABLES GLOBALES
   // ============================================================
 
   let currentUser = null;
   let currentBalance = 0;
   let timerInterval = null;
   let userData = null;
-
-  let userRoleCollection =
-    "vendeurs_clients";
-
+  let userRoleCollection = "vendeurs_clients";
   let selectedArticleId = null;
-
-  let selectedOperator =
-    "airtel";
-
-  let productsUnsubscribe =
-    null;
-
+  let selectedOperator = "airtel";
+  let productsUnsubscribe = null;
   let boostedProductsData = {};
 
-
   // ============================================================
-  // AUTHENTIFICATION FIREBASE
+  // AUTHENTIFICATION
   // ============================================================
 
-  onAuthStateChanged(
-    auth,
-    async (user) => {
-
-      if (!user) {
-
-        currentUser = null;
-
-        return;
-      }
-
-      try {
-
-        currentUser = user;
-
-        let userSnap =
-          await getDoc(
-            doc(
-              db,
-              "vendeurs_clients",
-              user.uid
-            )
-          );
-
-        if (userSnap.exists()) {
-
-          userRoleCollection =
-            "vendeurs_clients";
-
-        } else {
-
-          userSnap =
-            await getDoc(
-              doc(
-                db,
-                "vendeurs",
-                user.uid
-              )
-            );
-
-          if (userSnap.exists()) {
-
-            userRoleCollection =
-              "vendeurs";
-
-          } else {
-
-            console.warn(
-              "Profil utilisateur introuvable dans Firestore."
-            );
-
-          }
-
-        }
-
-        await loadUserData();
-
-      } catch (error) {
-
-        console.error(
-          "Erreur authentification :",
-          error
-        );
-
-        window.showToast(
-          "Impossible de charger votre compte.",
-          "error"
-        );
-
-      }
-
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      currentUser = null;
+      return;
     }
-  );
 
+    try {
+      currentUser = user;
+      let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
 
-  // ============================================================
-  // CHARGER LES DONNÉES UTILISATEUR
-  // ============================================================
+      if (userSnap.exists()) {
+        userRoleCollection = "vendeurs_clients";
+      } else {
+        userSnap = await getDoc(doc(db, "vendeurs", user.uid));
+        if (userSnap.exists()) {
+          userRoleCollection = "vendeurs";
+        }
+      }
+
+      await loadUserData();
+    } catch (error) {
+      console.error("Erreur authentification :", error);
+      window.showToast("Impossible de charger votre compte.", "error");
+    }
+  });
 
   async function loadUserData() {
-
     if (!currentUser) return;
 
     try {
+      const userRef = doc(db, userRoleCollection, currentUser.uid);
+      const userSnap = await getDoc(userRef);
 
-      const userRef =
-        doc(
-          db,
-          userRoleCollection,
-          currentUser.uid
-        );
+      if (!userSnap.exists()) return;
 
-      const userSnap =
-        await getDoc(userRef);
+      userData = userSnap.data();
+      currentBalance = Number(userData.solde) || 0;
 
-      if (!userSnap.exists()) {
-
-        console.warn(
-          "Document utilisateur introuvable."
-        );
-
-        return;
-      }
-
-      userData =
-        userSnap.data();
-
-      currentBalance =
-        Number(userData.solde) || 0;
-
-      const balanceElement =
-        document.getElementById(
-          "userBalance"
-        );
-
+      const balanceElement = document.getElementById("userBalance");
       if (balanceElement) {
-
-        balanceElement.textContent =
-          `${currentBalance.toFixed(2)} $`;
-
+        balanceElement.textContent = `${currentBalance.toFixed(2)} $`;
       }
 
       listenToBoostedArticles();
-
     } catch (error) {
-
-      console.error(
-        "Erreur chargement profil :",
-        error
-      );
-
+      console.error("Erreur chargement profil :", error);
     }
-
   }
-
-
-  // ============================================================
-  // TOKEN FIREBASE
-  // Utilisé lorsque le Worker aura besoin d'authentifier
-  // la requête.
-  // ============================================================
 
   async function getFirebaseAuthHeaders() {
-
-    if (!currentUser) {
-
-      throw new Error(
-        "Utilisateur non connecté."
-      );
-
-    }
-
-    const idToken =
-      await currentUser.getIdToken();
-
+    if (!currentUser) throw new Error("Utilisateur non connecté.");
+    const idToken = await currentUser.getIdToken();
     return {
-
-      "Content-Type":
-        "application/json",
-
-      "Authorization":
-        `Bearer ${idToken}`
-
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${idToken}`
     };
-
   }
 
-
   // ============================================================
-  // NORMALISER NUMÉRO RDC
+  // FONCTIONS UTILITAIRES DE PAIEMENT
   // ============================================================
 
-  function normalizeMobileMoneyPhone(
-    value
-  ) {
-
-    let phone =
-      String(value || "")
-        .trim()
-        .replace(/\s+/g, "")
-        .replace(/-/g, "");
-
-    if (
-      phone.startsWith("+243")
-    ) {
-
-      phone =
-        "0" +
-        phone.substring(4);
-
-    }
-
-    if (
-      phone.startsWith("243")
-    ) {
-
-      phone =
-        "0" +
-        phone.substring(3);
-
-    }
-
+  function normalizeMobileMoneyPhone(value) {
+    let phone = String(value || "").trim().replace(/\s+/g, "").replace(/-/g, "");
+    if (phone.startsWith("+243")) phone = "0" + phone.substring(4);
+    if (phone.startsWith("243")) phone = "0" + phone.substring(3);
     return phone;
   }
 
-
-  // ============================================================
-  // VALIDER NUMÉRO WONYA
-  // ============================================================
-
-  function isValidWonyaPhone(
-    phone
-  ) {
-
-    return /^0\d{9}$/.test(
-      phone
-    );
-
+  function isValidWonyaPhone(phone) {
+    return /^0\d{9}$/.test(phone);
   }
 
-
-  // ============================================================
-  // CRÉER UN PAIEMENT WONYA PAY
-  // ============================================================
-
-async function createRealPayment(amount, phoneNumber, userId, type) {
-    const CREATE_PAYMENT_URL = "https://vea-payment-worker.vea-payment.workers.dev/api/payment";
+  async function createRealPayment(params) {
+    const amount = params.amount;
+    const phone = params.phone;
+    const userId = currentUser?.uid || params.userId;
+    const type = params.type;
+    const articleId = params.articleId || null;
 
     try {
-        const response = await fetch(CREATE_PAYMENT_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                amount: amount,
-                phone: phoneNumber,
-                userId: userId,
-                type: type // Ex: "deposit" ou "boost_item"
-            })
-        });
+      const headers = await getFirebaseAuthHeaders();
+      const response = await fetch(CREATE_PAYMENT_URL, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({
+          amount: Number(amount),
+          phone: phone,
+          userId: userId,
+          type: type,
+          articleId: articleId
+        })
+      });
 
-        const data = await response.json();
-        console.log("Réponse création paiement WonyaPay :", data);
-
-        if (data.success) {
-            // Le paiement a été initié avec succès
-            // Tu peux récupérer refTransa pour vérifier le statut ensuite
-            const refTransa = data.refTransa;
-            waitForPaymentConfirmation(refTransa);
-        } else {
-            window.showToast("Erreur lors du paiement : " + (data.error || "Échec de l'opération"));
-        }
+      const data = await response.json();
+      if (data.success && data.refTransa) {
+        return data;
+      } else {
+        throw new Error(data.error || data.message || "Échec d'initialisation du paiement.");
+      }
     } catch (error) {
-        console.error("Erreur réseau ou serveur :", error);
-        window.showToast("Impossible de contacter le serveur de paiement.");
+      console.error("Erreur serveur de paiement :", error);
+      throw error;
     }
-}
-
-// 2. PLACE LES ÉCOUTEURS DE BOUTONS ICI :
-  document.addEventListener("DOMContentLoaded", () => {
-
-      // Écouteur pour le bouton Dépôt
-      const btnDepot = document.getElementById("btn-depot");
-      if (btnDepot) {
-          btnDepot.addEventListener("click", () => {
-              const montant = document.getElementById("input-montant").value;
-              const phone = document.getElementById("input-phone").value;
-              const user = firebase.auth().currentUser;
-
-              if (!user) {
-                  window.showToast("Veuillez vous connecter d'abord.");
-                  return;
-              }
-
-              createRealPayment(montant, phone, user.uid, "deposit");
-          });
-      }
-
-      // Écouteur pour le bouton Boost
-      const btnBoost = document.getElementById("btn-boost");
-      if (btnBoost) {
-          btnBoost.addEventListener("click", () => {
-              const phone = document.getElementById("input-phone").value;
-              const user = firebase.auth().currentUser;
-
-              if (!user) {
-                  window.showToast("Veuillez vous connecter d'abord.");
-                  return;
-              }
-
-              // Exemple pour un boost à 1.50$
-              createRealPayment(1.50, phone, user.uid, "boost_item");
-          });
-      }
-
-  });
-
-  // ============================================================
-  // EXTRAIRE LE STATUT WONYA PAY
-  // ============================================================
-
-  function extractPaymentStatus(
-    result
-  ) {
-
-    const wonya =
-      result?.wonyaResponse || {};
-
-    const data =
-      wonya?.data || {};
-
-    const rawStatus =
-
-      data?.status ||
-
-      data?.Status ||
-
-      data?.StatutWonya ||
-
-      data?.Statut ||
-
-      data?.statut ||
-
-      wonya?.status ||
-
-      wonya?.Status ||
-
-      wonya?.StatutWonya ||
-
-      wonya?.Statut ||
-
-      wonya?.statut ||
-
-      result?.status ||
-
-      result?.Status ||
-
-      result?.StatutWonya ||
-
-      result?.Statut ||
-
-      result?.statut ||
-
-      "";
-
-
-    return String(
-      rawStatus
-    )
-      .normalize("NFD")
-      .replace(
-        /[\u0300-\u036f]/g,
-        ""
-      )
-      .toLowerCase()
-      .trim();
-
   }
 
+  function extractPaymentStatus(result) {
+    const wonya = result?.wonyaResponse || {};
+    const data = wonya?.data || {};
+    const rawStatus = data?.status || data?.Status || data?.StatutWonya || data?.Statut || data?.statut ||
+                      wonya?.status || wonya?.Status || wonya?.StatutWonya || wonya?.Statut || wonya?.statut ||
+                      result?.status || result?.Status || result?.StatutWonya || result?.Statut || result?.statut || "";
 
-  // ============================================================
-  // VÉRIFIER LE STATUT WONYA PAY
-  // ============================================================
+    return String(rawStatus).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  }
 
-  async function checkRealPayment(
-    refTransa
-  ) {
+  async function checkRealPayment(refTransa) {
+    if (!refTransa) throw new Error("Référence de transaction manquante.");
 
-    if (!refTransa) {
-
-      throw new Error(
-        "Référence de transaction manquante."
-      );
-
-    }
-
-
-    const response =
-      await fetch(
-
-        `${CHECK_PAYMENT_URL}?ref=${encodeURIComponent(refTransa)}`,
-
-        {
-
-          method: "GET",
-
-          headers: {
-
-            "Accept":
-              "application/json"
-
-          }
-
-        }
-
-      );
-
+    const response = await fetch(`${CHECK_PAYMENT_URL}?ref=${encodeURIComponent(refTransa)}`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
 
     let result;
-
     try {
-
-      result =
-        await response.json();
-
+      result = await response.json();
     } catch {
-
-      throw new Error(
-        "Réponse invalide du serveur de statut."
-      );
-
+      throw new Error("Réponse invalide du serveur de statut.");
     }
 
-
-    console.log(
-      "Réponse statut complète :",
-      result
-    );
-
-
-    if (
-      !response.ok ||
-      !result.success
-    ) {
-
-      throw new Error(
-        result.error ||
-        result.message ||
-        "Impossible de vérifier la transaction."
-      );
-
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || result.message || "Impossible de vérifier la transaction.");
     }
 
-
-    const status =
-      extractPaymentStatus(
-        result
-      );
-
-
-    console.log(
-      "Statut WonyaPay détecté :",
-      status
-    );
-
-
-    const completedStatuses = [
-
-      "completed",
-      "success",
-      "successful",
-      "succes",
-      "recu",
-      "reussi",
-      "réussi"
-
-    ];
-
-
-    const failedStatuses = [
-
-      "failed",
-      "failure",
-      "cancelled",
-      "canceled",
-      "rejected",
-      "echec",
-      "échoué",
-      "refused",
-      "refuse"
-
-    ];
-
-
-    const pendingStatuses = [
-
-      "pending",
-      "processing",
-      "en_attente",
-      "en attente",
-      "initie",
-      "initiee",
-      "initiated"
-
-    ];
-
+    const status = extractPaymentStatus(result);
+    const completedStatuses = ["completed", "success", "successful", "succes", "recu", "reussi", "réussi"];
+    const failedStatuses = ["failed", "failure", "cancelled", "canceled", "rejected", "echec", "échoué", "refused", "refuse"];
+    const pendingStatuses = ["pending", "processing", "en_attente", "en attente", "initie", "initiee", "initiated"];
 
     return {
-
       success: true,
-
-      refTransa:
-        result.refTransa ||
-        refTransa,
-
+      refTransa: result.refTransa || refTransa,
       status,
-
-      completed:
-        completedStatuses.includes(
-          status
-        ),
-
-      failed:
-        failedStatuses.includes(
-          status
-        ),
-
-      pending:
-        pendingStatuses.includes(
-          status
-        ),
-
-      raw:
-        result
-
+      completed: completedStatuses.includes(status),
+      failed: failedStatuses.includes(status),
+      pending: pendingStatuses.includes(status),
+      raw: result
     };
-
   }
 
+  async function waitForPaymentConfirmation(refTransa) {
+    const startTime = Date.now();
+    while (Date.now() - startTime < PAYMENT_TIMEOUT) {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      const status = await checkRealPayment(refTransa);
 
-  // ============================================================
-  // ATTENDRE CONFIRMATION PAIEMENT
-  // ============================================================
-
-  async function waitForPaymentConfirmation(
-    refTransa
-  ) {
-
-    const startTime =
-      Date.now();
-
-
-    while (
-      Date.now() -
-      startTime <
-      PAYMENT_TIMEOUT
-    ) {
-
-      await new Promise(
-        resolve =>
-          setTimeout(
-            resolve,
-            3000
-          )
-      );
-
-
-      const status =
-        await checkRealPayment(
-          refTransa
-        );
-
-
-      console.log(
-        "Vérification transaction :",
-        status
-      );
-
-
-      if (
-        status.completed
-      ) {
-
-        return {
-
-          success: true,
-
-          status:
-            "completed",
-
-          refTransa
-
-        };
-
-      }
-
-
-      if (
-        status.failed
-      ) {
-
-        return {
-
-          success: false,
-
-          status:
-            "failed",
-
-          refTransa,
-
-          raw:
-            status.raw
-
-        };
-
-      }
-
+      if (status.completed) return { success: true, status: "completed", refTransa };
+      if (status.failed) return { success: false, status: "failed", refTransa, raw: status.raw };
     }
-
-
-    return {
-
-      success: false,
-
-      status:
-        "timeout",
-
-      refTransa
-
-    };
-
+    return { success: false, status: "timeout", refTransa };
   }
 
-
   // ============================================================
-  // SURVEILLANCE DES ARTICLES
+  // GESTION DES TIMERS ET ARTICLES
   // ============================================================
 
   function listenToBoostedArticles() {
+    if (productsUnsubscribe) productsUnsubscribe();
+    if (!currentUser) return;
 
-    if (
-      productsUnsubscribe
-    ) {
-
-      productsUnsubscribe();
-
-    }
-
-
-    if (!currentUser) {
-      return;
-    }
-
-
-    const productsQuery =
-      query(
-
-        collection(
-          db,
-          "produits"
-        ),
-
-        where(
-          "vendeurId",
-          "==",
-          currentUser.uid
-        )
-
-      );
-
-
-    productsUnsubscribe =
-      onSnapshot(
-
-        productsQuery,
-
-        (snapshot) => {
-
-          boostedProductsData =
-            {};
-
-          snapshot.forEach(
-            (docSnap) => {
-
-              boostedProductsData[
-                docSnap.id
-              ] =
-                docSnap.data();
-
-            }
-          );
-
-
-          renderTimers();
-
-        },
-
-        (error) => {
-
-          console.error(
-            "Erreur écoute produits :",
-            error
-          );
-
-        }
-
-      );
-
+    const productsQuery = query(collection(db, "produits"), where("vendeurId", "==", currentUser.uid));
+    productsUnsubscribe = onSnapshot(productsQuery, (snapshot) => {
+      boostedProductsData = {};
+      snapshot.forEach((docSnap) => {
+        boostedProductsData[docSnap.id] = docSnap.data();
+      });
+      renderTimers();
+    });
   }
-
-
-  // ============================================================
-  // AFFICHER LES TIMERS
-  // ============================================================
 
   function renderTimers() {
+    const container = document.getElementById("activeStatusContainer");
+    if (!container) return;
 
-    const container =
-      document.getElementById(
-        "activeStatusContainer"
-      );
-
-    if (!container) {
-      return;
-    }
-
-
-    container.innerHTML =
-      "";
-
-
+    container.innerHTML = "";
     if (timerInterval) {
-
-      clearInterval(
-        timerInterval
-      );
-
-      timerInterval =
-        null;
-
+      clearInterval(timerInterval);
+      timerInterval = null;
     }
 
-
-    const hasVip =
-      Boolean(
-        userData &&
-        userData.isPremium &&
-        userData.premiumUntil
-      );
-
-
-    const activeBoosts =
-      Array.isArray(
-        userData?.boosts
-      )
-        ? userData.boosts
-        : [];
-
-
-    if (
-      !hasVip &&
-      activeBoosts.length === 0
-    ) {
-
-      return;
-
-    }
-
-
-    const updateClocks =
-      async () => {
-
-        const currentTime =
-          Date.now();
-
-        let html =
-          "";
-
-        const validBoostsForUser =
-          [];
-
-        let hasBoostsChanged =
-          false;
-
-
-        // ------------------------------------------------------
-        // VIP
-        // ------------------------------------------------------
-
-        if (hasVip) {
-
-          const expiry =
-            new Date(
-              userData.premiumUntil
-            ).getTime();
-
-          const totalDuration =
-            30 *
-            24 *
-            60 *
-            60 *
-            1000;
-
-          const diff =
-            expiry -
-            currentTime;
-
-
-          if (
-            diff > 0
-          ) {
-
-            const pct =
-              Math.max(
-                0,
-                Math.min(
-                  100,
-                  (
-                    diff /
-                    totalDuration
-                  ) *
-                  100
-                )
-              );
-
-
-            html += `
-
-              <div class="status-card vip">
-
-                <div class="status-header">
-
-                  <div
-                    class="status-title"
-                    style="color:#FFD700;"
-                  >
-
-                    <i
-                      class="fa-solid fa-crown"
-                    ></i>
-
-                    ${window.getTranslation(
-                      "vip_status_title"
-                    )}
-
-                  </div>
-
-                  <div class="status-timer">
-
-                    ${formatTimeLeft(
-                      diff
-                    )}
-
-                  </div>
-
-                </div>
-
-                <div class="progress-bar">
-
-                  <div
-                    class="progress-fill gold"
-                    style="width:${pct}%"
-                  ></div>
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-
-        }
-
-
-        // ------------------------------------------------------
-        // BOOSTS
-        // ------------------------------------------------------
-
-        for (
-          const boost of activeBoosts
-        ) {
-
-          const expiry =
-            new Date(
-              boost.boostUntil
-            ).getTime();
-
-          const diff =
-            expiry -
-            currentTime;
-
-
-          const articleData =
-            boost.articleId
-              ? boostedProductsData[
-                  boost.articleId
-                ]
-              : null;
-
-
-          const isSold =
-            articleData &&
-            (
-              articleData.vendu === true ||
-              articleData.statut === "vendu"
-            );
-
-
-          if (
-            isSold ||
-            diff <= 0
-          ) {
-
-            hasBoostsChanged =
-              true;
-
-
-            if (
-              boost.articleId
-            ) {
-
-              try {
-
-                const productRef =
-                  doc(
-                    db,
-                    "produits",
-                    boost.articleId
-                  );
-
-
-                await updateDoc(
-                  productRef,
-                  {
-
-                    isBoosted:
-                      false,
-
-                    boostUntil:
-                      null
-
-                  }
-                );
-
-              } catch (error) {
-
-                console.error(
-                  "Erreur désactivation boost :",
-                  error
-                );
-
-              }
-
-            }
-
-
-            continue;
-
-          }
-
-
-          validBoostsForUser.push(
-            boost
-          );
-
-
-          const totalDuration =
-            7 *
-            24 *
-            60 *
-            60 *
-            1000;
-
-
-          const pct =
-            Math.max(
-              0,
-              Math.min(
-                100,
-                (
-                  diff /
-                  totalDuration
-                ) *
-                100
-              )
-            );
-
-
-          const imgHtml =
-            boost.boostedArticleImage
-              ? `
-
-                <img
-                  src="${boost.boostedArticleImage}"
-                  style="
-                    width:40px;
-                    height:40px;
-                    border-radius:8px;
-                    object-fit:cover;
-                  "
-                >
-
-              `
-              : "";
-
-
+    const hasVip = Boolean(userData && userData.isPremium && userData.premiumUntil);
+    const activeBoosts = Array.isArray(userData?.boosts) ? userData.boosts : [];
+
+    if (!hasVip && activeBoosts.length === 0) return;
+
+    const updateClocks = async () => {
+      const currentTime = Date.now();
+      let html = "";
+      const validBoostsForUser = [];
+      let hasBoostsChanged = false;
+
+      // VIP Timer
+      if (hasVip) {
+        const expiry = new Date(userData.premiumUntil).getTime();
+        const totalDuration = 30 * 24 * 60 * 60 * 1000;
+        const diff = expiry - currentTime;
+
+        if (diff > 0) {
+          const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
           html += `
-
-            <div class="status-card">
-
-              <div
-                class="status-header"
-                style="
-                  display:flex;
-                  align-items:center;
-                  gap:10px;
-                "
-              >
-
-                ${imgHtml}
-
-                <div
-                  style="flex:1;"
-                >
-
-                  <div
-                    class="status-title"
-                    style="color:#6366F1;"
-                  >
-
-                    <i
-                      class="fa-solid fa-rocket"
-                    ></i>
-
-                    ${window.getTranslation(
-                      "boost_status_title"
-                    )}
-
-                  </div>
-
+            <div class="status-card vip">
+              <div class="status-header">
+                <div class="status-title" style="color:#FFD700;">
+                  <i class="fa-solid fa-crown"></i> ${window.getTranslation("vip_status_title")}
                 </div>
-
-                <div
-                  class="status-timer"
-                >
-
-                  ${formatTimeLeft(
-                    diff
-                  )}
-
-                </div>
-
+                <div class="status-timer">${formatTimeLeft(diff)}</div>
               </div>
-
               <div class="progress-bar">
-
-                <div
-                  class="progress-fill"
-                  style="width:${pct}%"
-                ></div>
-
+                <div class="progress-fill gold" style="width:${pct}%"></div>
               </div>
-
-            </div>
-
-          `;
-
+            </div>`;
         }
+      }
 
+      // Boosts Timers
+      for (const boost of activeBoosts) {
+        const expiry = new Date(boost.boostUntil).getTime();
+        const diff = expiry - currentTime;
+        const articleData = boost.articleId ? boostedProductsData[boost.articleId] : null;
+        const isSold = articleData && (articleData.vendu === true || articleData.statut === "vendu");
 
-        // ------------------------------------------------------
-        // NETTOYAGE BOOSTS EXPIRÉS
-        // ------------------------------------------------------
-
-        if (
-          hasBoostsChanged
-        ) {
-
-          userData.boosts =
-            validBoostsForUser;
-
-
-          try {
-
-            const userRef =
-              doc(
-                db,
-                userRoleCollection,
-                currentUser.uid
-              );
-
-
-            await updateDoc(
-              userRef,
-              {
-
-                boosts:
-                  validBoostsForUser,
-
-                isBoosted:
-                  validBoostsForUser.length > 0
-
-              }
-            );
-
-          } catch (error) {
-
-            console.error(
-              "Erreur mise à jour boosts :",
-              error
-            );
-
+        if (isSold || diff <= 0) {
+          hasBoostsChanged = true;
+          if (boost.articleId) {
+            try {
+              await updateDoc(doc(db, "produits", boost.articleId), { isBoosted: false, boostUntil: null });
+            } catch (e) { console.error(e); }
           }
-
+          continue;
         }
 
+        validBoostsForUser.push(boost);
+        const totalDuration = 7 * 24 * 60 * 60 * 1000;
+        const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
+        const imgHtml = boost.boostedArticleImage ? `<img src="${boost.boostedArticleImage}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">` : "";
 
-        container.innerHTML =
-          html;
+        html += `
+          <div class="status-card">
+            <div class="status-header" style="display:flex;align-items:center;gap:10px;">
+              ${imgHtml}
+              <div style="flex:1;">
+                <div class="status-title" style="color:#6366F1;">
+                  <i class="fa-solid fa-rocket"></i> ${window.getTranslation("boost_status_title")}
+                </div>
+              </div>
+              <div class="status-timer">${formatTimeLeft(diff)}</div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>`;
+      }
 
-      };
+      if (hasBoostsChanged) {
+        userData.boosts = validBoostsForUser;
+        try {
+          await updateDoc(doc(db, userRoleCollection, currentUser.uid), {
+            boosts: validBoostsForUser,
+            isBoosted: validBoostsForUser.length > 0
+          });
+        } catch (e) { console.error(e); }
+      }
 
+      container.innerHTML = html;
+    };
 
     updateClocks();
-
-
-    timerInterval =
-      setInterval(
-        updateClocks,
-        1000
-      );
-
+    timerInterval = setInterval(updateClocks, 1000);
   }
 
+  function formatTimeLeft(ms) {
+    if (ms <= 0) return window.getTranslation("expired");
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = Math.floor((ms / (1000 * 60)) % 60);
+    const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+    return `${days}${window.getTranslation("days_short")} ${hours}${window.getTranslation("hours_short")} ${minutes}${window.getTranslation("min_short")} ${seconds}${window.getTranslation("sec_short")}`;
+  }
 
   // ============================================================
-  // FORMAT TIMER
+  // MODALES & ACTIONS UTILISATEUR
   // ============================================================
 
-  function formatTimeLeft(
-    ms
-  ) {
+  window.openDepositModal = () => {
+    const modal = document.getElementById("depositModal");
+    if (modal) modal.style.display = "flex";
+  };
 
-    if (
-      ms <= 0
-    ) {
+  window.closeDepositModal = () => {
+    const modal = document.getElementById("depositModal");
+    if (modal) modal.style.display = "none";
+  };
 
-      return window.getTranslation(
-        "expired"
-      );
+  window.closeBoostArticleModal = () => {
+    const modal = document.getElementById("boostArticleModal");
+    if (modal) modal.style.display = "none";
+    selectedArticleId = null;
+    const button = document.getElementById("confirmBoostArticleBtn");
+    if (button) button.disabled = true;
+  };
 
+  window.selectOperator = (element, operator) => {
+    document.querySelectorAll(".payment-opt").forEach(item => item.classList.remove("active"));
+    if (element) element.classList.add("active");
+    selectedOperator = operator;
+  };
+
+  window.processDeposit = async () => {
+    if (!currentUser) {
+      window.showToast("Vous devez être connecté.", "error");
+      return;
     }
 
+    const amount = parseFloat(document.getElementById("depositAmount")?.value);
+    const rawPhone = document.getElementById("phoneNumber")?.value;
+    const phone = normalizeMobileMoneyPhone(rawPhone);
 
-    const seconds =
-      Math.floor(
-        (ms / 1000) % 60
-      );
+    if (!amount || amount <= 0 || !isValidWonyaPhone(phone)) {
+      window.showToast("Entrez un numéro Mobile Money valide et un montant supérieur à zéro.", "error");
+      return;
+    }
 
-    const minutes =
-      Math.floor(
-        (ms / (1000 * 60)) % 60
-      );
+    if (amount < 1) {
+      window.showToast("Le montant minimum est de 1 USD.", "error");
+      return;
+    }
 
-    const hours =
-      Math.floor(
-        (ms / (1000 * 60 * 60)) % 24
-      );
+    try {
+      window.showToast("Préparation du paiement Mobile Money...", "info");
+      const payment = await createRealPayment({ type: "wallet_deposit", amount, phone });
+      const refTransa = payment.refTransa;
 
-    const days =
-      Math.floor(
-        ms /
-        (1000 * 60 * 60 * 24)
-      );
+      window.showToast("Demande envoyée. Validez le paiement sur votre téléphone.", "info");
+      const finalStatus = await waitForPaymentConfirmation(refTransa);
 
-
-    return `
-
-      ${days}${window.getTranslation(
-        "days_short"
-      )}
-
-      ${hours}${window.getTranslation(
-        "hours_short"
-      )}
-
-      ${minutes}${window.getTranslation(
-        "min_short"
-      )}
-
-      ${seconds}${window.getTranslation(
-        "sec_short"
-      )}
-
-    `.replace(/\s+/g, " ").trim();
-
-  }
-
-
-  // ============================================================
-  // MODALE RECHARGE
-  // ============================================================
-
-  window.openDepositModal =
-    () => {
-
-      const modal =
-        document.getElementById(
-          "depositModal"
-        );
-
-      if (modal) {
-
-        modal.style.display =
-          "flex";
-
-      }
-
-    };
-
-
-  window.closeDepositModal =
-    () => {
-
-      const modal =
-        document.getElementById(
-          "depositModal"
-        );
-
-      if (modal) {
-
-        modal.style.display =
-          "none";
-
-      }
-
-    };
-
-
-  // ============================================================
-  // MODALE BOOST
-  // ============================================================
-
-  window.closeBoostArticleModal =
-    () => {
-
-      const modal =
-        document.getElementById(
-          "boostArticleModal"
-        );
-
-      if (modal) {
-
-        modal.style.display =
-          "none";
-
-      }
-
-
-      selectedArticleId =
-        null;
-
-
-      const button =
-        document.getElementById(
-          "confirmBoostArticleBtn"
-        );
-
-      if (button) {
-
-        button.disabled =
-          true;
-
-      }
-
-    };
-
-
-  // ============================================================
-  // SÉLECTION OPÉRATEUR
-  // ============================================================
-
-  window.selectOperator =
-    (element, operator) => {
-
-      document
-        .querySelectorAll(
-          ".payment-opt"
-        )
-        .forEach(
-          item =>
-            item.classList.remove(
-              "active"
-            )
-        );
-
-
-      if (element) {
-
-        element.classList.add(
-          "active"
-        );
-
-      }
-
-
-      selectedOperator =
-        operator;
-
-      console.log(
-        "Opérateur sélectionné :",
-        selectedOperator
-      );
-
-    };
-
-
-  // ============================================================
-  // RECHARGE PORTEFEUILLE
-  // ============================================================
-
-  window.processDeposit =
-    async () => {
-
-      if (!currentUser) {
-
-        window.showToast(
-          "Vous devez être connecté.",
-          "error"
-        );
-
+      if (finalStatus.success && finalStatus.status === "completed") {
+        window.closeDepositModal();
+        document.getElementById("depositAmount").value = "";
+        document.getElementById("phoneNumber").value = "";
+        await loadUserData();
+        window.showToast(`Paiement confirmé ! Transaction ${refTransa}.`, "success");
         return;
-
       }
 
-
-      const amount =
-        parseFloat(
-          document.getElementById(
-            "depositAmount"
-          )?.value
-        );
-
-
-      const rawPhone =
-        document.getElementById(
-          "phoneNumber"
-        )?.value;
-
-
-      const phone =
-        normalizeMobileMoneyPhone(
-          rawPhone
-        );
-
-
-      if (
-        !amount ||
-        amount <= 0 ||
-        !isValidWonyaPhone(
-          phone
-        )
-      ) {
-
-        window.showToast(
-          "Entrez un numéro Mobile Money valide et un montant supérieur à zéro.",
-          "error"
-        );
-
+      if (finalStatus.status === "failed") {
+        window.showToast("Le paiement Mobile Money a échoué ou a été refusé.", "error");
         return;
-
       }
+      window.showToast("Le paiement est toujours en attente de confirmation.", "info");
+    } catch (error) {
+      window.showToast(error.message || "Impossible de lancer le paiement.", "error");
+    }
+  };
 
+  window.startBoostProcess = async () => {
+    if (!currentUser) {
+      window.showToast("Vous devez être connecté.", "error");
+      return;
+    }
 
-      if (
-        amount < 1
-      ) {
+    const listContainer = document.getElementById("articlesSelectList");
+    const confirmButton = document.getElementById("confirmBoostArticleBtn");
 
-        window.showToast(
-          "Le montant minimum est de 1 USD.",
-          "error"
-        );
+    if (!listContainer) return;
+    listContainer.innerHTML = `<div style="color:var(--text-muted); text-align:center;">Chargement de vos articles...</div>`;
+    if (confirmButton) confirmButton.disabled = true;
 
-        return;
+    document.getElementById("boostArticleModal").style.display = "flex";
 
-      }
+    try {
+      const productsQuery = query(collection(db, "produits"), where("vendeurId", "==", currentUser.uid));
+      const querySnapshot = await getDocs(productsQuery);
+      const nowTime = Date.now();
+      const availableArticles = [];
 
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const articleId = docSnap.id;
+        let boostExpiry = null;
 
-      try {
-
-        window.showToast(
-          "Préparation du paiement Mobile Money...",
-          "info"
-        );
-
-
-        const payment =
-          await createRealPayment({
-
-            type:
-              "wallet_deposit",
-
-            amount,
-
-            phone
-
-          });
-
-
-        const refTransa =
-          payment.refTransa;
-
-
-        console.log(
-          "Transaction WonyaPay créée :",
-          refTransa
-        );
-
-
-        window.showToast(
-          "Demande envoyée. Validez le paiement sur votre téléphone.",
-          "info"
-        );
-
-
-        const finalStatus =
-          await waitForPaymentConfirmation(
-            refTransa
-          );
-
-
-        if (
-          finalStatus.success &&
-          finalStatus.status ===
-            "completed"
-        ) {
-
-          window.closeDepositModal();
-
-
-          const amountInput =
-            document.getElementById(
-              "depositAmount"
-            );
-
-          const phoneInput =
-            document.getElementById(
-              "phoneNumber"
-            );
-
-
-          if (amountInput) {
-            amountInput.value =
-              "";
-          }
-
-          if (phoneInput) {
-            phoneInput.value =
-              "";
-          }
-
-
-          /*
-           IMPORTANT :
-
-           Le Worker doit maintenant créditer Firestore
-           côté serveur après confirmation WonyaPay.
-
-           Le navigateur ne crédite PAS le solde.
-          */
-
-          await loadUserData();
-
-
-          window.showToast(
-
-            `Paiement confirmé ! Transaction ${refTransa}.`,
-
-            "success"
-
-          );
-
-
-          return;
-
+        if (data.boostUntil) {
+          boostExpiry = typeof data.boostUntil.toDate === "function" ? data.boostUntil.toDate().getTime() : new Date(data.boostUntil).getTime();
         }
 
-
-        if (
-          finalStatus.status ===
-          "failed"
-        ) {
-
-          window.showToast(
-            "Le paiement Mobile Money a échoué ou a été refusé.",
-            "error"
-          );
-
-          return;
-
+        const isCurrentlyBoosted = data.isBoosted === true && Number.isFinite(boostExpiry) && boostExpiry > nowTime;
+        if (!data.vendu && data.statut !== "vendu" && !isCurrentlyBoosted) {
+          availableArticles.push({ id: articleId, ...data });
         }
+      });
 
-
-        window.showToast(
-          "Le paiement est toujours en attente de confirmation.",
-          "info"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Erreur paiement réel :",
-          error
-        );
-
-
-        window.showToast(
-          error.message ||
-          "Impossible de lancer le paiement.",
-          "error"
-        );
-
-      }
-
-    };
-
-
-  // ============================================================
-  // DÉMARRER BOOST
-  // ============================================================
-
-  window.startBoostProcess =
-    async () => {
-
-      if (!currentUser) {
-
-        window.showToast(
-          "Vous devez être connecté.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const cost =
-        1.50;
-
-
-      /*
-       Le contrôle de solde ici est seulement UX.
-       Le serveur devra refaire le contrôle.
-      */
-
-      if (
-        currentBalance <
-        cost
-      ) {
-
-        window.showToast(
-
-          window.getTranslation(
-            "insufficient_balance",
-            {
-
-              balance:
-                currentBalance.toFixed(2),
-
-              cost:
-                cost.toFixed(2)
-
-            }
-          ),
-
-          "error"
-
-        );
-
-
-        window.openDepositModal();
-
-        return;
-
-      }
-
-
-      const listContainer =
-        document.getElementById(
-          "articlesSelectList"
-        );
-
-
-      const confirmButton =
-        document.getElementById(
-          "confirmBoostArticleBtn"
-        );
-
-
-      if (!listContainer) {
+      if (availableArticles.length === 0) {
+        listContainer.innerHTML = `<div style="color:var(--text-muted); text-align:center;">Aucun article disponible à booster.</div>`;
         return;
       }
 
-
-      listContainer.innerHTML = `
-
-        <div
-          style="
-            color:var(--text-muted);
-            text-align:center;
-          "
-        >
-          Chargement de vos articles...
-        </div>
-
-      `;
-
-
-      if (confirmButton) {
-
-        confirmButton.disabled =
-          true;
-
-      }
-
-
-      document.getElementById(
-        "boostArticleModal"
-      ).style.display =
-        "flex";
-
-
-      try {
-
-        const productsQuery =
-          query(
-
-            collection(
-              db,
-              "produits"
-            ),
-
-            where(
-              "vendeurId",
-              "==",
-              currentUser.uid
-            )
-
-          );
-
-
-        const querySnapshot =
-          await getDocs(
-            productsQuery
-          );
-
-
-        const nowTime =
-          Date.now();
-
-
-        const availableArticles =
-          [];
-
-
-        querySnapshot.forEach(
-          (docSnap) => {
-
-            const data =
-              docSnap.data();
-
-            const articleId =
-              docSnap.id;
-
-
-            let boostExpiry =
-              null;
-
-
-            if (
-              data.boostUntil
-            ) {
-
-              if (
-                typeof data.boostUntil.toDate ===
-                "function"
-              ) {
-
-                boostExpiry =
-                  data.boostUntil
-                    .toDate()
-                    .getTime();
-
-              } else {
-
-                boostExpiry =
-                  new Date(
-                    data.boostUntil
-                  ).getTime();
-
-              }
-
-            }
-
-
-            const isCurrentlyBoosted =
-
-              data.isBoosted === true &&
-
-              Number.isFinite(
-                boostExpiry
-              ) &&
-
-              boostExpiry >
-                nowTime;
-
-
-            if (
-
-              !data.vendu &&
-
-              data.statut !== "vendu" &&
-
-              !isCurrentlyBoosted
-
-            ) {
-
-              availableArticles.push({
-
-                id:
-                  articleId,
-
-                ...data
-
-              });
-
-            }
-
-          }
-        );
-
-
-        if (
-          availableArticles.length ===
-          0
-        ) {
-
-          listContainer.innerHTML = `
-
-            <div
-              style="
-                color:var(--text-muted);
-                text-align:center;
-              "
-            >
-              Aucun article disponible à booster.
-            </div>
-
-          `;
-
-          return;
-
-        }
-
-
-        listContainer.innerHTML =
-          "";
-
-
-        availableArticles.forEach(
-          (item) => {
-
-            const imgUrl =
-
-              Array.isArray(
-                item.images
-              ) &&
-              item.images.length > 0
-
-                ? item.images[0]
-
-                : (
-                    item.image ||
-                    ""
-                  );
-
-
-            const card =
-              document.createElement(
-                "div"
-              );
-
-
-            card.className =
-              "article-item-card";
-
-
-            card.dataset.articleId =
-              item.id;
-
-
-            card.dataset.imgUrl =
-              imgUrl;
-
-
-            card.onclick =
-              () => {
-
-                document
-                  .querySelectorAll(
-                    ".article-item-card"
-                  )
-                  .forEach(
-                    el =>
-                      el.classList.remove(
-                        "selected"
-                      )
-                  );
-
-
-                card.classList.add(
-                  "selected"
-                );
-
-
-                selectedArticleId =
-                  item.id;
-
-
-                if (
-                  confirmButton
-                ) {
-
-                  confirmButton.disabled =
-                    false;
-
-                }
-
-              };
-
-
-            card.innerHTML = `
-
-              <img
-                src="${imgUrl}"
-                alt="${item.nom || "Article"}"
-              >
-
-              <div
-                class="article-item-info"
-              >
-
-                <div
-                  class="article-item-title"
-                >
-                  ${item.nom || "Sans nom"}
-                </div>
-
-                <div
-                  class="article-item-price"
-                >
-                  ${item.prix ?? ""}
-                  ${item.devise || "$"}
-                </div>
-
-              </div>
-
-            `;
-
-
-            listContainer.appendChild(
-              card
-            );
-
-          }
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Erreur récupération articles :",
-          error
-        );
-
-
-        listContainer.innerHTML = `
-
-          <div
-            style="
-              color:var(--accent-red);
-              text-align:center;
-            "
-          >
-            Erreur lors du chargement des articles.
+      listContainer.innerHTML = "";
+      availableArticles.forEach((item) => {
+        const imgUrl = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : (item.image || "");
+        const card = document.createElement("div");
+        card.className = "article-item-card";
+        card.dataset.articleId = item.id;
+        card.dataset.imgUrl = imgUrl;
+
+        card.onclick = () => {
+          document.querySelectorAll(".article-item-card").forEach(el => el.classList.remove("selected"));
+          card.classList.add("selected");
+          selectedArticleId = item.id;
+          if (confirmButton) confirmButton.disabled = false;
+        };
+
+        card.innerHTML = `
+          <img src="${imgUrl}" alt="${item.nom || "Article"}">
+          <div class="article-item-info">
+            <div class="article-item-title">${item.nom || "Sans nom"}</div>
+            <div class="article-item-price">${item.prix ?? ""} ${item.devise || "$"}</div>
           </div>
-
         `;
-
-      }
-
-    };
-
-
-  // ============================================================
-  // CONFIRMER ARTICLE À BOOSTER
-  // ============================================================
-
-  window.confirmBoostSelectedArticle =
-    async () => {
-
-      if (
-        !selectedArticleId
-      ) {
-
-        return;
-
-      }
-
-
-      try {
-
-        const articleIdToBoost =
-          selectedArticleId;
-
-
-        const productRef =
-          doc(
-            db,
-            "produits",
-            articleIdToBoost
-          );
-
-
-        const productSnap =
-          await getDoc(
-            productRef
-          );
-
-
-        if (
-          !productSnap.exists()
-        ) {
-
-          window.showToast(
-            "Cet article n'existe plus.",
-            "error"
-          );
-
-          window.closeBoostArticleModal();
-
-          return;
-
-        }
-
-
-        const productData =
-          productSnap.data();
-
-
-        const isSold =
-
-          productData.vendu === true ||
-
-          productData.statut ===
-            "vendu";
-
-
-        if (
-          isSold
-        ) {
-
-          window.showToast(
-            "Cet article est déjà vendu et ne peut pas être boosté.",
-            "error"
-          );
-
-          window.closeBoostArticleModal();
-
-          return;
-
-        }
-
-
-        let boostExpiry =
-          null;
-
-
-        if (
-          productData.boostUntil
-        ) {
-
-          if (
-            typeof productData.boostUntil.toDate ===
-            "function"
-          ) {
-
-            boostExpiry =
-              productData.boostUntil
-                .toDate()
-                .getTime();
-
-          } else {
-
-            boostExpiry =
-              new Date(
-                productData.boostUntil
-              ).getTime();
-
-          }
-
-        }
-
-
-        const isCurrentlyBoosted =
-
-          productData.isBoosted === true &&
-
-          Number.isFinite(
-            boostExpiry
-          ) &&
-
-          boostExpiry >
-            Date.now();
-
-
-        if (
-          isCurrentlyBoosted
-        ) {
-
-          window.showToast(
-            "Cet article est déjà en cours de boost.",
-            "error"
-          );
-
-          window.closeBoostArticleModal();
-
-          return;
-
-        }
-
-
-        const selectedCard =
-          document.querySelector(
-            ".article-item-card.selected"
-          );
-
-
-        const imgUrl =
-
-          selectedCard?.dataset.imgUrl ||
-
-          productData.images?.[0] ||
-
-          productData.image ||
-
-          "";
-
-
-        window.closeBoostArticleModal();
-
-
-        await window.payService(
-
-          "boost_item",
-
-          1.50,
-
-          7,
-
-          articleIdToBoost,
-
-          imgUrl
-
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Erreur vérification boost :",
-          error
-        );
-
-
-        window.showToast(
-          "Impossible de vérifier cet article.",
-          "error"
-        );
-
-      }
-
-    };
-
-
-  // ============================================================
-  // ACHAT VIP / BOOST PAR MOBILE MONEY
-  // ============================================================
-
-  window.payService =
-    async (
-      serviceType,
-      cost,
-      durationDays,
-      articleId = null,
-      articleImg = null
-    ) => {
-
-      if (!currentUser) {
-
-        window.showToast(
-          "Vous devez être connecté.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const serviceName =
-
-        serviceType ===
-        "vip_subscription"
-
-          ? window.getTranslation(
-              "vip_title"
-            )
-
-          : window.getTranslation(
-              "item_boost_title"
-            );
-
-
-      // --------------------------------------------------------
-      // CONFIRMATION
-      // --------------------------------------------------------
-
-      const confirmed =
-        await window.customConfirm(
-
-          window.getTranslation(
-
-            "confirm_purchase",
-
-            {
-
-              cost:
-                Number(cost).toFixed(2),
-
-              service:
-                serviceName
-
-            }
-
-          )
-
-        );
-
-
-      if (
-        !confirmed
-      ) {
-
-        return;
-
-      }
-
-
-      // --------------------------------------------------------
-      // VÉRIFICATION ARTICLE
-      // --------------------------------------------------------
-
-      if (
-        serviceType ===
-        "boost_item"
-      ) {
-
-        if (
-          !articleId
-        ) {
-
-          window.showToast(
-            "Article invalide.",
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        try {
-
-          const productRef =
-            doc(
-              db,
-              "produits",
-              articleId
-            );
-
-
-          const productSnap =
-            await getDoc(
-              productRef
-            );
-
-
-          if (
-            !productSnap.exists()
-          ) {
-
-            window.showToast(
-              "Cet article n'existe plus.",
-              "error"
-            );
-
-            return;
-
-          }
-
-
-          const productData =
-            productSnap.data();
-
-
-          const isSold =
-
-            productData.vendu === true ||
-
-            productData.statut ===
-              "vendu";
-
-
-          if (
-            isSold
-          ) {
-
-            window.showToast(
-              "Cet article est déjà vendu.",
-              "error"
-            );
-
-            return;
-
-          }
-
-
-          let boostExpiry =
-            null;
-
-
-          if (
-            productData.boostUntil
-          ) {
-
-            if (
-              typeof productData.boostUntil.toDate ===
-              "function"
-            ) {
-
-              boostExpiry =
-                productData.boostUntil
-                  .toDate()
-                  .getTime();
-
-            } else {
-
-              boostExpiry =
-                new Date(
-                  productData.boostUntil
-                ).getTime();
-
-            }
-
-          }
-
-
-          if (
-
-            productData.isBoosted === true &&
-
-            Number.isFinite(
-              boostExpiry
-            ) &&
-
-            boostExpiry >
-              Date.now()
-
-          ) {
-
-            window.showToast(
-              "Cet article est déjà boosté.",
-              "error"
-            );
-
-            return;
-
-          }
-
-
-        } catch (error) {
-
-          console.error(
-            "Erreur vérification article :",
-            error
-          );
-
-
-          window.showToast(
-            "Impossible de vérifier cet article.",
-            "error"
-          );
-
-
-          return;
-
-        }
-
-      }
-
-
-      // --------------------------------------------------------
-      // NUMÉRO MOBILE MONEY
-      // --------------------------------------------------------
-
-      const rawPhone =
-        window.prompt(
-          "Entrez votre numéro Mobile Money :"
-        );
-
-
-      if (
-        rawPhone === null
-      ) {
-
-        return;
-
-      }
-
-
-      const phone =
-        normalizeMobileMoneyPhone(
-          rawPhone
-        );
-
-
-      if (
-        !isValidWonyaPhone(
-          phone
-        )
-      ) {
-
-        window.showToast(
-          "Numéro Mobile Money invalide.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      try {
-
-        window.showToast(
-          "Préparation du paiement Mobile Money...",
-          "info"
-        );
-
-
-        // ------------------------------------------------------
-        // CRÉATION TRANSACTION WONYA
-        // ------------------------------------------------------
-
-        const payment =
-          await createRealPayment({
-
-            type:
-              serviceType,
-
-            amount:
-              Number(cost),
-
-            phone,
-
-            articleId
-
-          });
-
-
-        const refTransa =
-          payment.refTransa;
-
-
-        console.log(
-          "Transaction service créée :",
-          refTransa
-        );
-
-
-        window.showToast(
-          "Demande envoyée. Validez le paiement sur votre téléphone.",
-          "info"
-        );
-
-
-        // ------------------------------------------------------
-        // ATTENTE CONFIRMATION
-        // ------------------------------------------------------
-
-        const finalStatus =
-          await waitForPaymentConfirmation(
-            refTransa
-          );
-
-
-        // ------------------------------------------------------
-        // PAIEMENT CONFIRMÉ
-        // ------------------------------------------------------
-
-        if (
-
-          finalStatus.success &&
-
-          finalStatus.status ===
-            "completed"
-
-        ) {
-
-          /*
-           IMPORTANT :
-
-           Le paiement est confirmé par WonyaPay.
-
-           L'activation réelle du service doit être effectuée
-           par le Cloudflare Worker côté serveur.
-
-           On ne modifie PAS Firestore directement ici.
-          */
-
-          await loadUserData();
-
-
-          window.showToast(
-
-            window.getTranslation(
-
-              "purchase_success",
-
-              {
-
-                service:
-                  serviceName
-
-              }
-
-            ),
-
-            "success"
-
-          );
-
-
-          return;
-
-        }
-
-
-        // ------------------------------------------------------
-        // PAIEMENT ÉCHOUÉ
-        // ------------------------------------------------------
-
-        if (
-          finalStatus.status ===
-          "failed"
-        ) {
-
-          window.showToast(
-            "Le paiement a échoué ou a été refusé.",
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        // ------------------------------------------------------
-        // TIMEOUT
-        // ------------------------------------------------------
-
-        window.showToast(
-          "Paiement toujours en attente de confirmation.",
-          "info"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Erreur achat :",
-          error
-        );
-
-
-        window.showToast(
-
-          error.message ||
-
-          window.getTranslation(
-            "transaction_error"
-          ),
-
-          "error"
-
-        );
-
-      }
-
-    };
-
-
-  // ============================================================
-  // DOM READY
-  // ============================================================
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-      applyTranslations();
-
+        listContainer.appendChild(card);
+      });
+    } catch (error) {
+      console.error("Erreur récupération articles :", error);
+      listContainer.innerHTML = `<div style="color:var(--accent-red); text-align:center;">Erreur lors du chargement des articles.</div>`;
     }
-  );
+  };
 
+  window.confirmBoostSelectedArticle = async () => {
+    if (!selectedArticleId) return;
+
+    try {
+      const articleIdToBoost = selectedArticleId;
+      const productRef = doc(db, "produits", articleIdToBoost);
+      const productSnap = await getDoc(productRef);
+
+      if (!productSnap.exists()) {
+        window.showToast("Cet article n'existe plus.", "error");
+        window.closeBoostArticleModal();
+        return;
+      }
+
+      const productData = productSnap.data();
+      if (productData.vendu === true || productData.statut === "vendu") {
+        window.showToast("Cet article est déjà vendu.", "error");
+        window.closeBoostArticleModal();
+        return;
+      }
+
+      const selectedCard = document.querySelector(".article-item-card.selected");
+      const imgUrl = selectedCard?.dataset.imgUrl || productData.images?.[0] || productData.image || "";
+
+      window.closeBoostArticleModal();
+      await window.payService("boost_item", 1.50, 7, articleIdToBoost, imgUrl);
+    } catch (error) {
+      console.error("Erreur vérification boost :", error);
+      window.showToast("Impossible de vérifier cet article.", "error");
+    }
+  };
+
+  window.payService = async (serviceType, cost, durationDays, articleId = null, articleImg = null) => {
+    if (!currentUser) {
+      window.showToast("Vous devez être connecté.", "error");
+      return;
+    }
+
+    const serviceName = serviceType === "vip_subscription" ? window.getTranslation("vip_title") : window.getTranslation("item_boost_title");
+    const confirmed = await window.customConfirm(window.getTranslation("confirm_purchase", { cost: Number(cost).toFixed(2), service: serviceName }));
+
+    if (!confirmed) return;
+
+    const rawPhone = window.prompt("Entrez votre numéro Mobile Money :");
+    if (rawPhone === null) return;
+
+    const phone = normalizeMobileMoneyPhone(rawPhone);
+    if (!isValidWonyaPhone(phone)) {
+      window.showToast("Numéro Mobile Money invalide.", "error");
+      return;
+    }
+
+    try {
+      window.showToast("Préparation du paiement Mobile Money...", "info");
+      const payment = await createRealPayment({ type: serviceType, amount: Number(cost), phone, articleId });
+      const refTransa = payment.refTransa;
+
+      window.showToast("Demande envoyée. Validez le paiement sur votre téléphone.", "info");
+      const finalStatus = await waitForPaymentConfirmation(refTransa);
+
+      if (finalStatus.success && finalStatus.status === "completed") {
+        await loadUserData();
+        window.showToast(window.getTranslation("purchase_success", { service: serviceName }), "success");
+        return;
+      }
+
+      if (finalStatus.status === "failed") {
+        window.showToast("Le paiement a échoué ou a été refusé.", "error");
+        return;
+      }
+
+      window.showToast("Paiement toujours en attente de confirmation.", "info");
+    } catch (error) {
+      console.error("Erreur achat :", error);
+      window.showToast(error.message || window.getTranslation("transaction_error"), "error");
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    applyTranslations();
+  });
 </script>
 </body>
 </html>
