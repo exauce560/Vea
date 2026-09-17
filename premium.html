@@ -724,6 +724,23 @@
     </div>
   </div>
 
+<!-- Modal de Saisie du Téléphone pour Paiement Service -->
+<div class="modal" id="phonePaymentModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Numéro de paiement</div>
+      <button class="close-btn" onclick="closePhonePaymentModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="input-box">
+      <label>Entrez votre numéro Mobile Money</label>
+      <input type="tel" id="servicePhoneNumber" placeholder="ex: 0812345678">
+    </div>
+    <button class="btn-submit-deposit" id="confirmPhonePaymentBtn">
+      Payer
+    </button>
+  </div>
+</div>
+
 <script type="module">
   // ============================================================
   // IMPORTS FIREBASE
@@ -1440,51 +1457,90 @@
     }
   };
 
-  window.payService = async (serviceType, cost, durationDays, articleId = null, articleImg = null) => {
-    if (!currentUser) {
-      window.showToast("Vous devez être connecté.", "error");
+window.closePhonePaymentModal = () => {
+  const modal = document.getElementById("phonePaymentModal");
+  if (modal) modal.style.display = "none";
+};
+
+window.payService = async (serviceType, cost, durationDays, articleId = null, articleImg = null) => {
+  if (!currentUser) {
+    window.showToast("Vous devez être connecté.", "error");
+    return;
+  }
+
+  const serviceName = serviceType === "vip_subscription" ? window.getTranslation("vip_title") : window.getTranslation("item_boost_title");
+  const confirmed = await window.customConfirm(window.getTranslation("confirm_purchase", { cost: Number(cost).toFixed(2), service: serviceName }));
+
+  if (!confirmed) return;
+
+  // Affichage du showToast d'information demandé
+  window.showToast("Payer votre boost avec Orange Money, Airtel Money ou M-Pesa", "info");
+
+  // Ouverture de la modal pour la saisie du numéro
+  const phoneModal = document.getElementById("phonePaymentModal");
+  const phoneInput = document.getElementById("servicePhoneNumber");
+  const confirmBtn = document.getElementById("confirmPhonePaymentBtn");
+
+  if (!phoneModal || !phoneInput || !confirmBtn) return;
+
+  phoneInput.value = "";
+  phoneModal.style.display = "flex";
+
+  // Attente de la validation de la modal par l'utilisateur
+  const rawPhone = await new Promise((resolve) => {
+    const handleConfirm = () => {
+      const val = phoneInput.value;
+      cleanup();
+      phoneModal.style.display = "none";
+      resolve(val);
+    };
+
+    const handleClose = () => {
+      cleanup();
+      phoneModal.style.display = "none";
+      resolve(null);
+    };
+
+    const cleanup = () => {
+      confirmBtn.removeEventListener("click", handleConfirm);
+    };
+
+    confirmBtn.addEventListener("click", handleConfirm);
+  });
+
+  if (rawPhone === null || rawPhone.trim() === "") return;
+
+  const phone = normalizeMobileMoneyPhone(rawPhone);
+  if (!isValidWonyaPhone(phone)) {
+    window.showToast("Numéro Mobile Money invalide.", "error");
+    return;
+  }
+
+  try {
+    window.showToast("Préparation du paiement Mobile Money...", "info");
+    const payment = await createRealPayment({ type: serviceType, amount: Number(cost), phone, articleId });
+    const refTransa = payment.refTransa;
+
+    window.showToast("Demande envoyée. Validez le paiement sur votre téléphone.", "info");
+    const finalStatus = await waitForPaymentConfirmation(refTransa);
+
+    if (finalStatus.success && finalStatus.status === "completed") {
+      await loadUserData();
+      window.showToast(window.getTranslation("purchase_success", { service: serviceName }), "success");
       return;
     }
 
-    const serviceName = serviceType === "vip_subscription" ? window.getTranslation("vip_title") : window.getTranslation("item_boost_title");
-    const confirmed = await window.customConfirm(window.getTranslation("confirm_purchase", { cost: Number(cost).toFixed(2), service: serviceName }));
-
-    if (!confirmed) return;
-
-    const rawPhone = window.prompt("Entrez votre numéro Mobile Money :");
-    if (rawPhone === null) return;
-
-    const phone = normalizeMobileMoneyPhone(rawPhone);
-    if (!isValidWonyaPhone(phone)) {
-      window.showToast("Numéro Mobile Money invalide.", "error");
+    if (finalStatus.status === "failed") {
+      window.showToast("Le paiement a échoué ou a été refusé.", "error");
       return;
     }
 
-    try {
-      window.showToast("Préparation du paiement Mobile Money...", "info");
-      const payment = await createRealPayment({ type: serviceType, amount: Number(cost), phone, articleId });
-      const refTransa = payment.refTransa;
-
-      window.showToast("Demande envoyée. Validez le paiement sur votre téléphone.", "info");
-      const finalStatus = await waitForPaymentConfirmation(refTransa);
-
-      if (finalStatus.success && finalStatus.status === "completed") {
-        await loadUserData();
-        window.showToast(window.getTranslation("purchase_success", { service: serviceName }), "success");
-        return;
-      }
-
-      if (finalStatus.status === "failed") {
-        window.showToast("Le paiement a échoué ou a été refusé.", "error");
-        return;
-      }
-
-      window.showToast("Paiement toujours en attente de confirmation.", "info");
-    } catch (error) {
-      console.error("Erreur achat :", error);
-      window.showToast(error.message || window.getTranslation("transaction_error"), "error");
-    }
-  };
+    window.showToast("Paiement toujours en attente de confirmation.", "info");
+  } catch (error) {
+    console.error("Erreur achat :", error);
+    window.showToast(error.message || window.getTranslation("transaction_error"), "error");
+  }
+};
 
   document.addEventListener("DOMContentLoaded", () => {
     applyTranslations();
