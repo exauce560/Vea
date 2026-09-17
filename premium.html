@@ -1062,38 +1062,38 @@
     return /^0\d{9}$/.test(phone);
   }
 
-  async function createRealPayment(params) {
-    const amount = params.amount;
-    const phone = params.phone;
-    const userId = currentUser?.uid || params.userId;
-    const type = params.type;
-    const articleId = params.articleId || null;
+async function createRealPayment(params) {
+  const amount = params.amount;
+  const phone = params.phone;
+  const userId = currentUser?.uid || params.userId;
+  const type = params.type;
+  const articleId = params.articleId || null;
 
-    try {
-      const headers = await getFirebaseAuthHeaders();
-      const response = await fetch(CREATE_PAYMENT_URL, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({
-          amount: parseFloat(Number(amount).toFixed(2)),
-          phone: phone,
-          userId: userId,
-          type: type,
-          articleId: articleId
-        })
-      });
+  try {
+    const headers = await getFirebaseAuthHeaders();
+    const response = await fetch(CREATE_PAYMENT_URL, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        montant: parseFloat(Number(amount).toFixed(2)), // "montant" au lieu de "amount"
+        mobilemoney: phone,                             // "mobilemoney" au lieu de "phone"
+        devise: "USD",                                  // Devise obligatoire ("USD" ou "CDF")
+        serviceType: type,                              // "serviceType" au lieu de "type"
+        articleId: articleId
+      })
+    });
 
-      const data = await response.json();
-      if (data.success && data.refTransa) {
-        return data;
-      } else {
-        throw new Error(data.error || data.message || "Échec d'initialisation du paiement.");
-      }
-    } catch (error) {
-      console.error("Erreur serveur de paiement :", error);
-      throw error;
+    const data = await response.json();
+    if (data.success && data.refTransa) {
+      return data;
+    } else {
+      throw new Error(data.error || data.message || "Échec d'initialisation du paiement.");
     }
+  } catch (error) {
+    console.error("Erreur serveur de paiement :", error);
+    throw error;
   }
+}
 
   function extractPaymentStatus(result) {
     const wonya = result?.wonyaResponse || {};
