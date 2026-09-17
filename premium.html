@@ -1075,7 +1075,7 @@
         method: "POST",
         headers: headers,
         body: JSON.stringify({
-          amount: Number(amount),
+          amount: parseFloat(Number(amount).toFixed(2)),
           phone: phone,
           userId: userId,
           type: type,
