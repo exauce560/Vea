@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Conditions & Guide d'Utilisation - V-EA</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #0B0F19;
+      --card-bg: #151C2C;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: #FFD700;
+      --accent-purple: #6366F1;
+      --accent-green: #10B981;
+      --accent-blue: #38BDF8;
+      --text-white: #FFFFFF;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-white);
+      padding: 16px;
+      padding-bottom: 50px;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* En-tête */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .back-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-white);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-banner h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #FFF, var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-banner p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Nav par onglets */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      scrollbar-width: none;
+    }
+
+    .tabs-nav::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-purple);
+      color: var(--text-white);
+      border-color: var(--accent-purple);
+    }
+
+    /* Contenu des onglets */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cartes de sections */
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-white);
+    }
+
+    .card-title i {
+      color: var(--accent-blue);
+    }
+
+    .card-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Grille des opérateurs */
+    .operators-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .operator-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* Rôles Comptes */
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .badge-buyer { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+    .badge-seller { background: rgba(255, 215, 0, 0.15); color: var(--accent-gold); }
+    .badge-both { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-list li {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .feature-list li i {
+      margin-top: 3px;
+    }
+
+    .feature-list li.allowed i { color: var(--accent-green); }
+    .feature-list li.forbidden i { color: #EF4444; }
+
+    /* Alert Notice Box */
+    .notice-box {
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #FDE047;
+      display: flex;
+      gap: 10px;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- En-tête -->
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="header-title">Conditions & Aide</div>
+    <div style="width: 42px;"></div>
+  </div>
+
+  <!-- Hero Banner -->
+  <div class="hero-banner">
+    <h1>Bienvenue sur V-EA</h1>
+    <p>Votre plateforme de commerce mobile rapide, sécurisée et intelligente.</p>
+  </div>
+
+  <!-- Navigation par onglets -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('payments')"><i class="fa-solid fa-wallet"></i> Paiements & Frais</button>
+    <button class="tab-btn" onclick="switchTab('accounts')"><i class="fa-solid fa-users"></i> Types de Comptes</button>
+    <button class="tab-btn" onclick="switchTab('boosts')"><i class="fa-solid fa-rocket"></i> Boosts & Visibilité</button>
+    <button class="tab-btn" onclick="switchTab('rules')"><i class="fa-solid fa-shield-halved"></i> Règles d'Usage</button>
+  </div>
+
+  <!-- ONGLET 1 : PAIEMENTS & TRANSACTION -->
+  <div id="payments" class="tab-content active">
+    <div class="info-card">
+      <div class="card-title">
+        <i class="fa-solid fa-mobile-retro"></i> Opérateurs Mobile Money supportés
+      </div>
+      <p class="card-text">
+        Toutes les transactions sur V-EA s'effectuent en toute sécurité via vos réseaux de paiement habituels :
+      </p>
+      <div class="operators-grid">
+        <div class="operator-item"><i class="fa-solid fa-phone" style="color:#10B981;"></i> M-Pesa</div>
+        <div class="operator-item"><i class="fa-solid fa-phone" style="color:#EF4444;"></i> Airtel Money</div>
+        <div class="operator-item"><i class="fa-solid fa-phone" style="color:#F97316;"></i> Orange Money</div>
+        <div class="operator-item"><i class="fa-solid fa-phone" style="color:#38BDF8;"></i> AfriMoney</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <i class="fa-solid fa-circle-info"></i> Fonctionnement des Frais
+      </div>
+      <p class="card-text">
+        Lorsque vous initiez un achat ou une recharge (ex: 5.00$ ou 1.50$), le pop-up USSD sur votre téléphone peut afficher un montant légèrement supérieur (ex: 5.15$ ou 1.55$).
+      </p>
+      <div class="notice-box">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.2rem;"></i>
+        <div>
+          Cette petite différence correspond aux <strong>frais de traitement de l'opérateur mobile</strong>. V-EA ne prélève aucun frais caché.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLET 2 : TYPES DE COMPTES -->
+  <div id="accounts" class="tab-content">
+    <div class="info-card">
+      <span class="role-badge badge-buyer">COMPTE ACHETEUR</span>
+      <div class="card-title"><i class="fa-solid fa-cart-shopping"></i> Mode Acheteur</div>
+      <ul class="feature-list">
+        <li class="allowed"><i class="fa-solid fa-check"></i> Parcourir tous les produits et contacter les vendeurs.</li>
+        <li class="allowed"><i class="fa-solid fa-check"></i> Ajouter des articles en <strong>Favoris</strong>.</li>
+        <li class="allowed"><i class="fa-solid fa-check"></i> Suivre des boutiques favorites.</li>
+        <li class="forbidden"><i class="fa-solid fa-xmark"></i> Ne peut pas publier de produits à vendre.</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <span class="role-badge badge-seller">COMPTE VENDEUR</span>
+      <div class="card-title"><i class="fa-solid fa-store"></i> Mode Vendeur</div>
+      <ul class="feature-list">
+        <li class="allowed"><i class="fa-solid fa-check"></i> Publier des articles et gérer sa boutique.</li>
+        <li class="allowed"><i class="fa-solid fa-check"></i> Consulter la liste des acheteurs et recevoir des notifications.</li>
+        <li class="forbidden"><i class="fa-solid fa-xmark"></i> Ne peut pas mettre d'articles d'autres vendeurs en favoris.</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <span class="role-badge badge-both">COMPTE HYBRIDE</span>
+      <div class="card-title"><i class="fa-solid fa-arrows-repeat"></i> Acheteur & Vendeur</div>
+      <p class="card-text">
+        Si votre compte possède le double rôle, vous bénéficiez de 100% des fonctionnalités : vous pouvez acheter, enregistrer des favoris et vendre en toute liberté !
+      </p>
+    </div>
+  </div>
+
+  <!-- ONGLET 3 : BOOSTS & ABONNEMENTS -->
+  <div id="boosts" class="tab-content">
+    <div class="info-card">
+      <div class="card-title"><i class="fa-solid fa-rocket" style="color:var(--accent-purple);"></i> Boost Article (1.50$)</div>
+      <p class="card-text">
+        Pendant <strong>7 jours</strong>, votre article est mis en avant en haut des résultats de recherche avec un badge spécial "Sponsorisé" pour maximiser ses ventes.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title"><i class="fa-solid fa-crown" style="color:var(--accent-gold);"></i> Vendeur VIP Pro (5.00$)</div>
+      <p class="card-text">
+        Abonnement mensuel (30 jours) offrant le badge <strong>Vendeur VIP Doré</strong>, la publication illimitée, le tableau de bord des statistiques et un support WhatsApp prioritaire.
+      </p>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title"><i class="fa-solid fa-bell" style="color:var(--accent-blue);"></i> Abonnement Boutique & Notifications</div>
+      <p class="card-text">
+        Chaque fois qu'un vendeur publie un nouvel article, tous les utilisateurs qui <strong>suivent sa boutique</strong> reçoivent instantanément une notification automatique.
+      </p>
+    </div>
+  </div>
+
+  <!-- ONGLET 4 : RÈGLES ET SÉCURITÉ -->
+  <div id="rules" class="tab-content">
+    <div class="info-card">
+      <div class="card-title"><i class="fa-solid fa-user-shield"></i> Engagements de l'utilisateur</div>
+      <ul class="feature-list">
+        <li class="allowed"><i class="fa-solid fa-check"></i> Publier des articles conformes et des photos réelles.</li>
+        <li class="forbidden"><i class="fa-solid fa-xmark"></i> Interdiction de publier du contenu illégal ou frauduleux.</li>
+        <li class="forbidden"><i class="fa-solid fa-xmark"></i> Tout comportement abusif entraîne la suspension du compte.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    V-EA © 2026 — Tous droits réservés.
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
