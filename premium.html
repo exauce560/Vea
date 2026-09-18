@@ -1105,40 +1105,54 @@ async function createRealPayment(params) {
     return String(rawStatus).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   }
 
-  async function checkRealPayment(refTransa) {
-    if (!refTransa) throw new Error("Référence de transaction manquante.");
+async function checkRealPayment(refTransa) {
+  if (!refTransa) throw new Error("Référence de transaction manquante.");
 
-    const response = await fetch(`${CHECK_PAYMENT_URL}?ref=${encodeURIComponent(refTransa)}`, {
-      method: "GET",
-      headers: { "Accept": "application/json" }
-    });
-
-    let result;
-    try {
-      result = await response.json();
-    } catch {
-      throw new Error("Réponse invalide du serveur de statut.");
-    }
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || result.message || "Impossible de vérifier la transaction.");
-    }
-
-    const status = extractPaymentStatus(result);
-    const completedStatuses = ["completed", "success", "successful", "succes", "recu", "reussi", "réussi"];
-    const failedStatuses = ["failed", "failure", "cancelled", "canceled", "rejected", "echec", "échoué", "refused", "refuse"];
-    const pendingStatuses = ["pending", "processing", "en_attente", "en attente", "initie", "initiee", "initiated"];
-
-    return {
-      success: true,
-      refTransa: result.refTransa || refTransa,
-      status,
-      completed: completedStatuses.includes(status),
-      failed: failedStatuses.includes(status),
-      pending: pendingStatuses.includes(status),
-      raw: result
-    };
+  // 1. Récupération de l'utilisateur Firebase connecté
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    throw new Error("Authentification Firebase manquante. Veuillez vous connecter.");
   }
+
+  // 2. Génération du token ID pour le Worker
+  const token = await user.getIdToken();
+
+  // 3. Appel sécurisé avec le header Authorization
+  const response = await fetch(`${CHECK_PAYMENT_URL}?ref=${encodeURIComponent(refTransa)}`, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("Réponse invalide du serveur de statut.");
+  }
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || result.message || `Erreur serveur (${response.status})`);
+  }
+
+  // 4. Analyse et formatage du statut
+  const status = extractPaymentStatus(result);
+  const completedStatuses = ["completed", "success", "successful", "succes", "recu", "reussi", "réussi"];
+  const failedStatuses = ["failed", "failure", "cancelled", "canceled", "rejected", "echec", "échoué", "refused", "refuse"];
+  const pendingStatuses = ["pending", "processing", "en_attente", "en attente", "initie", "initiee", "initiated"];
+
+  return {
+    success: true,
+    refTransa: result.refTransa || refTransa,
+    status,
+    completed: completedStatuses.includes(status),
+    failed: failedStatuses.includes(status),
+    pending: pendingStatuses.includes(status),
+    raw: result
+  };
+}
 
   async function waitForPaymentConfirmation(refTransa) {
     const startTime = Date.now();
