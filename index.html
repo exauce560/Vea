@@ -211,7 +211,7 @@
       if (localUser) {
         statusText.textContent = "Connexion locale trouvée...";
         // Utilisateur trouvé localement -> Redirection immédiate
-        window.location.href = "acceuil.html";
+        //window.location.href = "acceuil.html";
         return true;
       }
       return false;
@@ -228,10 +228,10 @@
         if (user) {
           // Si Firebase trouve l'utilisateur, on enregistre sa session en local pour la prochaine fois
           localStorage.setItem("vea_user", JSON.stringify({ uid: user.uid, email: user.email }));
-          window.location.href = "acceuil.html";
+          //window.location.href = "acceuil.html";
         } else {
           // Aucun utilisateur trouvé ni en local ni sur Firebase -> Écran de bienvenue/connexion
-          window.location.href = "index1.html";
+          //window.location.href = "index1.html";
         }
       });
     }
