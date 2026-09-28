@@ -1013,6 +1013,11 @@
     if (!user) {
       currentUser = null;
       return;
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+      window.OneSignalDeferred.push(async function(OneSignal) {
+         await OneSignal.login(user.uid);
+      });
     }
 
     try {
@@ -1081,6 +1086,46 @@
   function isValidWonyaPhone(phone) {
     return /^0\d{9}$/.test(phone);
   }
+
+async function envoyerPushCustom({
+  idDestinataire,
+  titre,
+  message,
+  lienUrl,
+  soundFile
+}) {
+  const payload = {
+    idDestinataire,
+    titre,
+    message,
+    lienUrl,
+    soundFile
+  };
+
+  try {
+    const response = await fetch(
+      "https://vea-push-worker.vea-payment.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erreur du Worker");
+    }
+
+    console.log("Notification envoyée :", result);
+
+  } catch (err) {
+    console.error("Erreur d'envoi de la notification :", err);
+  }
+}
 
 async function createRealPayment(params) {
   const amount = params.amount;
@@ -1172,6 +1217,23 @@ async function checkRealPayment(refTransa) {
     pending: pendingStatuses.includes(status),
     raw: result
   };
+}
+
+// Pour chaque produit du vendeur récupéré de Firestore :
+const dateBoost = produit.boostUntil ? new Date(produit.boostUntil) : null;
+if (dateBoost) {
+  const diffJours = Math.ceil((dateBoost - new Date()) / (1000 * 60 * 60 * 24));
+
+  // Si le boost expire dans exactement 3 jours
+  if (diffJours === 3) {
+    envoyerPushCustom({
+      idDestinataire: currentUser.uid,
+      titre: "Votre Boost expire bientôt ! ⚡",
+      message: `Le boost pour votre article "${produit.nom}" se termine dans 3 jours. Renouvelez-le pour rester en tête !`,
+      lienUrl: "https://vea-market.duckdns.org/premium.html",
+      soundFile: "alert_sound"
+    });
+  }
 }
 
   async function waitForPaymentConfirmation(refTransa) {

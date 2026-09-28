@@ -713,6 +713,11 @@
 
         // Lancer la vérification des nouveaux articles
         checkNewArticlesFirebase(user.uid);
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+        window.OneSignalDeferred.push(async function(OneSignal) {
+           await OneSignal.login(user.uid);
+        });
 
         try {
           let userRef = doc(db, "acheteurs", user.uid);

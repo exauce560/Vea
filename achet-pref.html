@@ -307,6 +307,11 @@
     onAuthStateChanged(auth, (user) => {
       if (user) {
         currentUser = user;
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+        window.OneSignalDeferred.push(async function(OneSignal) {
+           await OneSignal.login(user.uid);
+        });
       } else {
         window.location.href = "acheteur.html";
       }

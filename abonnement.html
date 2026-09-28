@@ -361,6 +361,11 @@
       if (user) {
         currentUser = user;
         loadSubscriptions();
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+        window.OneSignalDeferred.push(async function(OneSignal) {
+           await OneSignal.login(user.uid);
+        });
       } else {
         document.getElementById("vendorsList").innerHTML = `<div class="empty-state">${t.pleaseLogin}</div>`;
       }

@@ -614,6 +614,11 @@
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+    window.OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.login(user.uid);
+    });
     try {
       let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
       let userData = null;

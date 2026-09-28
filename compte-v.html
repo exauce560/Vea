@@ -1018,6 +1018,11 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+        window.OneSignalDeferred.push(async function(OneSignal) {
+           await OneSignal.login(user.uid);
+        });
         const isValidUser = await verifyAndLoadUserData(user.uid);
         if (isValidUser) {
           loadVendorProducts(user.uid);

@@ -277,6 +277,11 @@
       currentUser = user;
       if (user) {
         loadUserFavorites(user.uid);
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+        window.OneSignalDeferred.push(async function(OneSignal) {
+           await OneSignal.login(user.uid);
+        });
       } else {
         const localFavs = JSON.parse(localStorage.getItem("userFavorites") || "[]");
         if (localFavs.length > 0) {

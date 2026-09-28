@@ -731,6 +731,10 @@
   onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     if (user) {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.login(user.uid);
+      });
       try {
         const userDocRef = doc(db, "vendeurs", user.uid);
         const userSnap = await getDoc(userDocRef);
@@ -760,6 +764,55 @@
       }
     }
   });
+
+async function envoyerPushCustom({
+  idDestinataire,
+  titre,
+  message,
+  lienUrl,
+  soundFile
+}) {
+  const payload = {
+    idDestinataire,
+    titre,
+    message,
+    lienUrl,
+    soundFile
+  };
+
+  try {
+    const response = await fetch(
+      "https://vea-push-worker.vea-payment.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erreur du Worker");
+    }
+
+    console.log("Notification envoyée :", result);
+
+  } catch (err) {
+    console.error("Erreur d'envoi de la notification :", err);
+  }
+}
+
+// Lors du clic sur "S'abonner" et mise à jour réussie de Firestore :
+envoyerPushCustom({
+  idDestinataire: vendeurId, // L'ID du propriétaire de la boutique
+  titre: "Nouveau fan ! 👤",
+  message: `${currentUser.displayName || "Un utilisateur"} vient de s'abonner à votre boutique.`,
+  lienUrl: "https://vea-market.duckdns.org/visit-visit-v.html",
+  soundFile: "sub_sound"
+});
 
   async function checkInitialSubscriptionStatus() {
     try {

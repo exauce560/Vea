@@ -821,6 +821,65 @@ function compressImage(file, maxWidth = 1200, quality = 0.75) {
   });
 }
 
+async function envoyerPushCustom({
+  idDestinataire,
+  titre,
+  message,
+  lienUrl,
+  soundFile
+}) {
+  const payload = {
+    idDestinataire,
+    titre,
+    message,
+    lienUrl,
+    soundFile
+  };
+
+  try {
+    const response = await fetch(
+      "https://vea-push-worker.vea-payment.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erreur du Worker");
+    }
+
+    console.log("Notification envoyée :", result);
+
+  } catch (err) {
+    console.error("Erreur d'envoi de la notification :", err);
+  }
+}
+
+// 1. Récupère d'abord les abonnés du vendeur depuis Firestore
+const abonnementsSnap = await getDocs(
+  query(collection(db, "abonnements"), where("vendeurId", "==", currentUser.uid))
+);
+
+// 2. Envoie la notification à chaque abonné
+abonnementsSnap.forEach((docSnap) => {
+  const abonneData = docSnap.data();
+  const subscriberId = abonneData.clientSubscriberId;
+
+  envoyerPushCustom({
+    idDestinataire: subscriberId,
+    titre: `Nouveau chez ${monNomBoutique} ! 🛍️`,
+    message: `${monNomBoutique} vient de publier : "${nomDuProduit}".`,
+    lienUrl: `https://vea-market.duckdns.org/article.html?id=${nouveauProduitId}`,
+    soundFile: "new_item_sound"
+  });
+});
+
     function getCurrenciesByCountry(countryName) {
       if (!countryName) return [{ value: "$", label: "$" }];
 
@@ -964,6 +1023,11 @@ function compressImage(file, maxWidth = 1200, quality = 0.75) {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+        window.OneSignalDeferred.push(async function(OneSignal) {
+           await OneSignal.login(user.uid);
+        });
         try {
           let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
           let userData = null;
