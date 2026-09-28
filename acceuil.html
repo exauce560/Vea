@@ -1000,6 +1000,14 @@
 
         window.OneSignalDeferred.push(async function(OneSignal) {
            await OneSignal.login(user.uid);
+           console.log("OneSignal connecté avec UID :", user.uid);
+
+           await envoyerPushCustom({
+                idDestinataire: user.uid,
+                titre: "Test Vea Market 🚀",
+                message: "Ceci est un test de notification.",
+                lienUrl: "https://vea-market.duckdns.org/acceuil.html"
+           });
         });
 
         try {
