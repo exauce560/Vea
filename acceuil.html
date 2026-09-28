@@ -992,22 +992,85 @@
     let feedSeenSaveTimeout = null;
     let userCollectionName = "acheteurs";
 
+async function envoyerPushCustom({
+  idDestinataire,
+  titre,
+  message,
+  lienUrl,
+  soundFile
+}) {
+  const payload = {
+    idDestinataire,
+    titre,
+    message,
+    lienUrl,
+    soundFile
+  };
+
+  try {
+    const response = await fetch(
+      "https://vea-push-worker.vea-payment.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erreur du Worker");
+    }
+
+    console.log("Notification envoyée :", result);
+
+  } catch (err) {
+    console.error("Erreur d'envoi de la notification :", err);
+  }
+}
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
         let preferences = [];
+        console.log("🔥 Firebase utilisateur connecté :", user.uid);
+
         window.OneSignalDeferred = window.OneSignalDeferred || [];
 
         window.OneSignalDeferred.push(async function(OneSignal) {
-           await OneSignal.login(user.uid);
-           console.log("OneSignal connecté avec UID :", user.uid);
 
-           await envoyerPushCustom({
-                idDestinataire: user.uid,
-                titre: "Test Vea Market 🚀",
-                message: "Ceci est un test de notification.",
-                lienUrl: "https://vea-market.duckdns.org/acceuil.html"
-           });
+            console.log("🔥 Callback OneSignal exécuté");
+
+            try {
+
+            await OneSignal.login(user.uid);
+
+                console.log(
+                    "✅ OneSignal connecté avec UID :",
+                    user.uid
+                );
+
+                console.log("📤 Envoi du test vers le Worker...");
+
+                await envoyerPushCustom({
+                    idDestinataire: user.uid,
+                    titre: "Test Vea Market 🚀",
+                    message: "Ceci est un test de notification.",
+                    lienUrl: "https://vea-market.duckdns.org/acceuil.html"
+                });
+
+                console.log("✅ Test terminé");
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Erreur OneSignal :",
+                    error
+                );
+            }
         });
 
         try {
@@ -1326,45 +1389,7 @@ document
     }
 });
 
-async function envoyerPushCustom({
-  idDestinataire,
-  titre,
-  message,
-  lienUrl,
-  soundFile
-}) {
-  const payload = {
-    idDestinataire,
-    titre,
-    message,
-    lienUrl,
-    soundFile
-  };
 
-  try {
-    const response = await fetch(
-      "https://vea-push-worker.vea-payment.workers.dev",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Erreur du Worker");
-    }
-
-    console.log("Notification envoyée :", result);
-
-  } catch (err) {
-    console.error("Erreur d'envoi de la notification :", err);
-  }
-}
 
 
     function checkAndShowAd(userData) {
