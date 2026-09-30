@@ -1048,30 +1048,50 @@ async function envoyerPushCustom({
 
         window.OneSignalDeferred.push(async function(OneSignal) {
 
-            console.log("🔥 Callback OneSignal exécuté");
+              console.log("🔥 Callback OneSignal exécuté");
 
             try {
 
-            await OneSignal.login(user.uid);
+                await OneSignal.login(user.uid);
 
                 console.log(
                     "✅ OneSignal connecté avec UID :",
                     user.uid
                 );
-                console.log("🔔 OneSignal permission :", OneSignal.Notifications.permission);
-                console.log("🔔 OneSignal optIn :", OneSignal.User.PushSubscription.optedIn);
-                console.log("🆔 OneSignal subscription ID :", OneSignal.User.PushSubscription.id);
 
-                console.log("📤 Envoi du test vers le Worker...");
+                console.log(
+                    "🔔 Permission avant :",
+                    OneSignal.Notifications.permission
+                );
 
-                await envoyerPushCustom({
-                    idDestinataire: user.uid,
-                    titre: "Test Vea Market 🚀",
-                    message: "Ceci est un test de notification.",
-                    lienUrl: "https://vea-market.duckdns.org/acceuil.html"
-                });
+                console.log(
+                    "🔔 OptIn avant :",
+                    OneSignal.User.PushSubscription.optedIn
+                );
 
-                console.log("✅ Test terminé");
+                console.log(
+                    "🆔 Subscription ID avant :",
+                    OneSignal.User.PushSubscription.id
+                );
+
+                console.log("🔔 Demande d'autorisation Push...");
+
+                await OneSignal.Notifications.requestPermission();
+
+                console.log(
+                    "🔔 Permission après :",
+                    OneSignal.Notifications.permission
+                );
+
+                console.log(
+                    "🔔 OptIn après :",
+                    OneSignal.User.PushSubscription.optedIn
+                );
+
+                console.log(
+                    "🆔 Subscription ID après :",
+                    OneSignal.User.PushSubscription.id
+                );
 
             } catch (error) {
 
@@ -1081,6 +1101,8 @@ async function envoyerPushCustom({
                 );
             }
         });
+
+
 
         try {
           const profileBtn = document.getElementById("profileBtn");
