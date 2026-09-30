@@ -1021,6 +1021,11 @@ async function envoyerPushCustom({
 
     const result = await response.json();
 
+    console.log(
+      "📨 Réponse complète du Worker :",
+      JSON.stringify(result, null, 2)
+    );
+
     if (!response.ok) {
       throw new Error(result.error || "Erreur du Worker");
     }
@@ -1031,6 +1036,7 @@ async function envoyerPushCustom({
     console.error("Erreur d'envoi de la notification :", err);
   }
 }
+
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -1052,6 +1058,9 @@ async function envoyerPushCustom({
                     "✅ OneSignal connecté avec UID :",
                     user.uid
                 );
+                console.log("🔔 OneSignal permission :", OneSignal.Notifications.permission);
+                console.log("🔔 OneSignal optIn :", OneSignal.User.PushSubscription.optedIn);
+                console.log("🆔 OneSignal subscription ID :", OneSignal.User.PushSubscription.id);
 
                 console.log("📤 Envoi du test vers le Worker...");
 
