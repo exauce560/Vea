@@ -1018,40 +1018,6 @@ async function envoyerPushCustom({
     });
   }
 
-  const followBtn = document.getElementById("followBtn");
-  followBtn.addEventListener("click", async () => {
-    const t = translations[currentLang] || translations.fr;
-    if (!currentUser) {
-      alert(t.auth_required);
-      return;
-    }
-
-    if (currentUser.uid === vendeurId) {
-      alert(t.self_subscribe_error);
-      return;
-    }
-
-    isSubscribed = !isSubscribed;
-    updateFollowButtonUI(isSubscribed);
-
-    try {
-      const vendorRef = doc(db, targetCollection, vendeurId);
-      const buyerRef = doc(db, "acheteurs", currentUser.uid);
-
-      if (isSubscribed) {
-        await updateDoc(vendorRef, {
-          followersCount: increment(1),
-          showToastCount: increment(1)
-        });
-        await setDoc(buyerRef, { abonnements: arrayUnion(vendeurId) }, { merge: true });
-      } else {
-        await updateDoc(vendorRef, { followersCount: increment(-1) });
-        await setDoc(buyerRef, { abonnements: arrayRemove(vendeurId) }, { merge: true });
-      }
-    } catch (e) {
-      console.error("Erreur mise à jour abonnement:", e);
-    }
-  });
 
   function initProductsRealtime() {
     const activeGrid = document.getElementById("productsGrid");
