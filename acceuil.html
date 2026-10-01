@@ -799,7 +799,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
     <!-- Activation du mode plein écran sur Safari iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Vea Market">
 
@@ -811,10 +811,23 @@
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
+  // Son de notification personnalisé
+  const customNotificationSound = new Audio("assets/sounds/notif.mp3");
+
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "31639645-a285-43ec-9366-175f51dff21c",
+    });
+
+    // Joue le son lorsqu'une notification arrive en premier plan (Foreground)
+    OneSignal.Notifications.addEventListener("foregroundWillDisplay", () => {
+      customNotificationSound.play().catch(err => console.log("Audio bloqué :", err));
+    });
+
+    // Optionnel : Joue le son lors du clic
+    OneSignal.Notifications.addEventListener("click", () => {
+      customNotificationSound.play().catch(err => console.log("Audio clic bloqué :", err));
     });
   });
 </script>
@@ -1035,6 +1048,18 @@ async function envoyerPushCustom({
   } catch (err) {
     console.error("Erreur d'envoi de la notification :", err);
   }
+}
+if (currentUser && !localStorage.getItem("welcome_pushed_" + currentUser.uid)) {
+  envoyerPushCustom({
+    idDestinataire: currentUser.uid,
+    titre: "Bienvenue sur Vea Market ! 👤",
+    message: `Ravi de vous revoir ! Découvrez les derniers articles disponibles dans votre région.`,
+    lienUrl: "https://vea-market.duckdns.org/acceuil.html",
+    soundFile: "notif.mp3"
+  });
+
+  // Marque la notification comme envoyée pour cet utilisateur
+  localStorage.setItem("welcome_pushed_" + currentUser.uid, "true");
 }
 
 

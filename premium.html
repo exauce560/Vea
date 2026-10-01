@@ -573,12 +573,35 @@
     }
   </style>
 
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vea Market">
+
+<!-- Icône pour l'écran d'accueil iOS -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Fichier manifest -->
+<link rel="manifest" href="manifest.json">
+
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
+  // Son de notification personnalisé
+  const customNotificationSound = new Audio("assets/sounds/notif.mp3");
+
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "31639645-a285-43ec-9366-175f51dff21c",
+    });
+
+    // Joue le son lorsqu'une notification arrive en premier plan (Foreground)
+    OneSignal.Notifications.addEventListener("foregroundWillDisplay", () => {
+      customNotificationSound.play().catch(err => console.log("Audio bloqué :", err));
+    });
+
+    // Optionnel : Joue le son lors du clic
+    OneSignal.Notifications.addEventListener("click", () => {
+      customNotificationSound.play().catch(err => console.log("Audio clic bloqué :", err));
     });
   });
 </script>
@@ -1013,12 +1036,12 @@
     if (!user) {
       currentUser = null;
       return;
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-      window.OneSignalDeferred.push(async function(OneSignal) {
-         await OneSignal.login(user.uid);
-      });
     }
+
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.login(user.uid);
+    });
 
     try {
       currentUser = user;
@@ -1174,7 +1197,7 @@ async function checkRealPayment(refTransa) {
   if (!refTransa) throw new Error("Référence de transaction manquante.");
 
   // 1. Récupération de l'utilisateur Firebase connecté
-  const user = firebase.auth().currentUser;
+  const user = auth.currentUser;
   if (!user) {
     throw new Error("Authentification Firebase manquante. Veuillez vous connecter.");
   }
@@ -1231,7 +1254,7 @@ if (dateBoost) {
       titre: "Votre Boost expire bientôt ! ⚡",
       message: `Le boost pour votre article "${produit.nom}" se termine dans 3 jours. Renouvelez-le pour rester en tête !`,
       lienUrl: "https://vea-market.duckdns.org/premium.html",
-      soundFile: "alert_sound"
+      soundFile: "notif.mp3"
     });
   }
 }
@@ -1276,9 +1299,34 @@ if (dateBoost) {
       timerInterval = null;
     }
 
+
     const hasVip = Boolean(userData && userData.isPremium && userData.premiumUntil);
     const activeBoosts = Array.isArray(userData?.boosts) ? userData.boosts : [];
+    // --- VÉRIFICATION DE L'EXPIRATION DES BOOSTS (3 JOURS) ---
+    if (auth.currentUser) {
+      for (const boost of activeBoosts) {
+        if (!boost.boostUntil) continue;
 
+        const expiry = new Date(boost.boostUntil).getTime();
+        const diffJours = Math.ceil((expiry - Date.now()) / (1000 * 60 * 60 * 24));
+
+        // Clé unique dans localStorage pour ne pas envoyer la notification plusieurs fois
+        const notifKey = `push_sent_3days_${boost.id || boost.boostUntil}`;
+
+        if (diffJours === 3 && !localStorage.getItem(notifKey)) {
+          envoyerPushCustom({
+            idDestinataire: auth.currentUser.uid,
+            titre: "Votre Boost expire bientôt ! ⚡",
+            message: "Le boost pour votre article se termine dans 3 jours. Renouvelez-le pour rester en tête !",
+            lienUrl: "https://vea-market.duckdns.org/premium.html",
+            soundFile: "alert_sound"
+          });
+
+          // Marque la notification comme envoyée localement
+          localStorage.setItem(notifKey, "true");
+        }
+      }
+    }
     if (!hasVip && activeBoosts.length === 0) return;
 
     const updateClocks = async () => {
@@ -1584,6 +1632,8 @@ window.payService = async (serviceType, cost, durationDays, articleId = null, ar
 
   // Attente de la validation de la modal par l'utilisateur
   const rawPhone = await new Promise((resolve) => {
+    const closeBtn = phoneModal.querySelector(".close-btn");
+
     const handleConfirm = () => {
       const val = phoneInput.value;
       cleanup();
@@ -1599,9 +1649,11 @@ window.payService = async (serviceType, cost, durationDays, articleId = null, ar
 
     const cleanup = () => {
       confirmBtn.removeEventListener("click", handleConfirm);
+      if (closeBtn) closeBtn.removeEventListener("click", handleClose);
     };
 
     confirmBtn.addEventListener("click", handleConfirm);
+    if (closeBtn) closeBtn.addEventListener("click", handleClose);
   });
 
   if (rawPhone === null || rawPhone.trim() === "") return;

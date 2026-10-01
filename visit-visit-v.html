@@ -497,12 +497,35 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
 
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vea Market">
+
+<!-- Icône pour l'écran d'accueil iOS -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Fichier manifest -->
+<link rel="manifest" href="manifest.json">
+
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
+  // Son de notification personnalisé
+  const customNotificationSound = new Audio("assets/sounds/notif.mp3");
+
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "31639645-a285-43ec-9366-175f51dff21c",
+    });
+
+    // Joue le son lorsqu'une notification arrive en premier plan (Foreground)
+    OneSignal.Notifications.addEventListener("foregroundWillDisplay", () => {
+      customNotificationSound.play().catch(err => console.log("Audio bloqué :", err));
+    });
+
+    // Optionnel : Joue le son lors du clic
+    OneSignal.Notifications.addEventListener("click", () => {
+      customNotificationSound.play().catch(err => console.log("Audio clic bloqué :", err));
     });
   });
 </script>
@@ -805,14 +828,7 @@ async function envoyerPushCustom({
   }
 }
 
-// Lors du clic sur "S'abonner" et mise à jour réussie de Firestore :
-envoyerPushCustom({
-  idDestinataire: vendeurId, // L'ID du propriétaire de la boutique
-  titre: "Nouveau fan ! 👤",
-  message: `${currentUser.displayName || "Un utilisateur"} vient de s'abonner à votre boutique.`,
-  lienUrl: "https://vea-market.duckdns.org/visit-visit-v.html",
-  soundFile: "sub_sound"
-});
+
 
   async function checkInitialSubscriptionStatus() {
     try {
@@ -841,6 +857,54 @@ envoyerPushCustom({
       followBtn.textContent = t.follow_btn;
       followBtn.classList.remove("subscribed");
     }
+  }
+
+  const followBtn = document.getElementById("followBtn");
+  if (followBtn) {
+    followBtn.addEventListener("click", async () => {
+      const t = translations[currentLang] || translations.fr;
+      if (!currentUser) {
+        alert(t.auth_required);
+        return;
+      }
+
+      if (currentUser.uid === vendeurId) {
+        alert(t.self_subscribe_error);
+        return;
+      }
+
+      isSubscribed = !isSubscribed;
+      updateFollowButtonUI(isSubscribed);
+
+      try {
+        const vendorRef = doc(db, targetCollection, vendeurId);
+        const buyerRef = doc(db, "acheteurs", currentUser.uid);
+
+        if (isSubscribed) {
+          await updateDoc(vendorRef, {
+            followersCount: increment(1),
+            showToastCount: increment(1)
+          });
+          await setDoc(buyerRef, { abonnements: arrayUnion(vendeurId) }, { merge: true });
+
+          // Envoi de la notification push au vendeur après abonnement réussi
+          const subscriberName = currentUser.displayName || currentUser.shopName || "Un utilisateur";
+          envoyerPushCustom({
+            idDestinataire: vendeurId,
+            titre: "Nouveau fan ! 👤",
+            message: `${subscriberName} vient de s'abonner à votre boutique.`,
+            lienUrl: `https://vea-market.duckdns.org/visit-visit-v.html?vendeurId=${vendeurId}`,
+            soundFile: "notif.mp3"
+          });
+
+        } else {
+          await updateDoc(vendorRef, { followersCount: increment(-1) });
+          await setDoc(buyerRef, { abonnements: arrayRemove(vendeurId) }, { merge: true });
+        }
+      } catch (e) {
+        console.error("Erreur mise à jour abonnement:", e);
+      }
+    });
   }
 
   async function initVendorRealtime() {
