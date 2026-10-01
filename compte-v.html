@@ -250,7 +250,6 @@
       gap: 10px;
     }
 
-    /* Rond vert (Nouvelles publications d'abonnements) */
     .new-badge {
       width: 10px;
       height: 10px;
@@ -329,7 +328,6 @@
       object-fit: cover;
     }
 
-    /* Overlay produit vendu */
     .product-card.sold .product-img {
       filter: grayscale(80%) brightness(0.6);
     }
@@ -565,17 +563,13 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
 
-
 <body>
 
-  <!-- Conteneur Toast -->
   <div id="toast-container"></div>
 
   <div class="app-container">
-    <!-- En-tête -->
     <div class="header">
       <div class="brand-logo-container">
-        <!-- Conteneur Panier mis à jour avec lien photo personnalisable -->
         <div class="cart-icon-wrapper" title="Panier">
           <img id="cartCustomPhoto" class="cart-custom-img" src="https://via.placeholder.com/150" alt="Icone Panier Vendeur" style="display:none;" />
           <svg id="cartSvgDefault" class="cart-svg-mini" viewBox="0 0 1254.000000 1254.000000" preserveAspectRatio="xMidYMid meet">
@@ -634,7 +628,6 @@
     <div class="section-title" data-i18n="section_config">Configuration</div>
     <div class="menu-list">
 
-      <!-- Option Abonnement exclusive au compte vendeurs_clients -->
       <a href="abonnement.html" id="menuAbonnement" class="menu-item" style="display: none;">
         <span class="menu-item-left">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
@@ -662,6 +655,7 @@
         <span id="userPhoneDisplay" class="menu-value">---</span>
       </button>
 
+      <!-- SWITCH 1: Confirmation produit vendu + Rappel Push toutes les 1.5 semaines -->
       <div class="menu-item">
         <span class="menu-item-left">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -673,10 +667,11 @@
         </label>
       </div>
 
+      <!-- SWITCH 2: Notifications Push OneSignal -->
       <div class="menu-item">
         <span class="menu-item-left">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="m15 8 2 2 4-4"/><path d="M16.8607 4.4824A6 6 0 0 0 6 8C6 12.499 4.589 13.956 3.262 15.326"/><path d="M3.262 15.326A1 1 0 0 0 4 17H20A1 1 0 0 0 20.74 15.327C20.209 14.779 19.665 14.218 19.203 13.454"/></svg>
-          <span data-i18n="menu_notifications">Notifications</span>
+          <span data-i18n="menu_notifications">Notifications Push</span>
         </span>
         <label class="switch">
           <input type="checkbox" id="notifToggle" onchange="toggleNotifications(this.checked)">
@@ -701,7 +696,6 @@
       </a>
     </div>
 
-    <!-- Déconnexion -->
     <div class="menu-list" style="margin-top: 10px;">
       <button type="button" class="menu-item" onclick="logoutUser()" style="color: #ef4444;">
         <span class="menu-item-left">
@@ -711,20 +705,18 @@
       </button>
     </div>
 
-    <!-- Pied de page -->
     <footer style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
       VÉA Market © 2026
     </footer>
   </div>
 
-  <!-- Bouton de retour -->
   <button class="back-button" onclick="history.back()" title="Retour">
     <svg style="width:20px;height:20px;fill:currentColor;" viewBox="0 0 24 24">
       <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
     </svg>
   </button>
 
-  <!-- Modale Modification Profil -->
+  <!-- Modales -->
   <div class="modal-overlay" id="profileModal">
     <div class="modal-content">
       <div class="modal-title" data-i18n="modal_profile_title">Modifier le Profil</div>
@@ -760,21 +752,16 @@
     </div>
   </div>
 
-  <!-- Modale Changer Photo Profil Directement -->
   <div class="modal-overlay" id="avatarModal">
     <div class="modal-content">
       <div class="modal-title">Changer la Photo de Profil</div>
-
       <label style="font-size:0.85rem; color:var(--text-muted);">Importer une image locale</label>
       <input type="file" id="avatarFileInput" accept="image/*" class="modal-input" onchange="previewAvatarFile(event)">
-
       <label style="font-size:0.85rem; color:var(--text-muted); margin-top:8px;">Ou coller une URL d'image</label>
       <input type="text" id="avatarUrlDirectInput" class="modal-input" placeholder="https://...">
-
       <div style="text-align:center; margin-top:8px;">
         <img id="avatarPreview" src="" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:none; margin: 0 auto; border:2px solid var(--primary);">
       </div>
-
       <div class="modal-buttons">
         <button class="btn btn-secondary" onclick="closeAvatarModal()">Annuler</button>
         <button class="btn btn-primary" onclick="saveAvatarChange()">Enregistrer</button>
@@ -782,7 +769,6 @@
     </div>
   </div>
 
-  <!-- Modale Description -->
   <div class="modal-overlay" id="descModal">
     <div class="modal-content">
       <div class="modal-title" data-i18n="modal_desc_title">Description de la boutique</div>
@@ -794,7 +780,6 @@
     </div>
   </div>
 
-  <!-- Modale Numéro WhatsApp -->
   <div class="modal-overlay" id="phoneModal">
     <div class="modal-content">
       <div class="modal-title" data-i18n="modal_phone_title">Numéro WhatsApp</div>
@@ -806,11 +791,9 @@
     </div>
   </div>
 
-  <!-- Modale Ajouter / Modifier Lien Social -->
   <div class="modal-overlay" id="socialModal">
     <div class="modal-content">
       <div class="modal-title">Lien Social (socialLinks)</div>
-
       <label style="font-size:0.85rem; color:var(--text-muted);">Plateforme</label>
       <select id="socialPlatformInput" class="modal-select">
         <option value="Facebook">Facebook</option>
@@ -833,7 +816,6 @@
     </div>
   </div>
 
-  <!-- Modale Langue & Mode -->
   <div class="modal-overlay" id="langModal">
     <div class="modal-content">
       <div class="modal-title" data-i18n="modal_lang_title">Langue & Apparence</div>
@@ -857,7 +839,6 @@
     </div>
   </div>
 
-  <!-- Script de traduction (Traducteur global synchronisé) -->
   <script>
     const translations = {
       fr: {
@@ -958,7 +939,6 @@
       return translations[lang][key] || key;
     }
 
-    // Données des provinces par pays pour la sélection dynamique
     const provincesByCountry = {
       "RDC": ["Nord-Kivu", "Sud-Kivu", "Kinshasa", "Haut-Katanga", "Ituri", "Kasaï-Central", "Equateur", "Autre"],
       "Rwanda": ["Kigali", "Province du Nord", "Province du Sud", "Province de l'Est", "Province de l'Ouest"],
@@ -989,7 +969,7 @@
     }
   </script>
 
-  <!-- Script Firebase & Logique Vendeur / Vendeur_Client -->
+  <!-- Script Firebase & Logique Vendeur -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -1010,7 +990,7 @@
     const db = getFirestore(app);
 
     let currentUser = null;
-    let userCollection = null; // "vendeurs" ou "vendeurs_clients"
+    let userCollection = null;
     let socialLinksArray = [];
 
     window.ASK_ON_HOMEPAGE_WHEN_SOLD = localStorage.getItem("ask_homepage_when_sold") === "true";
@@ -1023,9 +1003,11 @@
         window.OneSignalDeferred.push(async function(OneSignal) {
            await OneSignal.login(user.uid);
         });
+
         const isValidUser = await verifyAndLoadUserData(user.uid);
         if (isValidUser) {
           loadVendorProducts(user.uid);
+          checkAndScheduleSoldReminder(user.uid);
         } else {
           showToast("Accès refusé. Compte réservé aux vendeurs.");
           setTimeout(() => {
@@ -1037,7 +1019,6 @@
       }
     });
 
-    // Verification stricte dans "vendeurs" et "vendeurs_clients" UNIQUEMENT
     async function verifyAndLoadUserData(uid) {
       try {
         let ref = doc(db, "vendeurs", uid);
@@ -1046,7 +1027,6 @@
         if (snap.exists()) {
           userCollection = "vendeurs";
         } else {
-          // Si non trouve dans vendeurs, verifier dans vendeurs_clients
           ref = doc(db, "vendeurs_clients", uid);
           snap = await getDoc(ref);
           if (snap.exists()) {
@@ -1054,7 +1034,6 @@
           }
         }
 
-        // Si le compte n'appartient ni a "vendeurs" ni a "vendeurs_clients"
         if (!snap.exists() || !userCollection) {
           return false;
         }
@@ -1062,7 +1041,6 @@
         const data = snap.data();
         const shopName = data.shopName || data.nom || "Ma Boutique";
 
-        // Afficher/Masquer le menu "Abonnements" & vérifier les nouveautés si vendeurs_clients
         const menuAbonnement = document.getElementById("menuAbonnement");
         if (userCollection === "vendeurs_clients") {
           menuAbonnement.style.display = "flex";
@@ -1071,7 +1049,6 @@
           menuAbonnement.style.display = "none";
         }
 
-        // Chargement de l'adresse (gestion des objets ou des chaînes)
         let formattedAddress = "";
         let countryVal = data.pays || "";
         let provinceVal = data.province || "";
@@ -1111,7 +1088,6 @@
         document.getElementById("userPhoneDisplay").textContent = phone || "Ajouter";
         document.getElementById("userRoleBadge").textContent = userCollection === "vendeurs_clients" ? "Vendeur-Client" : "Vendeur";
 
-        // Chargement photo du panier si configurée
         setCartPhoto(cartPhoto);
 
         document.getElementById("editShopName").value = shopName;
@@ -1133,7 +1109,6 @@
       }
     }
 
-    // Vérification des produits récents chez les vendeurs suivis
     async function checkSubscribedSellersNewProducts(subscriptions) {
       if (!subscriptions || subscriptions.length === 0) return;
 
@@ -1142,7 +1117,6 @@
       const now = Date.now();
 
       try {
-        // découpage par paquets de 10 max pour la requête 'in' de Firestore
         const chunks = [];
         for (let i = 0; i < subscriptions.length; i += 10) {
           chunks.push(subscriptions.slice(i, i + 10));
@@ -1184,6 +1158,44 @@
         }
       } catch (e) {
         console.error("Erreur vérification nouveautés abonnements:", e);
+      }
+    }
+
+    // LOGIQUE DU SWITCH 1 : RAPPEL PRODUITS TOUTES LES 1.5 SEMAINES (10.5 jours)
+    async function checkAndScheduleSoldReminder(uid) {
+      const isEnabled = localStorage.getItem("ask_homepage_when_sold") === "true";
+      if (!isEnabled) return;
+
+      const TEN_HALF_DAYS_MS = 10.5 * 24 * 60 * 60 * 1000;
+      const lastCheck = localStorage.getItem("last_sold_check_time") || 0;
+      const now = Date.now();
+
+      if (now - lastCheck >= TEN_HALF_DAYS_MS) {
+        try {
+          const q = query(
+            collection(db, "produits"),
+            where("vendeurId", "==", uid),
+            where("vendu", "==", false)
+          );
+          const snap = await getDocs(q);
+
+          if (!snap.empty) {
+            // Déclencher une notification locale ou push si active
+            window.OneSignalDeferred.push(async function(OneSignal) {
+              const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
+              if (isOptedIn && Notification.permission === "granted") {
+                new Notification("Rappel VÉA Market", {
+                  body: "Avez-vous des articles vendus ? Pensez à mettre à jour vos stocks !",
+                  icon: "favicon-32x32.png"
+                });
+              }
+            });
+            showToast("Rappel : Pensez à vérifier si vos articles en vente sont épuisés !");
+          }
+          localStorage.setItem("last_sold_check_time", now.toString());
+        } catch (err) {
+          console.error("Erreur lors de la vérification de rappel de stock :", err);
+        }
       }
     }
 
@@ -1264,7 +1276,6 @@
       }
     };
 
-    // Charger et afficher les produits postés par le vendeur avec gestion stricte du stock et état "vendu"
     async function loadVendorProducts(uid) {
       const container = document.getElementById("vendorProductsContainer");
       container.innerHTML = "";
@@ -1281,7 +1292,6 @@
           const prod = documentSnap.data();
           const prodId = documentSnap.id;
 
-          // Stock par défaut si non spécifié
           const stockVal = prod.stock !== undefined ? Number(prod.stock) : 0;
           const isSold = prod.vendu === true || stockVal <= 0;
 
@@ -1318,7 +1328,6 @@
       }
     }
 
-    // Gestion du clic sur "Vendu" : décrémente le stock de 1 et verrouille une fois arrivé à 0
     window.handleSellProduct = async function(prodId, currentStock) {
       if (currentStock <= 0) {
         showToast("Cet article est déjà épuisé/vendu.");
@@ -1329,7 +1338,6 @@
       const isNowSold = newStock <= 0;
 
       try {
-        // Mise à jour partielle dans la base de données sans altérer la structure du produit
         await updateDoc(doc(db, "produits", prodId), {
           stock: newStock,
           vendu: isNowSold
@@ -1343,7 +1351,6 @@
       }
     };
 
-    // Supprimer un produit avec alerte Toast
     window.deleteProduct = async function(prodId) {
       try {
         await deleteDoc(doc(db, "produits", prodId));
@@ -1354,7 +1361,6 @@
       }
     };
 
-    // Sauvegarde Profil (met à jour adresse avec Pays, Province, Ville)
     window.saveProfileChanges = async function() {
         const shopName = document.getElementById("editShopName").value.trim();
         const country = document.getElementById("editCountrySelect").value;
@@ -1366,7 +1372,6 @@
 
         const formattedAddress = [city, province, country].filter(Boolean).join(", ");
 
-        // Objet de mise à jour Firebase complet
         const updateData = {
             shopName: shopName,
             pays: country,
@@ -1375,7 +1380,6 @@
             address: formattedAddress
         };
 
-        // Ne mettre à jour les photos que si le champ n'est pas vide
         if (photoUrl !== "") {
             updateData.photoUrl = photoUrl;
         }
@@ -1395,7 +1399,6 @@
         }
     };
 
-    // Déconnexion
     window.logoutUser = function() {
       signOut(auth).then(() => {
         showToast("Déconnexion réussie");
@@ -1405,7 +1408,6 @@
       });
     };
 
-    // Fonctions de mise à jour description et téléphone
     window.updateDescription = async function() {
       const desc = document.getElementById("descInput").value.trim();
       try {
@@ -1429,7 +1431,6 @@
       }
     };
 
-    // Prévisualisation et Enregistrement Avatar
     window.previewAvatarFile = function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -1489,10 +1490,41 @@
       }
     }
 
+    // Gestion de l'interrupteur pour la demande de confirmation (Rappel 1.5 semaines)
     function toggleAskHomeSold(enabled) {
       window.ASK_ON_HOMEPAGE_WHEN_SOLD = enabled;
       localStorage.setItem("ask_homepage_when_sold", enabled ? "true" : "false");
-      showToast(enabled ? "Option activée" : "Option désactivée");
+      if (enabled) {
+        showToast("Rappels de stock activés (toutes les 1.5 semaines).");
+      } else {
+        showToast("Rappels de stock désactivés.");
+      }
+    }
+
+    // Gestion de l'interrupteur pour les Notifications Push OneSignal
+    function toggleNotifications(enabled) {
+      localStorage.setItem("app_notif", enabled ? "enabled" : "disabled");
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+      window.OneSignalDeferred.push(async function(OneSignal) {
+        if (enabled) {
+          try {
+            await OneSignal.Notifications.requestPermission();
+            await OneSignal.User.PushSubscription.optIn();
+            showToast("Notifications push activées !");
+          } catch (e) {
+            console.error(e);
+            showToast("Erreur lors de l'activation des notifications.");
+          }
+        } else {
+          try {
+            await OneSignal.User.PushSubscription.optOut();
+            showToast("Notifications push désactivées.");
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      });
     }
 
     function saveLangSettings() {
@@ -1506,11 +1538,6 @@
       document.getElementById("currentLangLabel").textContent = `${lang.toUpperCase()} / ${themeText}`;
       document.getElementById("langModal").style.display = "none";
       showToast(getTranslation('settings_saved'));
-    }
-
-    function toggleNotifications(enabled) {
-      localStorage.setItem("app_notif", enabled ? "enabled" : "disabled");
-      showToast(enabled ? "Notifications activées" : "Notifications désactivées");
     }
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -1531,10 +1558,12 @@
       const themeText = isDark ? (savedLang === 'en' ? 'Dark' : 'Sombre') : (savedLang === 'en' ? 'Light' : 'Clair');
       document.getElementById("currentLangLabel").textContent = `${savedLang.toUpperCase()} / ${themeText}`;
 
-      const savedNotif = localStorage.getItem("app_notif");
-      if (savedNotif === "enabled") {
-        document.getElementById("notifToggle").checked = true;
-      }
+      // Synchronisation de l'état du switch notification avec OneSignal
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(async function(OneSignal) {
+        const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
+        document.getElementById("notifToggle").checked = isOptedIn;
+      });
 
       const savedAskHome = localStorage.getItem("ask_homepage_when_sold");
       if (savedAskHome === "true") {
