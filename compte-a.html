@@ -38,6 +38,20 @@
       flex: 1;
     }
 
+    /* Ombre légèrement bleue pour encadrer les fonctionnalités */
+    .card-box {
+      background: #1e1e1e;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.18);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    body.light-mode .card-box {
+      background: #ffffff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(37, 99, 235, 0.15);
+    }
+
     .header {
       display: flex;
       align-items: center;
@@ -89,11 +103,11 @@
     input:checked + .slider-large { background-color: #2563eb; }
     input:checked + .slider-large:before { transform: translateX(26px); }
 
+    /* Profil Utilisateur */
     .profile-card {
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 8px 0;
     }
 
     .avatar-wrapper {
@@ -173,11 +187,11 @@
       flex-shrink: 0;
     }
 
+    /* Carrousel des Favoris */
     .favorites-section {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 4px;
     }
 
     .favorites-title {
@@ -195,7 +209,7 @@
       display: flex;
       gap: 12px;
       overflow-x: auto;
-      padding: 4px 0 8px 0;
+      padding: 4px 0;
       scrollbar-width: none;
     }
     .favorites-list::-webkit-scrollbar {
@@ -261,17 +275,19 @@
       text-overflow: ellipsis;
     }
 
+    /* Menu & Navigation */
     .menu-list {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      padding: 4px 12px;
     }
 
     .menu-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 8px;
+      padding: 16px 4px;
       text-decoration: none;
       color: inherit;
       font-size: 1.05rem;
@@ -287,6 +303,10 @@
     }
     body.light-mode .menu-item {
       border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
     }
 
     .menu-item:active {
@@ -340,7 +360,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
       z-index: 90;
       transition: background 0.2s, transform 0.2s;
     }
@@ -351,7 +371,6 @@
       background: #ffffff;
       border-color: rgba(0,0,0,0.15);
       color: #0f172a;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .back-icon {
@@ -360,6 +379,7 @@
       fill: currentColor;
     }
 
+    /* Modales */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -381,11 +401,11 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+      border: 1px solid rgba(37, 99, 235, 0.3);
     }
     body.light-mode .modal-content {
       background: #ffffff;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
 
     .modal-title {
@@ -486,11 +506,12 @@
 <body>
 
   <div class="app-container">
+    <!-- Header -->
     <div class="header">
       <div class="brand-title">VÉA MARKET</div>
 
       <div class="notif-wrapper">
-        <span class="notif-label" id="txtNotifs">Notifs</span>
+        <span class="notif-label" data-lang-fr="Notifs" data-lang-en="Notifs">Notifs</span>
         <label class="switch-large">
           <input type="checkbox" id="notifToggle" onchange="toggleNotifications(this.checked)">
           <span class="slider-large"></span>
@@ -498,7 +519,8 @@
       </div>
     </div>
 
-    <div class="profile-card">
+    <!-- Profil Utilisateur avec Ombre Bleue -->
+    <div class="profile-card card-box">
       <div class="avatar-wrapper" onclick="triggerFileInput()" title="Changer la photo">
         <img id="userAvatar" class="profile-avatar" src="https://via.placeholder.com/150" alt="Avatar">
         <div class="avatar-badge">
@@ -510,7 +532,7 @@
         <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
       </div>
       <div class="profile-info">
-        <span id="userName" class="profile-name">Chargement...</span>
+        <span id="userName" class="profile-name" data-lang-fr="Chargement..." data-lang-en="Loading...">Chargement...</span>
         <span id="userCountry" class="profile-country">---</span>
         <span class="profile-city">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="location-icon">
@@ -524,49 +546,48 @@
       </div>
     </div>
 
-    <div class="favorites-section" id="favoritesSection">
-      <div class="favorites-title" id="txtFavTitle">Mes Favoris Récents</div>
+    <!-- Carrousel des Articles Favoris -->
+    <div class="favorites-section card-box" id="favoritesSection">
+      <div class="favorites-title" data-lang-fr="Mes Favoris Récents" data-lang-en="My Recent Favorites">Mes Favoris Récents</div>
       <div class="favorites-list" id="favoritesList">
+        <!-- Dynamiquement peuplé via JS -->
       </div>
     </div>
 
-    <div class="menu-list">
+    <!-- Menu Principal avec Ombre Bleue (Sans symboles >) -->
+    <div class="menu-list card-box">
       <button type="button" class="menu-item" onclick="openAddressModal()">
-        <span id="txtMenuAddress">MODIFIER MON ADRESSE</span>
-        <span id="currentAddressValue" class="menu-value">&rsaquo;</span>
+        <span data-lang-fr="MODIFIER MON ADRESSE" data-lang-en="EDIT MY ADDRESS">MODIFIER MON ADRESSE</span>
+        <span id="currentAddressValue" class="menu-value"></span>
       </button>
 
       <a href="abonnement.html" class="menu-item" id="abonnementLink">
-        <span id="txtMenuSub">ABONNEMENT</span>
+        <span data-lang-fr="ABONNEMENT" data-lang-en="SUBSCRIPTION">ABONNEMENT</span>
         <div class="menu-item-right">
           <span id="newArticleBadge" class="new-badge" title="Nouveau contenu disponible"></span>
-          <span>&rsaquo;</span>
         </div>
       </a>
 
       <a href="favoris.html" class="menu-item">
-        <span id="txtMenuFav">FAVORIS</span>
-        <span>&rsaquo;</span>
+        <span data-lang-fr="FAVORIS" data-lang-en="FAVORITES">FAVORIS</span>
       </a>
 
       <a href="confidentialite.html" class="menu-item">
-        <span id="txtMenuPrivacy">CONFIDENTIALITÉ</span>
-        <span>&rsaquo;</span>
+        <span data-lang-fr="CONFIDENTIALITÉ" data-lang-en="PRIVACY">CONFIDENTIALITÉ</span>
       </a>
 
       <button type="button" class="menu-item" onclick="openLangModal()">
-        <span id="txtMenuSettings">PARAMÈTRES & APPARENCE</span>
-        <span id="currentLangLabel" class="menu-value">Sombre (FR)</span>
+        <span data-lang-fr="MODE APPARENCE ET LANGUE" data-lang-en="THEME AND LANGUAGE">MODE APPARENCE ET LANGUE</span>
+        <span id="currentLangLabel" class="menu-value">FR / Sombre</span>
       </button>
 
       <button type="button" class="menu-item" onclick="openPhoneModal()">
-        <span id="txtMenuWhatsapp">NUM WHATSAPP</span>
-        <span id="userPhoneDisplay" class="menu-value">Non défini</span>
+        <span data-lang-fr="NUM WHATSAPP" data-lang-en="WHATSAPP NUMBER">NUM WHATSAPP</span>
+        <span id="userPhoneDisplay" class="menu-value" data-lang-fr="Non défini" data-lang-en="Not set">Non défini</span>
       </button>
 
       <button type="button" class="menu-item menu-item-logout" id="logoutBtn">
-        <span id="txtMenuLogout">DÉCONNEXION</span>
-        <span>&rsaquo;</span>
+        <span data-lang-fr="DÉCONNEXION" data-lang-en="LOGOUT">DÉCONNEXION</span>
       </button>
     </div>
 
@@ -581,38 +602,40 @@
     </svg>
   </button>
 
+  <!-- Modale Adresse -->
   <div class="modal-overlay" id="addressModal">
     <div class="modal-content">
-      <div class="modal-title" id="txtAddressModalTitle">Modifier mon adresse</div>
+      <div class="modal-title" data-lang-fr="Modifier mon adresse" data-lang-en="Edit my address">Modifier mon adresse</div>
 
       <div class="form-group">
-        <label for="addressCountry" id="txtLabelCountry">Pays</label>
+        <label for="addressCountry" data-lang-fr="Pays" data-lang-en="Country">Pays</label>
         <input type="text" id="addressCountry" class="modal-input" placeholder="ex: RDC">
       </div>
 
       <div class="form-group">
-        <label for="addressProvince" id="txtLabelProvince">Province / Région</label>
+        <label for="addressProvince" data-lang-fr="Province / Région" data-lang-en="Province / Region">Province / Région</label>
         <input type="text" id="addressProvince" class="modal-input" placeholder="ex: Nord-Kivu">
       </div>
 
       <div class="form-group">
-        <label for="addressCity" id="txtLabelCity">Ville</label>
+        <label for="addressCity" data-lang-fr="Ville" data-lang-en="City">Ville</label>
         <input type="text" id="addressCity" class="modal-input" placeholder="ex: Goma">
       </div>
 
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closeAddressModal()" id="btnCancelAddr">Annuler</button>
-        <button class="btn btn-primary" id="saveAddressBtn" onclick="updateAddress()">Sauvegarder</button>
+        <button class="btn btn-secondary" onclick="closeAddressModal()" data-lang-fr="Annuler" data-lang-en="Cancel">Annuler</button>
+        <button class="btn btn-primary" id="saveAddressBtn" onclick="updateAddress()" data-lang-fr="Sauvegarder" data-lang-en="Save">Sauvegarder</button>
       </div>
     </div>
   </div>
 
+  <!-- Modale Langue et Apparence -->
   <div class="modal-overlay" id="langModal">
     <div class="modal-content">
-      <div class="modal-title" id="txtLangModalTitle">Paramètres & Apparence</div>
+      <div class="modal-title" data-lang-fr="Apparence et Langue" data-lang-en="Theme & Language">Apparence et Langue</div>
 
       <div class="modal-option">
-        <span id="txtDarkMode">Mode Sombre</span>
+        <span data-lang-fr="Mode Sombre" data-lang-en="Dark Mode">Mode Sombre</span>
         <label class="switch">
           <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode(this.checked)">
           <span class="slider"></span>
@@ -620,31 +643,33 @@
       </div>
 
       <div class="form-group">
-        <label for="langSelect" id="txtLanguage">Langue / Language</label>
-        <select id="langSelect" class="modal-select">
-          <option value="fr">Français</option>
-          <option value="en">English</option>
+        <label for="languageSelect" data-lang-fr="Langue d'affichage" data-lang-en="Display Language">Langue d'affichage</label>
+        <select id="languageSelect" class="modal-select">
+          <option value="fr">Français (FR)</option>
+          <option value="en">English (EN)</option>
         </select>
       </div>
 
       <div class="modal-buttons">
-        <button class="btn btn-primary" onclick="saveLangSettings()" id="btnSaveLang">Enregistrer</button>
+        <button class="btn btn-primary" onclick="saveLangSettings()" data-lang-fr="Enregistrer" data-lang-en="Save">Enregistrer</button>
       </div>
     </div>
   </div>
 
+  <!-- Modale Numéro -->
   <div class="modal-overlay" id="phoneModal">
     <div class="modal-content">
-      <div class="modal-title" id="txtPhoneModalTitle">Modifier le Numéro WhatsApp</div>
+      <div class="modal-title" data-lang-fr="Modifier le Numéro WhatsApp" data-lang-en="Edit WhatsApp Number">Modifier le Numéro WhatsApp</div>
       <input type="tel" id="phoneInput" class="modal-input" placeholder="+243900000000">
 
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closePhoneModal()" id="btnCancelPhone">Annuler</button>
-        <button class="btn btn-primary" id="savePhoneBtn" onclick="updatePhoneNumber()">Mettre à jour</button>
+        <button class="btn btn-secondary" onclick="closePhoneModal()" data-lang-fr="Annuler" data-lang-en="Cancel">Annuler</button>
+        <button class="btn btn-primary" id="savePhoneBtn" onclick="updatePhoneNumber()" data-lang-fr="Mettre à jour" data-lang-en="Update">Mettre à jour</button>
       </div>
     </div>
   </div>
 
+  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -667,7 +692,7 @@
     let currentUser = null;
     let currentUserCollection = "acheteurs";
 
-    // EFFACE LE LOCALSTORAGE A LA DECONNEXION
+    // Vider complètement le LocalStorage lors de la déconnexion
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       try {
         await signOut(auth);
@@ -680,6 +705,7 @@
       }
     });
 
+    // Chargement des favoris sous forme de ronds avec vérification Vendu/24h
     async function loadFavoriteArticles(userUid, favIds) {
       const container = document.getElementById("favoritesList");
       container.innerHTML = "";
@@ -840,13 +866,15 @@
 
             document.getElementById("userName").textContent = data.nom || data.displayName || "Client";
 
-            const addr = data.address || {};
-            const country = addr.country || data.country || data.pays || "RDC";
-            const province = addr.province || data.province || "";
-            const city = addr.city || data.city || data.ville || "Goma";
+            // Charger depuis localStorage en priorité, sinon Firestore
+            const localCountry = localStorage.getItem("user_address_country");
+            const localProvince = localStorage.getItem("user_address_province");
+            const localCity = localStorage.getItem("user_address_city");
 
-            // SAUVEGARDE L'ADRESSE DANS LOCALSTORAGE AU CHARGEMENT
-            localStorage.setItem("user_address", JSON.stringify({ country, province, city }));
+            const addr = data.address || {};
+            const country = localCountry || addr.country || data.country || data.pays || "RDC";
+            const province = localProvince || addr.province || data.province || "";
+            const city = localCity || addr.city || data.city || data.ville || "Goma";
 
             document.getElementById("userCountry").textContent = country;
             document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
@@ -861,7 +889,9 @@
             }
 
             const phone = data.telephone || data.whatsapp || data.phone || "";
-            document.getElementById("userPhoneDisplay").textContent = phone || "Ajouter";
+            const lang = localStorage.getItem("app_lang") || "fr";
+            const notSetText = lang === "en" ? "Not set" : "Non défini";
+            document.getElementById("userPhoneDisplay").textContent = phone || notSetText;
             document.getElementById("phoneInput").value = phone;
 
             const favorisIds = data.favoris || [];
@@ -871,7 +901,8 @@
           console.error("Erreur récupération Firestore :", err);
         }
       } else {
-        document.getElementById("userName").textContent = "Non connecté";
+        const lang = localStorage.getItem("app_lang") || "fr";
+        document.getElementById("userName").textContent = lang === "en" ? "Not connected" : "Non connecté";
         document.getElementById("favoritesSection").style.display = "none";
       }
     });
@@ -891,7 +922,8 @@
             photoUrl: base64Image,
             avatar: base64Image
           });
-          alert("Photo de profil mise à jour !");
+          const lang = localStorage.getItem("app_lang") || "fr";
+          alert(lang === "en" ? "Profile picture updated!" : "Photo de profil mise à jour !");
         } catch (error) {
           console.error("Erreur mise à jour photo :", error);
           alert("Erreur lors de la sauvegarde.");
@@ -900,69 +932,74 @@
       reader.readAsDataURL(file);
     };
 
-    // MISE A JOUR DE L'ADRESSE (DANS FIRESTORE ET EN LOCALSTORAGE)
     window.updateAddress = async function() {
-      if (!currentUser) return alert("Vous devez être connecté.");
-
       const country = document.getElementById("addressCountry").value.trim();
       const province = document.getElementById("addressProvince").value.trim();
       const city = document.getElementById("addressCity").value.trim();
 
-      const saveBtn = document.getElementById("saveAddressBtn");
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Sauvegarde...";
+      // Sauvegarde dans localStorage
+      localStorage.setItem("user_address_country", country);
+      localStorage.setItem("user_address_province", province);
+      localStorage.setItem("user_address_city", city);
 
-      try {
-        const userRef = doc(db, currentUserCollection, currentUser.uid);
+      document.getElementById("userCountry").textContent = country || "RDC";
+      document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
 
-        await updateDoc(userRef, {
-          pays: country,
-          province: province,
-          ville: city,
-          "address.country": country,
-          "address.province": province,
-          "address.city": city
-        });
+      const lang = localStorage.getItem("app_lang") || "fr";
 
-        // Mise à jour LocalStorage
-        localStorage.setItem("user_address", JSON.stringify({ country, province, city }));
+      if (currentUser) {
+        const saveBtn = document.getElementById("saveAddressBtn");
+        saveBtn.disabled = true;
+        saveBtn.textContent = lang === "en" ? "Saving..." : "Sauvegarde...";
 
-        document.getElementById("userCountry").textContent = country || "RDC";
-        document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
-
-        closeAddressModal();
-        const currentLang = localStorage.getItem("app_lang") || "fr";
-        alert(currentLang === "en" ? "Address updated successfully!" : "Adresse mise à jour avec succès !");
-      } catch (error) {
-        console.error("Erreur mise à jour adresse :", error);
-        alert("Erreur lors de la mise à jour.");
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Sauvegarder";
+        try {
+          const userRef = doc(db, currentUserCollection, currentUser.uid);
+          await updateDoc(userRef, {
+            pays: country,
+            province: province,
+            ville: city,
+            "address.country": country,
+            "address.province": province,
+            "address.city": city
+          });
+        } catch (error) {
+          console.error("Erreur mise à jour adresse Firestore :", error);
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = lang === "en" ? "Save" : "Sauvegarder";
+        }
       }
+
+      closeAddressModal();
+      alert(lang === "en" ? "Address updated successfully!" : "Adresse mise à jour avec succès !");
     };
 
     window.updatePhoneNumber = async function() {
       const newPhone = document.getElementById("phoneInput").value.trim();
-      if (!currentUser) return alert("Vous devez être connecté.");
+      const lang = localStorage.getItem("app_lang") || "fr";
+
+      if (!currentUser) {
+        alert(lang === "en" ? "You must be logged in." : "Vous devez être connecté.");
+        return;
+      }
 
       const saveBtn = document.getElementById("savePhoneBtn");
       saveBtn.disabled = true;
-      saveBtn.textContent = "Sauvegarde...";
+      saveBtn.textContent = lang === "en" ? "Saving..." : "Sauvegarde...";
 
       try {
         const userRef = doc(db, currentUserCollection, currentUser.uid);
         await updateDoc(userRef, { telephone: newPhone, whatsapp: newPhone });
 
-        document.getElementById("userPhoneDisplay").textContent = newPhone || "Non défini";
+        document.getElementById("userPhoneDisplay").textContent = newPhone || (lang === "en" ? "Not set" : "Non défini");
         closePhoneModal();
-        alert("Numéro mis à jour avec succès !");
+        alert(lang === "en" ? "Phone number updated successfully!" : "Numéro mis à jour avec succès !");
       } catch (error) {
         console.error("Erreur mise à jour numéro :", error);
         alert("Erreur lors de la mise à jour.");
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = "Mettre à jour";
+        saveBtn.textContent = lang === "en" ? "Update" : "Mettre à jour";
       }
     };
 
@@ -978,61 +1015,8 @@
     };
   </script>
 
+  <!-- Script d'interface, Traduction et LocalStorage -->
   <script>
-    // DICTIONNAIRE MULTILINGUE FR/EN
-    const translations = {
-      fr: {
-        notifs: "Notifs",
-        favTitle: "Mes Favoris Récents",
-        menuAddress: "MODIFIER MON ADRESSE",
-        menuSub: "ABONNEMENT",
-        menuFav: "FAVORIS",
-        menuPrivacy: "CONFIDENTIALITÉ",
-        menuSettings: "PARAMÈTRES & APPARENCE",
-        menuWhatsapp: "NUM WHATSAPP",
-        menuLogout: "DÉCONNEXION",
-        addressModalTitle: "Modifier mon adresse",
-        labelCountry: "Pays",
-        labelProvince: "Province / Région",
-        labelCity: "Ville",
-        btnCancel: "Annuler",
-        btnSave: "Sauvegarder",
-        langModalTitle: "Paramètres & Apparence",
-        darkMode: "Mode Sombre",
-        language: "Langue / Language",
-        btnSaveLang: "Enregistrer",
-        phoneModalTitle: "Modifier le Numéro WhatsApp",
-        btnUpdate: "Mettre à jour",
-        themeDark: "Sombre",
-        themeLight: "Clair"
-      },
-      en: {
-        notifs: "Notifications",
-        favTitle: "My Recent Favorites",
-        menuAddress: "EDIT MY ADDRESS",
-        menuSub: "SUBSCRIPTION",
-        menuFav: "FAVORITES",
-        menuPrivacy: "PRIVACY",
-        menuSettings: "SETTINGS & APPEARANCE",
-        menuWhatsapp: "WHATSAPP NUMBER",
-        menuLogout: "LOGOUT",
-        addressModalTitle: "Edit my address",
-        labelCountry: "Country",
-        labelProvince: "State / Province",
-        labelCity: "City",
-        btnCancel: "Cancel",
-        btnSave: "Save",
-        langModalTitle: "Settings & Appearance",
-        darkMode: "Dark Mode",
-        language: "Language / Langue",
-        btnSaveLang: "Save",
-        phoneModalTitle: "Edit WhatsApp Number",
-        btnUpdate: "Update",
-        themeDark: "Dark",
-        themeLight: "Light"
-      }
-    };
-
     function triggerFileInput() {
       document.getElementById("avatarFileInput").click();
     }
@@ -1049,54 +1033,34 @@
       document.getElementById("langModal").style.display = "flex";
     }
 
-    // SAUVEGARDE DE LA LANGUE ET DU THÈME DANS LOCALSTORAGE
     function saveLangSettings() {
       const isDark = document.getElementById("darkModeToggle").checked;
-      const lang = document.getElementById("langSelect").value;
+      const selectedLang = document.getElementById("languageSelect").value;
 
       localStorage.setItem("app_theme", isDark ? "dark" : "light");
-      localStorage.setItem("app_lang", lang);
+      localStorage.setItem("app_lang", selectedLang);
 
-      applyLanguage(lang);
-      updateLangLabelDisplay(isDark, lang);
+      applyLanguage(selectedLang);
+      updateLangLabelDisplay(isDark, selectedLang);
       document.getElementById("langModal").style.display = "none";
     }
 
     function applyLanguage(lang) {
-      const t = translations[lang] || translations.fr;
       document.documentElement.lang = lang;
-
-      document.getElementById("txtNotifs").textContent = t.notifs;
-      document.getElementById("txtFavTitle").textContent = t.favTitle;
-      document.getElementById("txtMenuAddress").textContent = t.menuAddress;
-      document.getElementById("txtMenuSub").textContent = t.menuSub;
-      document.getElementById("txtMenuFav").textContent = t.menuFav;
-      document.getElementById("txtMenuPrivacy").textContent = t.menuPrivacy;
-      document.getElementById("txtMenuSettings").textContent = t.menuSettings;
-      document.getElementById("txtMenuWhatsapp").textContent = t.menuWhatsapp;
-      document.getElementById("txtMenuLogout").textContent = t.menuLogout;
-
-      document.getElementById("txtAddressModalTitle").textContent = t.addressModalTitle;
-      document.getElementById("txtLabelCountry").textContent = t.labelCountry;
-      document.getElementById("txtLabelProvince").textContent = t.labelProvince;
-      document.getElementById("txtLabelCity").textContent = t.labelCity;
-      document.getElementById("btnCancelAddr").textContent = t.btnCancel;
-      document.getElementById("saveAddressBtn").textContent = t.btnSave;
-
-      document.getElementById("txtLangModalTitle").textContent = t.langModalTitle;
-      document.getElementById("txtDarkMode").textContent = t.darkMode;
-      document.getElementById("txtLanguage").textContent = t.language;
-      document.getElementById("btnSaveLang").textContent = t.btnSaveLang;
-
-      document.getElementById("txtPhoneModalTitle").textContent = t.phoneModalTitle;
-      document.getElementById("btnCancelPhone").textContent = t.btnCancel;
-      document.getElementById("savePhoneBtn").textContent = t.btnUpdate;
+      const elements = document.querySelectorAll("[data-lang-fr]");
+      elements.forEach((el) => {
+        if (lang === "en" && el.getAttribute("data-lang-en")) {
+          el.textContent = el.getAttribute("data-lang-en");
+        } else {
+          el.textContent = el.getAttribute("data-lang-fr");
+        }
+      });
     }
 
     function updateLangLabelDisplay(isDark, lang) {
-      const t = translations[lang] || translations.fr;
-      const modeText = isDark ? t.themeDark : t.themeLight;
-      document.getElementById("currentLangLabel").textContent = `${modeText} (${lang.toUpperCase()})`;
+      const themeLabel = isDark ? (lang === "en" ? "Dark" : "Sombre") : (lang === "en" ? "Light" : "Clair");
+      const langLabel = lang.toUpperCase();
+      document.getElementById("currentLangLabel").textContent = `${langLabel} / ${themeLabel}`;
     }
 
     function toggleDarkMode(isDark) {
@@ -1120,33 +1084,32 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
-      // CHARGEMENT DE LA LANGUE ET DU THÈME DEPUIS LOCALSTORAGE
+      // Thème localstorage
       const savedTheme = localStorage.getItem("app_theme");
-      const savedLang = localStorage.getItem("app_lang") || "fr";
-
       const isDark = savedTheme !== "light";
       if (!isDark) {
         document.body.classList.add("light-mode");
         document.getElementById("darkModeToggle").checked = false;
       }
 
-      document.getElementById("langSelect").value = savedLang;
+      // Langue localstorage
+      const savedLang = localStorage.getItem("app_lang") || "fr";
+      document.getElementById("languageSelect").value = savedLang;
       applyLanguage(savedLang);
       updateLangLabelDisplay(isDark, savedLang);
 
-      // RESTAURATION DE L'ADRESSE DEPUIS LOCALSTORAGE SI DISPONIBLE
-      const savedAddress = localStorage.getItem("user_address");
-      if (savedAddress) {
-        try {
-          const addr = JSON.parse(savedAddress);
-          if (addr.country) document.getElementById("userCountry").textContent = addr.country;
-          if (addr.city) document.getElementById("userCity").textContent = addr.province ? `${addr.province}, ${addr.city}` : addr.city;
-          if (addr.country) document.getElementById("addressCountry").value = addr.country;
-          if (addr.province) document.getElementById("addressProvince").value = addr.province;
-          if (addr.city) document.getElementById("addressCity").value = addr.city;
-        } catch(e) {
-          console.error("Erreur lors de la lecture de l'adresse depuis le localStorage", e);
-        }
+      // Adresse localstorage
+      const localCountry = localStorage.getItem("user_address_country");
+      const localProvince = localStorage.getItem("user_address_province");
+      const localCity = localStorage.getItem("user_address_city");
+
+      if (localCountry) document.getElementById("addressCountry").value = localCountry;
+      if (localProvince) document.getElementById("addressProvince").value = localProvince;
+      if (localCity) document.getElementById("addressCity").value = localCity;
+
+      if (localCountry || localCity) {
+        document.getElementById("userCountry").textContent = localCountry || "RDC";
+        document.getElementById("userCity").textContent = localProvince ? `${localProvince}, ${localCity}` : (localCity || "Goma");
       }
 
       const hasNewArticle = localStorage.getItem("has_new_article");
