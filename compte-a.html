@@ -38,7 +38,6 @@
       flex: 1;
     }
 
-    /* Header simplifié sans SVG lourds */
     .header {
       display: flex;
       align-items: center;
@@ -56,7 +55,6 @@
       letter-spacing: 1px;
     }
 
-    /* Switch Notification Agrandit */
     .notif-wrapper {
       display: flex;
       align-items: center;
@@ -91,7 +89,6 @@
     input:checked + .slider-large { background-color: #2563eb; }
     input:checked + .slider-large:before { transform: translateX(26px); }
 
-    /* Profil Utilisateur */
     .profile-card {
       display: flex;
       align-items: center;
@@ -176,7 +173,6 @@
       flex-shrink: 0;
     }
 
-    /* Carrousel des Favoris en Ronds */
     .favorites-section {
       display: flex;
       flex-direction: column;
@@ -233,7 +229,6 @@
       object-fit: cover;
     }
 
-    /* Coche pour article vendu */
     .sold-overlay {
       position: absolute;
       inset: 0;
@@ -266,7 +261,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Menu & Navigation */
     .menu-list {
       display: flex;
       flex-direction: column;
@@ -332,7 +326,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Bouton retour */
     .back-button {
       position: fixed;
       bottom: 20px;
@@ -367,7 +360,6 @@
       fill: currentColor;
     }
 
-    /* Modales */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -494,12 +486,11 @@
 <body>
 
   <div class="app-container">
-    <!-- En-tête Epuré avec Switch Notif Agrandit -->
     <div class="header">
       <div class="brand-title">VÉA MARKET</div>
 
       <div class="notif-wrapper">
-        <span class="notif-label">Notifs</span>
+        <span class="notif-label" id="txtNotifs">Notifs</span>
         <label class="switch-large">
           <input type="checkbox" id="notifToggle" onchange="toggleNotifications(this.checked)">
           <span class="slider-large"></span>
@@ -507,7 +498,6 @@
       </div>
     </div>
 
-    <!-- Profil Utilisateur -->
     <div class="profile-card">
       <div class="avatar-wrapper" onclick="triggerFileInput()" title="Changer la photo">
         <img id="userAvatar" class="profile-avatar" src="https://via.placeholder.com/150" alt="Avatar">
@@ -534,23 +524,20 @@
       </div>
     </div>
 
-    <!-- NOUVEAU BLOC: Carrousel des Articles Favoris (Ronds) -->
     <div class="favorites-section" id="favoritesSection">
-      <div class="favorites-title">Mes Favoris Récents</div>
+      <div class="favorites-title" id="txtFavTitle">Mes Favoris Récents</div>
       <div class="favorites-list" id="favoritesList">
-        <!-- Dynamiquement peuplé via JavaScript -->
       </div>
     </div>
 
-    <!-- Menu Principal -->
     <div class="menu-list">
       <button type="button" class="menu-item" onclick="openAddressModal()">
-        <span>MODIFIER MON ADRESSE</span>
+        <span id="txtMenuAddress">MODIFIER MON ADRESSE</span>
         <span id="currentAddressValue" class="menu-value">&rsaquo;</span>
       </button>
 
       <a href="abonnement.html" class="menu-item" id="abonnementLink">
-        <span>ABONNEMENT</span>
+        <span id="txtMenuSub">ABONNEMENT</span>
         <div class="menu-item-right">
           <span id="newArticleBadge" class="new-badge" title="Nouveau contenu disponible"></span>
           <span>&rsaquo;</span>
@@ -558,27 +545,27 @@
       </a>
 
       <a href="favoris.html" class="menu-item">
-        <span>FAVORIS</span>
+        <span id="txtMenuFav">FAVORIS</span>
         <span>&rsaquo;</span>
       </a>
 
       <a href="confidentialite.html" class="menu-item">
-        <span>CONFIDENTIALITÉ</span>
+        <span id="txtMenuPrivacy">CONFIDENTIALITÉ</span>
         <span>&rsaquo;</span>
       </a>
 
       <button type="button" class="menu-item" onclick="openLangModal()">
-        <span>MODE APPARENCE</span>
-        <span id="currentLangLabel" class="menu-value">Sombre</span>
+        <span id="txtMenuSettings">PARAMÈTRES & APPARENCE</span>
+        <span id="currentLangLabel" class="menu-value">Sombre (FR)</span>
       </button>
 
       <button type="button" class="menu-item" onclick="openPhoneModal()">
-        <span>NUM WHATSAPP</span>
+        <span id="txtMenuWhatsapp">NUM WHATSAPP</span>
         <span id="userPhoneDisplay" class="menu-value">Non défini</span>
       </button>
 
       <button type="button" class="menu-item menu-item-logout" id="logoutBtn">
-        <span>DÉCONNEXION</span>
+        <span id="txtMenuLogout">DÉCONNEXION</span>
         <span>&rsaquo;</span>
       </button>
     </div>
@@ -594,28 +581,27 @@
     </svg>
   </button>
 
-  <!-- Modales -->
   <div class="modal-overlay" id="addressModal">
     <div class="modal-content">
-      <div class="modal-title">Modifier mon adresse</div>
+      <div class="modal-title" id="txtAddressModalTitle">Modifier mon adresse</div>
 
       <div class="form-group">
-        <label for="addressCountry">Pays</label>
+        <label for="addressCountry" id="txtLabelCountry">Pays</label>
         <input type="text" id="addressCountry" class="modal-input" placeholder="ex: RDC">
       </div>
 
       <div class="form-group">
-        <label for="addressProvince">Province / Région</label>
+        <label for="addressProvince" id="txtLabelProvince">Province / Région</label>
         <input type="text" id="addressProvince" class="modal-input" placeholder="ex: Nord-Kivu">
       </div>
 
       <div class="form-group">
-        <label for="addressCity">Ville</label>
+        <label for="addressCity" id="txtLabelCity">Ville</label>
         <input type="text" id="addressCity" class="modal-input" placeholder="ex: Goma">
       </div>
 
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closeAddressModal()">Annuler</button>
+        <button class="btn btn-secondary" onclick="closeAddressModal()" id="btnCancelAddr">Annuler</button>
         <button class="btn btn-primary" id="saveAddressBtn" onclick="updateAddress()">Sauvegarder</button>
       </div>
     </div>
@@ -623,35 +609,42 @@
 
   <div class="modal-overlay" id="langModal">
     <div class="modal-content">
-      <div class="modal-title">Apparence</div>
+      <div class="modal-title" id="txtLangModalTitle">Paramètres & Apparence</div>
 
       <div class="modal-option">
-        <span>Mode Sombre</span>
+        <span id="txtDarkMode">Mode Sombre</span>
         <label class="switch">
           <input type="checkbox" id="darkModeToggle" checked onchange="toggleDarkMode(this.checked)">
           <span class="slider"></span>
         </label>
       </div>
 
+      <div class="form-group">
+        <label for="langSelect" id="txtLanguage">Langue / Language</label>
+        <select id="langSelect" class="modal-select">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
       <div class="modal-buttons">
-        <button class="btn btn-primary" onclick="saveLangSettings()">Enregistrer</button>
+        <button class="btn btn-primary" onclick="saveLangSettings()" id="btnSaveLang">Enregistrer</button>
       </div>
     </div>
   </div>
 
   <div class="modal-overlay" id="phoneModal">
     <div class="modal-content">
-      <div class="modal-title">Modifier le Numéro WhatsApp</div>
+      <div class="modal-title" id="txtPhoneModalTitle">Modifier le Numéro WhatsApp</div>
       <input type="tel" id="phoneInput" class="modal-input" placeholder="+243900000000">
 
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closePhoneModal()">Annuler</button>
+        <button class="btn btn-secondary" onclick="closePhoneModal()" id="btnCancelPhone">Annuler</button>
         <button class="btn btn-primary" id="savePhoneBtn" onclick="updatePhoneNumber()">Mettre à jour</button>
       </div>
     </div>
   </div>
 
-  <!-- Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -674,17 +667,19 @@
     let currentUser = null;
     let currentUserCollection = "acheteurs";
 
+    // EFFACE LE LOCALSTORAGE A LA DECONNEXION
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       try {
         await signOut(auth);
+        localStorage.clear();
         window.location.href = "index.html";
       } catch (error) {
         console.error("Erreur de déconnexion :", error);
+        localStorage.clear();
         window.location.href = "index.html";
       }
     });
 
-    // Chargement des favoris sous forme de ronds avec vérification Vendu/24h
     async function loadFavoriteArticles(userUid, favIds) {
       const container = document.getElementById("favoritesList");
       container.innerHTML = "";
@@ -695,7 +690,6 @@
       }
 
       try {
-        // Découpage par paquets de 10 max pour Firestore 'in'
         const chunks = [];
         for (let i = 0; i < favIds.length; i += 10) {
           chunks.push(favIds.slice(i, i + 10));
@@ -715,11 +709,10 @@
             let isSold = prod.vendu === true || prod.sold === true;
             let soldAt = prod.venduAt ? (prod.venduAt.toDate ? prod.venduAt.toDate() : new Date(prod.venduAt)) : null;
 
-            // Règle: si vendu depuis plus de 24h, on ne l'affiche pas (disparition le lendemain)
             if (isSold && soldAt) {
               const hoursDiff = (now - soldAt) / (1000 * 60 * 60);
               if (hoursDiff >= 24) {
-                return; // Ignorer cet article
+                return;
               }
             }
 
@@ -852,6 +845,9 @@
             const province = addr.province || data.province || "";
             const city = addr.city || data.city || data.ville || "Goma";
 
+            // SAUVEGARDE L'ADRESSE DANS LOCALSTORAGE AU CHARGEMENT
+            localStorage.setItem("user_address", JSON.stringify({ country, province, city }));
+
             document.getElementById("userCountry").textContent = country;
             document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
 
@@ -868,7 +864,6 @@
             document.getElementById("userPhoneDisplay").textContent = phone || "Ajouter";
             document.getElementById("phoneInput").value = phone;
 
-            // Charger le carrousel des favoris
             const favorisIds = data.favoris || [];
             loadFavoriteArticles(user.uid, favorisIds);
           }
@@ -905,6 +900,7 @@
       reader.readAsDataURL(file);
     };
 
+    // MISE A JOUR DE L'ADRESSE (DANS FIRESTORE ET EN LOCALSTORAGE)
     window.updateAddress = async function() {
       if (!currentUser) return alert("Vous devez être connecté.");
 
@@ -928,11 +924,15 @@
           "address.city": city
         });
 
+        // Mise à jour LocalStorage
+        localStorage.setItem("user_address", JSON.stringify({ country, province, city }));
+
         document.getElementById("userCountry").textContent = country || "RDC";
         document.getElementById("userCity").textContent = province ? `${province}, ${city}` : city;
 
         closeAddressModal();
-        alert("Adresse mise à jour avec succès !");
+        const currentLang = localStorage.getItem("app_lang") || "fr";
+        alert(currentLang === "en" ? "Address updated successfully!" : "Adresse mise à jour avec succès !");
       } catch (error) {
         console.error("Erreur mise à jour adresse :", error);
         alert("Erreur lors de la mise à jour.");
@@ -978,8 +978,61 @@
     };
   </script>
 
-  <!-- Script d'interface -->
   <script>
+    // DICTIONNAIRE MULTILINGUE FR/EN
+    const translations = {
+      fr: {
+        notifs: "Notifs",
+        favTitle: "Mes Favoris Récents",
+        menuAddress: "MODIFIER MON ADRESSE",
+        menuSub: "ABONNEMENT",
+        menuFav: "FAVORIS",
+        menuPrivacy: "CONFIDENTIALITÉ",
+        menuSettings: "PARAMÈTRES & APPARENCE",
+        menuWhatsapp: "NUM WHATSAPP",
+        menuLogout: "DÉCONNEXION",
+        addressModalTitle: "Modifier mon adresse",
+        labelCountry: "Pays",
+        labelProvince: "Province / Région",
+        labelCity: "Ville",
+        btnCancel: "Annuler",
+        btnSave: "Sauvegarder",
+        langModalTitle: "Paramètres & Apparence",
+        darkMode: "Mode Sombre",
+        language: "Langue / Language",
+        btnSaveLang: "Enregistrer",
+        phoneModalTitle: "Modifier le Numéro WhatsApp",
+        btnUpdate: "Mettre à jour",
+        themeDark: "Sombre",
+        themeLight: "Clair"
+      },
+      en: {
+        notifs: "Notifications",
+        favTitle: "My Recent Favorites",
+        menuAddress: "EDIT MY ADDRESS",
+        menuSub: "SUBSCRIPTION",
+        menuFav: "FAVORITES",
+        menuPrivacy: "PRIVACY",
+        menuSettings: "SETTINGS & APPEARANCE",
+        menuWhatsapp: "WHATSAPP NUMBER",
+        menuLogout: "LOGOUT",
+        addressModalTitle: "Edit my address",
+        labelCountry: "Country",
+        labelProvince: "State / Province",
+        labelCity: "City",
+        btnCancel: "Cancel",
+        btnSave: "Save",
+        langModalTitle: "Settings & Appearance",
+        darkMode: "Dark Mode",
+        language: "Language / Langue",
+        btnSaveLang: "Save",
+        phoneModalTitle: "Edit WhatsApp Number",
+        btnUpdate: "Update",
+        themeDark: "Dark",
+        themeLight: "Light"
+      }
+    };
+
     function triggerFileInput() {
       document.getElementById("avatarFileInput").click();
     }
@@ -996,15 +1049,54 @@
       document.getElementById("langModal").style.display = "flex";
     }
 
+    // SAUVEGARDE DE LA LANGUE ET DU THÈME DANS LOCALSTORAGE
     function saveLangSettings() {
       const isDark = document.getElementById("darkModeToggle").checked;
+      const lang = document.getElementById("langSelect").value;
+
       localStorage.setItem("app_theme", isDark ? "dark" : "light");
-      updateLangLabelDisplay(isDark);
+      localStorage.setItem("app_lang", lang);
+
+      applyLanguage(lang);
+      updateLangLabelDisplay(isDark, lang);
       document.getElementById("langModal").style.display = "none";
     }
 
-    function updateLangLabelDisplay(isDark) {
-      document.getElementById("currentLangLabel").textContent = isDark ? "Sombre" : "Clair";
+    function applyLanguage(lang) {
+      const t = translations[lang] || translations.fr;
+      document.documentElement.lang = lang;
+
+      document.getElementById("txtNotifs").textContent = t.notifs;
+      document.getElementById("txtFavTitle").textContent = t.favTitle;
+      document.getElementById("txtMenuAddress").textContent = t.menuAddress;
+      document.getElementById("txtMenuSub").textContent = t.menuSub;
+      document.getElementById("txtMenuFav").textContent = t.menuFav;
+      document.getElementById("txtMenuPrivacy").textContent = t.menuPrivacy;
+      document.getElementById("txtMenuSettings").textContent = t.menuSettings;
+      document.getElementById("txtMenuWhatsapp").textContent = t.menuWhatsapp;
+      document.getElementById("txtMenuLogout").textContent = t.menuLogout;
+
+      document.getElementById("txtAddressModalTitle").textContent = t.addressModalTitle;
+      document.getElementById("txtLabelCountry").textContent = t.labelCountry;
+      document.getElementById("txtLabelProvince").textContent = t.labelProvince;
+      document.getElementById("txtLabelCity").textContent = t.labelCity;
+      document.getElementById("btnCancelAddr").textContent = t.btnCancel;
+      document.getElementById("saveAddressBtn").textContent = t.btnSave;
+
+      document.getElementById("txtLangModalTitle").textContent = t.langModalTitle;
+      document.getElementById("txtDarkMode").textContent = t.darkMode;
+      document.getElementById("txtLanguage").textContent = t.language;
+      document.getElementById("btnSaveLang").textContent = t.btnSaveLang;
+
+      document.getElementById("txtPhoneModalTitle").textContent = t.phoneModalTitle;
+      document.getElementById("btnCancelPhone").textContent = t.btnCancel;
+      document.getElementById("savePhoneBtn").textContent = t.btnUpdate;
+    }
+
+    function updateLangLabelDisplay(isDark, lang) {
+      const t = translations[lang] || translations.fr;
+      const modeText = isDark ? t.themeDark : t.themeLight;
+      document.getElementById("currentLangLabel").textContent = `${modeText} (${lang.toUpperCase()})`;
     }
 
     function toggleDarkMode(isDark) {
@@ -1028,14 +1120,34 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
+      // CHARGEMENT DE LA LANGUE ET DU THÈME DEPUIS LOCALSTORAGE
       const savedTheme = localStorage.getItem("app_theme");
+      const savedLang = localStorage.getItem("app_lang") || "fr";
+
       const isDark = savedTheme !== "light";
       if (!isDark) {
         document.body.classList.add("light-mode");
         document.getElementById("darkModeToggle").checked = false;
       }
 
-      updateLangLabelDisplay(isDark);
+      document.getElementById("langSelect").value = savedLang;
+      applyLanguage(savedLang);
+      updateLangLabelDisplay(isDark, savedLang);
+
+      // RESTAURATION DE L'ADRESSE DEPUIS LOCALSTORAGE SI DISPONIBLE
+      const savedAddress = localStorage.getItem("user_address");
+      if (savedAddress) {
+        try {
+          const addr = JSON.parse(savedAddress);
+          if (addr.country) document.getElementById("userCountry").textContent = addr.country;
+          if (addr.city) document.getElementById("userCity").textContent = addr.province ? `${addr.province}, ${addr.city}` : addr.city;
+          if (addr.country) document.getElementById("addressCountry").value = addr.country;
+          if (addr.province) document.getElementById("addressProvince").value = addr.province;
+          if (addr.city) document.getElementById("addressCity").value = addr.city;
+        } catch(e) {
+          console.error("Erreur lors de la lecture de l'adresse depuis le localStorage", e);
+        }
+      }
 
       const hasNewArticle = localStorage.getItem("has_new_article");
       const badge = document.getElementById("newArticleBadge");
