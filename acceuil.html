@@ -1488,281 +1488,142 @@ document
     };
 
 async function loadProducts(userPreferences, forceRefresh = false) {
+  try {
+    const q = query(
+      collection(db, "produits"),
+      orderBy("createdAt", "desc")
+    );
 
-    try {
+    const querySnapshot = forceRefresh
+      ? await getDocsFromServer(q)
+      : await getDocs(q);
 
-        const q = query(
-            collection(db, "produits"),
-            orderBy("createdAt", "desc")
-        );
+    // 1. Initialisation des variables globales de la fonction
+    const vendeurCache = new Map();
+    const now = new Date();
+    let hasNewUnreadArticles = false;
+    const userCountry = userPreferences?.country || "";
 
-        const querySnapshot = forceRefresh
-            ? await getDocsFromServer(q)
-            : await getDocs(q);
+    // 2. Traitement et enrichissement des produits EN PARALLÈLE
+    const fetchedProducts = await Promise.all(
+      querySnapshot.docs.map(async (docSnap) => {
+        const product = {
+          id: docSnap.id,
+          ...docSnap.data()
+        };
 
-        const fetchedProducts = [];
+        // Nouveautés (< 24h)
+        if (product.createdAt) {
+          const createdDate = product.createdAt.toDate
+            ? product.createdAt.toDate()
+            : new Date(product.createdAt);
 
-        const vendeurCache = new Map();
-
-        const now = new Date();
-
-        let hasNewUnreadArticles = false;
-
-        // ==========================================
-        // 📦 RÉCUPÉRATION DES PRODUITS
-        // ==========================================
-
-        for (const docSnap of querySnapshot.docs) {
-
-            const product = {
-                id: docSnap.id,
-                ...docSnap.data()
-            };
-
-            // ==========================================
-            // 🆕 NOUVEAUTÉS
-            // ==========================================
-
-            if (product.createdAt) {
-
-                const createdDate =
-                    product.createdAt.toDate
-                        ? product.createdAt.toDate()
-                        : new Date(product.createdAt);
-
-                const hoursDiff =
-                    Math.abs(now - createdDate) / 36e5;
-
-                if (hoursDiff < 24) {
-                    hasNewUnreadArticles = true;
-                }
-            }
-
-            // ==========================================
-            // ❌ PRODUIT VENDU
-            // ==========================================
-
-            product.isSold =
-                product.vendu === true ||
-                product.statut === "vendu";
-
-            // ==========================================
-            // 👤 VENDEUR
-            // ==========================================
-
-            if (product.vendeurId) {
-
-                try {
-
-                    let vData =
-                        vendeurCache.get(product.vendeurId);
-
-                    if (!vData) {
-
-                        let vendeurSnap =
-                            await getDoc(
-                                doc(
-                                    db,
-                                    "vendeurs",
-                                    product.vendeurId
-                                )
-                            );
-
-                        if (!vendeurSnap.exists()) {
-
-                            vendeurSnap =
-                                await getDoc(
-                                    doc(
-                                        db,
-                                        "vendeurs_clients",
-                                        product.vendeurId
-                                    )
-                                );
-                        }
-
-                        if (vendeurSnap.exists()) {
-
-                            vData =
-                                vendeurSnap.data();
-
-                            vendeurCache.set(
-                                product.vendeurId,
-                                vData
-                            );
-                        }
-                    }
-
-                    if (vData) {
-
-                        const vAddr =
-                            vData.address || {};
-
-                        product.shopName =
-                            vData.shopName ||
-                            vData.displayName ||
-                            vData.nom ||
-                            "Boutique";
-
-                        product.city =
-                            vAddr.city ||
-                            vData.city ||
-                            vData.ville ||
-                            "";
-
-                        product.province =
-                            vAddr.province ||
-                            vData.province ||
-                            "";
-
-                        product.country =
-                            vAddr.country ||
-                            vData.country ||
-                            vData.pays ||
-                            "";
-
-                        // ==========================================
-                        // 🚀 BOOST COMPTE
-                        // ==========================================
-
-                        product.vendeurIsPremium =
-                            vData.isPremium === true &&
-                            vData.premiumUntil &&
-                            new Date(vData.premiumUntil) > now;
-
-                    }
-
-                } catch (err) {
-
-                    console.error(
-                        "Erreur vendeur :",
-                        err
-                    );
-
-                    product.shopName = "Boutique";
-                }
-            }
-
-            // ==========================================
-            // 🚀 BOOST ARTICLE
-            // ==========================================
-
-            product.isItemBoosted =
-                product.isBoosted === true &&
-                product.boostUntil &&
-                new Date(product.boostUntil) > now;
-
-            // ==========================================
-            // 🚀 BOOST COMPTE
-            // ==========================================
-
-            product.isAccountBoosted =
-                product.vendeurIsPremium === true;
-
-            // ==========================================
-            // ⭐ STYLE BOOST
-            // ==========================================
-
-            product.hasBoostStyle =
-                product.isItemBoosted ||
-                product.isAccountBoosted;
-
-            // ==========================================
-            // 🌍 VISIBILITÉ BOOST
-            // ==========================================
-
-            let isBoostedForCurrentUser = false;
-
-            if (product.hasBoostStyle) {
-
-                const isSameCountry =
-                    userCountry &&
-                    product.country &&
-                    userCountry
-                        .toLowerCase()
-                        .trim() ===
-                    product.country
-                        .toLowerCase()
-                        .trim();
-
-                if (isSameCountry) {
-
-                    isBoostedForCurrentUser = true;
-
-                } else {
-
-                    // 1% pour les boosts étrangers
-                    isBoostedForCurrentUser =
-                        Math.random() < 0.01;
-                }
-            }
-
-            product.isBoostedActive =
-                isBoostedForCurrentUser;
-
-            fetchedProducts.push(product);
+          const hoursDiff = Math.abs(now - createdDate) / 36e5;
+          if (hoursDiff < 24) {
+            hasNewUnreadArticles = true;
+          }
         }
 
-        // ==========================================
-        // 🔴 BADGES NOUVEAUTÉS
-        // ==========================================
+        // Produit vendu
+        product.isSold = product.vendu === true || product.statut === "vendu";
 
-        const profileBadge =
-            document.getElementById("profileBadge");
+        // Chargement du vendeur avec cache
+        if (product.vendeurId) {
+          try {
+            let vData = vendeurCache.get(product.vendeurId);
 
-        const tabBadge =
-            document.getElementById("tabBadge");
-
-        if (hasNewUnreadArticles) {
-
-            if (profileBadge) {
-                profileBadge.style.display = "block";
+            if (!vData) {
+              let vendeurSnap = await getDoc(doc(db, "vendeurs", product.vendeurId));
+              if (!vendeurSnap.exists()) {
+                vendeurSnap = await getDoc(doc(db, "vendeurs_clients", product.vendeurId));
+              }
+              if (vendeurSnap.exists()) {
+                vData = vendeurSnap.data();
+                vendeurCache.set(product.vendeurId, vData);
+              }
             }
 
-            if (tabBadge) {
-                tabBadge.style.display = "block";
+            if (vData) {
+              const vAddr = vData.address || {};
+              product.shopName = vData.shopName || vData.displayName || vData.nom || "Boutique";
+              product.city = vAddr.city || vData.city || vData.ville || "";
+              product.province = vAddr.province || vData.province || "";
+              product.country = vAddr.country || vData.country || vData.pays || "";
+
+              product.vendeurIsPremium =
+                vData.isPremium === true &&
+                vData.premiumUntil &&
+                new Date(vData.premiumUntil) > now;
             }
+          } catch (err) {
+            console.error("Erreur vendeur :", err);
+            product.shopName = "Boutique";
+          }
         }
 
-        // ==========================================
-        // 🧠 MOTEUR DE FEED VEA
-        // ==========================================
+        // Statuts de Boost
+        product.isItemBoosted =
+          product.isBoosted === true &&
+          product.boostUntil &&
+          new Date(product.boostUntil) > now;
 
-        // 1️⃣ On récupère TOUS les produits
-        allProducts = fetchedProducts;
+        product.isAccountBoosted = product.vendeurIsPremium === true;
+        product.hasBoostStyle = product.isItemBoosted || product.isAccountBoosted;
 
-// 2️⃣ On calcule le score de chaque produit
-        allProducts = buildPersonalizedFeed(allProducts);
+        // Visibilité du Boost
+        let isBoostedForCurrentUser = false;
+        if (product.hasBoostStyle) {
+          const isSameCountry =
+            userCountry &&
+            product.country &&
+            userCountry.toLowerCase().trim() === product.country.toLowerCase().trim();
 
-// 3️⃣ On sélectionne seulement 20 produits
-        currentFeedProducts = selectFeedBatch(allProducts);
+          if (isSameCountry) {
+            isBoostedForCurrentUser = true;
+          } else {
+            // 1% de chance pour les boosts d'autres pays
+            isBoostedForCurrentUser = Math.random() < 0.01;
+          }
+        }
 
-        console.log(
-          "🔥 FEED VEA :",
-          currentFeedProducts.map(p => ({
-              id: p.id,
-              nom: p.nom,
-              score: Math.round(p.feedScore),
-              boostCompte: p.isAccountBoosted,
-              boostArticle: p.isItemBoosted,
-              vu: !!feedSeenProducts[p.id]
-          }))
-        );
+        product.isBoostedActive = isBoostedForCurrentUser;
 
-        // ==========================================
-        // 🎯 AFFICHAGE
-        // ==========================================
+        return product;
+      })
+    );
 
-        // IMPORTANT : on affiche le lot de 20,
-        // pas tous les produits.
-        renderProducts(currentFeedProducts);
+    // 3. Badges nouveautés
+    const profileBadge = document.getElementById("profileBadge");
+    const tabBadge = document.getElementById("tabBadge");
 
-    } catch (e) {
-
-        console.error(
-            "Erreur chargement articles:",
-            e
-        );
+    if (hasNewUnreadArticles) {
+      if (profileBadge) profileBadge.style.display = "block";
+      if (tabBadge) tabBadge.style.display = "block";
     }
+
+    // 4. Moteur de Feed VEA
+    allProducts = fetchedProducts;
+    allProducts = buildPersonalizedFeed(allProducts);
+    currentFeedProducts = selectFeedBatch(allProducts);
+
+    console.log(
+      "🔥 FEED VEA :",
+      currentFeedProducts.map((p) => ({
+        id: p.id,
+        nom: p.nom,
+        score: Math.round(p.feedScore),
+        boostCompte: p.isAccountBoosted,
+        boostArticle: p.isItemBoosted,
+        vu: !!feedSeenProducts[p.id]
+      }))
+    );
+
+    // 5. Affichage
+    renderProducts(currentFeedProducts);
+
+  } catch (e) {
+    console.error("Erreur chargement articles:", e);
+  }
 }
 
 function buildPersonalizedFeed(products) {
