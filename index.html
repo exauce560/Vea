@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VEA Market - Votre Marketplace Shopping</title>
+  <style>
+    :root {
+      --primary-blue: #0056b3;
+      --primary-hover: #004085;
+      --bg-light: #f8f9fa;
+      --text-dark: #212529;
+      --text-muted: #6c757d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header / Navbar */
+    header {
+      background-color: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .hero h1 span {
+      color: var(--primary-blue);
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Gallery Section */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Options de Téléchargement / Accès */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .btn-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    /* Bouton Android (Bleu Pur) */
+    .btn-android {
+      background-color: var(--primary-blue);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3);
+    }
+
+    .btn-android:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Bouton PWA / iOS (Blanc & Bordure) */
+    .btn-pwa {
+      background-color: #ffffff;
+      color: var(--text-dark);
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-pwa:hover {
+      border-color: var(--primary-blue);
+      color: var(--primary-blue);
+    }
+
+    .btn-action svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: #ffffff;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">VEA MARKET</div>
+  </header>
+
+  <!-- Contenu Principal -->
+  <main class="hero">
+    <h1>Achetez et vendez sur <span>VEA Market</span></h1>
+    <p>Découvrez la mode, les chaussures et les accessoires tendance près de chez vous. Choisissez votre mode d'accès pour commencer.</p>
+
+    <!-- Galerie d'images Unsplash -->
+    <section class="gallery">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80" alt="Magasin de vêtements" loading="lazy" />
+        <div class="card-body">
+          <div class="card-title">Boutiques & Mode</div>
+          <div class="card-subtitle">Des milliers d'articles tendance</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Chaussures Sneakers" loading="lazy" />
+        <div class="card-body">
+          <div class="card-title">Chaussures & Sneakers</div>
+          <div class="card-subtitle">Les plus grandes marques disponibles</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80" alt="Shopping vêtements" loading="lazy" />
+        <div class="card-body">
+          <div class="card-title">Vente entre particuliers</div>
+          <div class="card-subtitle">Faites de bonnes affaires en direct</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Boutons d'accès -->
+    <section class="actions">
+      <!-- Option Android : Télécharge l'APK -->
+      <a href="./vea-market.apk" download="vea-market.apk" class="btn-action btn-android">
+        <svg viewBox="0 0 24 24">
+          <path d="M17.523 15.3414C17.0622 15.3414 16.6875 14.9668 16.6875 14.5059C16.6875 14.0451 17.0622 13.6705 17.523 13.6705C17.9839 13.6705 18.3586 14.0451 18.3586 14.5059C18.3586 14.9668 17.9839 15.3414 17.523 15.3414ZM6.47695 15.3414C6.0161 15.3414 5.64143 14.9668 5.64143 14.5059C5.64143 14.0451 6.0161 13.6705 6.47695 13.6705C6.9378 13.6705 7.31248 14.0451 7.31248 14.5059C7.31248 14.9668 6.9378 15.3414 6.47695 15.3414ZM17.8441 9.87321L19.5398 6.93608C19.6826 6.68884 19.598 6.37258 19.3508 6.22981C19.1035 6.08703 18.7873 6.17163 18.6445 6.41887L16.9082 9.42588C15.4222 8.74838 13.7652 8.35645 12 8.35645C10.2348 8.35645 8.57778 8.74838 7.0918 9.42588L5.35547 6.41887C5.2127 6.17163 4.89644 6.08703 4.6492 6.22981C4.40196 6.37258 4.31736 6.68884 4.46014 6.93608L6.15586 9.87321C2.69766 11.758 0.322266 15.2285 0 19.3125H24C23.6777 15.2285 21.3023 11.758 17.8441 9.87321Z"/>
+        </svg>
+        Application Android (.APK)
+      </a>
+
+      <!-- Option PWA / Web : Redirige vers verification.html -->
+      <a href="verification.html" class="btn-action btn-pwa">
+        <svg viewBox="0 0 24 24">
+          <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09999 22C7.78999 22.05 6.79999 20.68 5.95999 19.47C4.24999 17 2.93999 12.45 4.69999 9.39C5.56999 7.87 7.12999 6.91 8.81999 6.88C10.1 6.86 11.32 7.75 12.11 7.75 C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+        </svg>
+        Version Web / iPhone (PWA)
+      </a>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 VEA Market. Tous droits réservés.
+  </footer>
+
+</body>
+</html>
