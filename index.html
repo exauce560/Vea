@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VEA Market - Votre Marketplace Shopping</title>
+  <title>Vea Market - Votre Marketplace Shopping</title>
   <style>
     :root {
       --primary-blue: #0056b3;
       --primary-hover: #004085;
-      --african-gold: #e67e22;
-      --african-terracotta: #d35400;
-      --bg-light: #fcfbf7;
-      --text-dark: #212529;
-      --text-muted: #55595c;
-      --card-border: #f3e5d8;
+      --african-gold: #ff9f43;
+      --african-terracotta: #ee5253;
+      --whatsapp-green: #25d366;
+      --bg-light: #f4f6f9;
+      --text-dark: #1e272e;
+      --text-muted: #576574;
     }
 
     * {
@@ -25,9 +25,8 @@
 
     body {
       background-color: var(--bg-light);
-      /* Subtil motif géométrique d'inspiration africaine en arrière-plan */
-      background-image: radial-gradient(rgba(230, 126, 34, 0.08) 1px, transparent 0);
-      background-size: 24px 24px;
+      background-image: radial-gradient(rgba(255, 159, 67, 0.12) 1px, transparent 0);
+      background-size: 20px 20px;
       color: var(--text-dark);
       display: flex;
       flex-direction: column;
@@ -37,311 +36,341 @@
     /* Header / Navbar */
     header {
       background-color: #ffffff;
-      padding: 1rem 1.5rem;
+      padding: 0.8rem 1.2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
       border-bottom: 3px solid var(--african-gold);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
       object-fit: cover;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     .logo {
-      font-size: 1.4rem;
-      font-weight: 800;
+      font-size: 1.3rem;
+      font-weight: 900;
       color: var(--primary-blue);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
-    /* Hero Section */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 2rem 1rem;
+    /* Conteneur principal */
+    .container {
+      padding: 1.2rem 1rem;
       max-width: 1200px;
       margin: 0 auto;
+      width: 100%;
       flex: 1;
     }
 
-    .hero h1 {
+    /* Hero Section Visual-First */
+    .hero-title {
+      text-align: center;
       font-size: 1.8rem;
-      margin-bottom: 0.8rem;
-      color: var(--text-dark);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
       line-height: 1.2;
     }
 
-    .hero h1 span {
+    .hero-title span {
       color: var(--primary-blue);
     }
 
-    .hero .subtitle {
-      font-size: 1rem;
-      color: var(--text-muted);
-      max-width: 700px;
-      margin-bottom: 2rem;
-      line-height: 1.5;
-    }
-
-    /* Guide rapide d'utilisation */
-    .user-guide {
-      background: linear-gradient(135deg, #ffffff, #fffaf5);
-      border: 1px solid var(--card-border);
-      border-left: 5px solid var(--african-terracotta);
-      border-radius: 12px;
-      padding: 1.2rem;
-      margin-bottom: 2rem;
-      width: 100%;
-      max-width: 800px;
-      text-align: left;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    }
-
-    .user-guide h2 {
-      font-size: 1.1rem;
-      color: var(--african-terracotta);
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .user-guide ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    .hero-subtitle {
+      text-align: center;
       font-size: 0.95rem;
-      color: var(--text-dark);
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
     }
 
-    .user-guide li strong {
-      color: var(--primary-blue);
-    }
-
-    /* Gallery Section */
-    .gallery {
+    /* BOUTONS D'ACCÈS SUR MOBILE (EN HAUT DIRECTEMENT) */
+    .actions {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 1.2rem;
+      gap: 0.8rem;
       width: 100%;
-      margin-bottom: 2.5rem;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-      border: 1px solid var(--card-border);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(230, 126, 34, 0.15);
-    }
-
-    .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .card-body {
-      padding: 1rem;
-      text-align: left;
-    }
-
-    .card-title {
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin-bottom: 0.3rem;
-      color: var(--text-dark);
-    }
-
-    .card-subtitle {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    /* Options de Téléchargement / Accès */
-    .actions {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-      max-width: 700px;
-      margin-bottom: 3rem;
+      margin-bottom: 1.8rem;
     }
 
     .btn-action {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 1rem 1.5rem;
+      gap: 10px;
+      padding: 0.9rem 1rem;
       border-radius: 12px;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-      width: 100%;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: center;
     }
 
-    /* Bouton Android */
+    .btn-action:active {
+      transform: scale(0.98);
+    }
+
     .btn-android {
       background-color: var(--primary-blue);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3);
     }
 
-    .btn-android:hover {
-      background-color: var(--primary-hover);
-    }
-
-    /* Bouton PWA / iOS */
     .btn-pwa {
       background-color: #ffffff;
       color: var(--text-dark);
-      border: 2px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-pwa:hover {
-      border-color: var(--primary-blue);
-      color: var(--primary-blue);
+      border: 2px solid #dcdde1;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
     }
 
     .btn-action svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       fill: currentColor;
       flex-shrink: 0;
     }
 
-    /* Section Présentation Détaillée (40+ lignes d'explications) */
-    .about-section {
+    /* ENCADRÉ VISUEL SUR LES AVANTAGES CLÉS (RÉASSURANCE) */
+    .key-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .feature-card {
       background: #ffffff;
-      border-radius: 16px;
-      padding: 2rem 1.5rem;
-      margin-bottom: 2.5rem;
-      width: 100%;
-      max-width: 900px;
+      border-radius: 12px;
+      padding: 0.9rem 0.8rem;
+      border: 1px solid #f1f2f6;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+
+    .feature-icon {
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .feature-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .feature-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .feature-card.highlight {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #e3f2fd, #ffffff);
+      border: 1.5 solid #90caf9;
+      flex-direction: row;
       text-align: left;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      padding: 1rem;
+    }
+
+    .feature-card.highlight .feature-icon {
+      font-size: 2.2rem;
+    }
+
+    /* GRILLE D'ARTICLES / CATEGORIES (MOBILE: 2 COLONNES) */
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur mobile */
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .product-card {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f1f2f6;
       position: relative;
     }
 
-    .about-section::before {
-      content: "";
+    .product-card img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .product-badge {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-blue), var(--african-gold), var(--african-terracotta));
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
 
-    .about-section h2 {
-      font-size: 1.5rem;
-      color: var(--primary-blue);
-      margin-bottom: 1rem;
+    .product-info {
+      padding: 0.6rem;
     }
 
-    .about-section h3 {
-      font-size: 1.15rem;
+    .product-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-tag {
+      font-size: 0.7rem;
       color: var(--african-terracotta);
-      margin-top: 1.5rem;
+      font-weight: 600;
+    }
+
+    /* MINI SECTION POURQUOI VEA (VISUEL RAPIDE) */
+    .mini-about {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1.2rem;
+      border-top: 4px solid var(--african-gold);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      margin-bottom: 2rem;
+    }
+
+    .mini-about h3 {
+      font-size: 1.1rem;
       margin-bottom: 0.6rem;
+      color: var(--primary-blue);
     }
 
-    .about-section p {
-      font-size: 0.95rem;
-      line-height: 1.6;
+    .mini-about p {
+      font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      line-height: 1.4;
+      margin-bottom: 0.8rem;
     }
 
-    .about-section ul {
-      margin-left: 1.2rem;
-      margin-bottom: 1rem;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
-    .about-section li {
-      margin-bottom: 0.4rem;
+    .tag {
+      background: #f1f2f6;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dark);
     }
 
     /* Footer */
     footer {
       text-align: center;
-      padding: 1.5rem;
+      padding: 1rem;
       background-color: #ffffff;
       color: var(--text-muted);
-      font-size: 0.85rem;
-      border-top: 1px solid #e2e8f0;
-      margin-top: auto;
+      font-size: 0.8rem;
+      border-top: 1px solid #dcdde1;
     }
 
-    /* Media Queries pour la réactivité (Écrans PC et Tablettes) */
+    /* MEDIA QUERIES (ÉCRANS PC & TABLETTES) */
     @media (min-width: 768px) {
       header {
         padding: 1rem 3rem;
       }
 
-      .logo {
-        font-size: 1.6rem;
+      .container {
+        padding: 2.5rem 2rem;
       }
 
-      .hero {
-        padding: 3.5rem 2rem;
+      .hero-title {
+        font-size: 2.4rem;
       }
 
-      .hero h1 {
-        font-size: 2.6rem;
-      }
-
-      .hero .subtitle {
-        font-size: 1.15rem;
-      }
-
-      .gallery {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.8rem;
+      .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
       }
 
       .actions {
-        flex-direction: row;
+        grid-template-columns: 1fr 1fr;
+        max-width: 600px;
+        margin: 0 auto 2.5rem auto;
       }
 
-      .btn-action {
-        flex: 1;
+      .key-features {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
       }
 
-      .about-section {
-        padding: 2.5rem 2.5rem;
+      .feature-card.highlight {
+        grid-column: span 4;
+      }
+
+      .catalog-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 colonnes sur PC */
+        gap: 1.2rem;
+      }
+
+      .product-card img {
+        height: 180px;
+      }
+
+      .product-info {
+        padding: 0.9rem;
+      }
+
+      .product-title {
+        font-size: 1rem;
+      }
+
+      .product-tag {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .catalog-grid {
+        grid-template-columns: repeat(6, 1fr); /* 6 colonnes sur grand écran */
+      }
+      .product-card img {
+        height: 150px;
       }
     }
   </style>
@@ -351,105 +380,140 @@
   <!-- Header -->
   <header>
     <div class="brand">
-      <img src="apple-touch-icon.png" alt="Icône VEA Market" class="brand-icon" />
+      <img src="apple-touch-icon.png" alt="VEA" class="brand-icon" />
       <div class="logo">VEA MARKET</div>
     </div>
   </header>
 
-  <!-- Contenu Principal -->
-  <main class="hero">
-    <h1>Achetez et vendez sur <span>VEA Market</span></h1>
-    <p class="subtitle">La plateforme incontournable d'achat et de vente. Trouvez de la mode, des produits cosmétiques, du matériel électronique pro et du mobilier près de chez vous.</p>
+  <div class="container">
+    
+    <!-- En-tête -->
+    <h1 class="hero-title">Achetez & Vendez sur <span>VEA Market</span></h1>
+    <p class="hero-subtitle">La marketplace 100% directe, simple et rapide.</p>
 
-    <!-- Guide rapide d'utilisation -->
-    <section class="user-guide">
-      <h2> Comment accéder à l'application ?</h2>
-      <ul>
-        <li> Si vous utilisez un smartphone <strong>Android</strong> : Cliquez sur le bouton bleu <strong>« Application Android (.APK) »</strong> pour lancer le téléchargement direct de votre application mobile.</li>
-        <li> Si vous êtes sur <strong>iPhone (iOS) ou sur Ordinateur</strong> : Cliquez sur le bouton blanc <strong>« Version Web / iPhone (PWA) »</strong> pour accéder directement à la marketplace en ligne sans téléchargement.</li>
-      </ul>
-    </section>
-
-    <!-- Galerie d'images -->
-    <section class="gallery">
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80" alt="Boutiques & Mode" loading="lazy" />
-        <div class="card-body">
-          <div class="card-title">Mode, Habits & Chaussures</div>
-          <div class="card-subtitle">Découvrez des vêtements tendance, chaussures de marque et styles uniques.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80" alt="Cosmétiques et Perruques" loading="lazy" />
-        <div class="card-body">
-          <div class="card-title">Cosmétiques & Perruques</div>
-          <div class="card-subtitle">Produits de beauté, soins capillaires, perruques de qualité et accessoires.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=80" alt="Électronique et Meubles" loading="lazy" />
-        <div class="card-body">
-          <div class="card-title"> High-Tech & Mobilier</div>
-          <div class="card-subtitle">Appareils électroniques pros, smartphones, ordinateurs et meubles pour la maison.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Boutons d'accès -->
+    <!-- Boutons d'accès (Mis en avant directement) -->
     <section class="actions">
-      <!-- Option Android : Télécharge l'APK -->
       <a href="https://github.com/exauce560/Vea/releases/download/v1.0.0/vea-market.apk" class="btn-action btn-android">
         <svg viewBox="0 0 24 24">
           <path d="M17.523 15.3414C17.0622 15.3414 16.6875 14.9668 16.6875 14.5059C16.6875 14.0451 17.0622 13.6705 17.523 13.6705C17.9839 13.6705 18.3586 14.0451 18.3586 14.5059C18.3586 14.9668 17.9839 15.3414 17.523 15.3414ZM6.47695 15.3414C6.0161 15.3414 5.64143 14.9668 5.64143 14.5059C5.64143 14.0451 6.0161 13.6705 6.47695 13.6705C6.9378 13.6705 7.31248 14.0451 7.31248 14.5059C7.31248 14.9668 6.9378 15.3414 6.47695 15.3414ZM17.8441 9.87321L19.5398 6.93608C19.6826 6.68884 19.598 6.37258 19.3508 6.22981C19.1035 6.08703 18.7873 6.17163 18.6445 6.41887L16.9082 9.42588C15.4222 8.74838 13.7652 8.35645 12 8.35645C10.2348 8.35645 8.57778 8.74838 7.0918 9.42588L5.35547 6.41887C5.2127 6.17163 4.89644 6.08703 4.6492 6.22981C4.40196 6.37258 4.31736 6.68884 4.46014 6.93608L6.15586 9.87321C2.69766 11.758 0.322266 15.2285 0 19.3125H24C23.6777 15.2285 21.3023 11.758 17.8441 9.87321Z"/>
         </svg>
-        Application Android (.APK)
+        Télécharger l'Application (.APK)
       </a>
 
-      <!-- Option PWA / Web : Redirige vers verification.html -->
       <a href="verification.html" class="btn-action btn-pwa">
         <svg viewBox="0 0 24 24">
           <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09999 22C7.78999 22.05 6.79999 20.68 5.95999 19.47C4.24999 17 2.93999 12.45 4.69999 9.39C5.56999 7.87 7.12999 6.91 8.81999 6.88C10.1 6.86 11.32 7.75 12.11 7.75 C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
         </svg>
-        Version Web / iPhone (PWA)
+        Utiliser la Version Web / iPhone
       </a>
     </section>
 
-    <!-- Section Présentation Détaillée de VEA Market -->
-    <article class="about-section">
-      <h2>À propos de VEA Market</h2>
-      <p> Bienvenue sur <strong>VEA Market</strong>, votre place de marché dynamique conçue pour faciliter le commerce de proximité et la vente en ligne de manière fluide, conviviale et sécurisée. Inspirée par l'énergie et la convivialité des grands marchés africains contemporains, VEA Market rassemble acheteurs et vendeurs au sein d'une même plateforme intuitive accessible sur mobile et ordinateur.</p>
+    <!-- Avantages Convaincants (Visual Grid) -->
+    <section class="key-features">
+      <div class="feature-card highlight">
+        <div class="feature-icon">💬</div>
+        <div>
+          <div class="feature-title">Discussion WhatsApp Directe</div>
+          <div class="feature-desc">Discutez directement avec le vendeur avant d'acheter. Aucun intermédiaire !</div>
+        </div>
+      </div>
 
-      <p>Notre mission principale est d'offrir une vitrine digitale puissante aux commerçants, créateurs, indépendants ainsi qu'aux particuliers qui souhaitent renouveler leur garde-robe ou vendre des objets du quotidien. Grâce à des outils simples et modernes, chacun peut créer sa boutique en quelques secondes, publier ses articles et entrer en contact direct avec ses clients.</p>
+      <div class="feature-card">
+        <div class="feature-icon">💵</div>
+        <div class="feature-title">Paiement en Espèces</div>
+        <div class="feature-desc">Pas de paiement sur l'application. Payez de main à main à la livraison.</div>
+      </div>
 
-      <h3>Une diversité d'articles pour tous les besoins</h3>
-      <p>Sur VEA Market, vous découvrirez un large éventail de catégories soigneusement organisées pour répondre à toutes vos envies :</p>
-      <ul>
-        <li><strong>Mode & Vêtements :</strong> Une vaste sélection d'habits pour hommes, femmes et enfants, allant du prêt-à-porter moderne aux tenues traditionnelles, en passant par les créations uniques.</li>
-        <li><strong>Chaussures & Sneakers :</strong> Des modèles pour tous les styles et toutes les occasions, des paires de ville élégantes aux baskets tendance de grandes marques.</li>
-        <li><strong>Cosmétiques & Soins :</strong> Des produits de beauté, crèmes, maquillage et soins capillaires spécialement sélectionnés pour mettre en valeur votre beauté au quotidien.</li>
-        <li><strong>Perruques & Coiffure :</strong> Un grand choix de perruques naturelles et synthétiques, mèches et accessoires pour changer de look au gré de vos envies.</li>
-        <li><strong>Mobilier & Décoration :</strong> Des meubles confortables pour le salon, la chambre ou le bureau, permettant d'aménager votre intérieur avec goût.</li>
-        <li><strong>Électronique Professionnelle & High-Tech :</strong> Des smartphones, ordinateurs portables, accessoires électroniques et équipements professionnels récents et performants.</li>
-      </ul>
+      <div class="feature-card">
+        <div class="feature-icon">❤️</div>
+        <div class="feature-title">Favoris & Recommandations</div>
+        <div class="feature-desc">Sauvegardez vos coups de cœur pour les acheter plus tard.</div>
+      </div>
+    </section>
 
-      <h3>Pourquoi choisir VEA Market ?</h3>
-      <p>VEA Market n'est pas une simple plateforme de e-commerce classique, c'est une véritable communauté marchande. Que vous recherchiez du matériel de qualité professionnelle ou une bonne affaire entre particuliers, notre plateforme garantit une expérience optimale grâce à :</p>
-      <ul>
-        <li>Une interface rapide, légère et conçue pour consommer très peu de données mobiles.</li>
-        <li>Une compatibilité parfaite avec tous les appareils : application Android dédiée ou version Web/PWA pour iOS et ordinateurs.</li>
-        <li>Une mise en relation directe entre vendeurs et acheteurs pour des négociations transparentes et équitables.</li>
-        <li>La mise en valeur des commerces locaux et du savoir-faire régional.</li>
-      </ul>
+    <!-- Galerie d'Articles (6 Catégories en Grille Mobile 2x3) -->
+    <h2 class="section-title">🛍️ Explorez nos Rayons</h2>
+    <section class="catalog-grid">
+      
+      <!-- 1. Habits -->
+      <div class="product-card">
+        <div class="product-badge">❤️</div>
+        <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=400&q=80" alt="Habits & Mode" loading="lazy" />
+        <div class="product-info">
+          <div class="product-title">Habits & Tendance</div>
+          <div class="product-tag">Mode Homme / Femme</div>
+        </div>
+      </div>
 
-      <p>Rejoignez la communauté VEA Market dès aujourd'hui. Choisissez l'option qui vous convient ci-dessus et commencez à explorer nos offres ou à mettre vos propres produits en ligne en toute simplicité !</p>
-    </article>
-  </main>
+      <!-- 2. Chaussures -->
+      <div class="product-card">
+        <div class="product-badge">❤️</div>
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80" alt="Chaussures" loading="lazy" />
+        <div class="product-info">
+          <div class="product-title">Chaussures & Baskets</div>
+          <div class="product-tag">Toutes marques</div>
+        </div>
+      </div>
+
+      <!-- 3. Cosmétiques -->
+      <div class="product-card">
+        <div class="product-badge">❤️</div>
+        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=400&q=80" alt="Cosmétiques" loading="lazy" />
+        <div class="product-info">
+          <div class="product-title">Cosmétiques & Soins</div>
+          <div class="product-tag">Beauté & Éclat</div>
+        </div>
+      </div>
+
+      <!-- 4. Perruques -->
+      <div class="product-card">
+        <div class="product-badge">❤️</div>
+        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=400&q=80" alt="Perruques" loading="lazy" />
+        <div class="product-info">
+          <div class="product-title">Perruques & Mèches</div>
+          <div class="product-tag">Qualité supérieure</div>
+        </div>
+      </div>
+
+      <!-- 5. Meubles -->
+      <div class="product-card">
+        <div class="product-badge">❤️</div>
+        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80" alt="Meubles" loading="lazy" />
+        <div class="product-info">
+          <div class="product-title">Meubles & Deco</div>
+          <div class="product-tag">Pour la maison</div>
+        </div>
+      </div>
+
+      <!-- 6. Électronique Pro -->
+      <div class="product-card">
+        <div class="product-badge">❤️</div>
+        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80" alt="Électronique Pro" loading="lazy" />
+        <div class="product-info">
+          <div class="product-title">High-Tech & Pro</div>
+          <div class="product-tag">Phones & Laptops</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Mini section résumé -->
+    <section class="mini-about">
+      <h3>🌍 La Marketplace Africaine Intuitive</h3>
+      <p>VEA Market est conçue pour être rapide et économique en données mobiles. Retrouvez vos articles préférés et négociez en direct.</p>
+      <div class="tags-container">
+        <span class="tag">#ContactWhatsApp</span>
+        <span class="tag">#PaiementCash</span>
+        <span class="tag">#Favoris</span>
+        <span class="tag">#AffairesDirectes</span>
+      </div>
+    </section>
+
+  </div>
 
   <!-- Footer -->
   <footer>
-    &copy; 2026 VEA Market. Tous droits réservés.
+    &copy; 2026 Vea Market. Tous droits réservés.
   </footer>
 
 </body>
