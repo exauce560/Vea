@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vea Market - Votre Marketplace Shopping</title>
+  <title>VEA Market - Votre Marketplace Shopping</title>
   <style>
     :root {
       --primary-blue: #0056b3;
       --primary-hover: #004085;
-      --bg-light: #f8f9fa;
+      --african-gold: #e67e22;
+      --african-terracotta: #d35400;
+      --bg-light: #fcfbf7;
       --text-dark: #212529;
-      --text-muted: #6c757d;
+      --text-muted: #55595c;
+      --card-border: #f3e5d8;
     }
 
     * {
@@ -22,6 +25,9 @@
 
     body {
       background-color: var(--bg-light);
+      /* Subtil motif géométrique d'inspiration africaine en arrière-plan */
+      background-image: radial-gradient(rgba(230, 126, 34, 0.08) 1px, transparent 0);
+      background-size: 24px 24px;
       color: var(--text-dark);
       display: flex;
       flex-direction: column;
@@ -31,15 +37,30 @@
     /* Header / Navbar */
     header {
       background-color: #ffffff;
-      padding: 1rem 2rem;
+      padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-bottom: 3px solid var(--african-gold);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     .logo {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: var(--primary-blue);
       text-transform: uppercase;
@@ -52,53 +73,93 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 3rem 1.5rem;
+      padding: 2rem 1rem;
       max-width: 1200px;
       margin: 0 auto;
       flex: 1;
     }
 
     .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      margin-bottom: 0.8rem;
       color: var(--text-dark);
+      line-height: 1.2;
     }
 
     .hero h1 span {
       color: var(--primary-blue);
     }
 
-    .hero p {
-      font-size: 1.1rem;
+    .hero .subtitle {
+      font-size: 1rem;
       color: var(--text-muted);
-      max-width: 600px;
-      margin-bottom: 2.5rem;
+      max-width: 700px;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    /* Guide rapide d'utilisation */
+    .user-guide {
+      background: linear-gradient(135deg, #ffffff, #fffaf5);
+      border: 1px solid var(--card-border);
+      border-left: 5px solid var(--african-terracotta);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 2rem;
+      width: 100%;
+      max-width: 800px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .user-guide h2 {
+      font-size: 1.1rem;
+      color: var(--african-terracotta);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-guide ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+    }
+
+    .user-guide li strong {
+      color: var(--primary-blue);
     }
 
     /* Gallery Section */
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
       width: 100%;
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
     }
 
     .card {
       background: #fff;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      transition: transform 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--card-border);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .card:hover {
       transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(230, 126, 34, 0.15);
     }
 
     .card img {
       width: 100%;
-      height: 220px;
+      height: 200px;
       object-fit: cover;
     }
 
@@ -108,24 +169,26 @@
     }
 
     .card-title {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 1.1rem;
       margin-bottom: 0.3rem;
+      color: var(--text-dark);
     }
 
     .card-subtitle {
       color: var(--text-muted);
       font-size: 0.9rem;
+      line-height: 1.4;
     }
 
     /* Options de Téléchargement / Accès */
     .actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
       width: 100%;
       max-width: 700px;
+      margin-bottom: 3rem;
     }
 
     .btn-action {
@@ -133,28 +196,27 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      padding: 1rem 2rem;
+      padding: 1rem 1.5rem;
       border-radius: 12px;
       text-decoration: none;
       font-weight: 600;
       font-size: 1rem;
       transition: all 0.2s ease;
-      flex: 1;
-      min-width: 250px;
+      width: 100%;
     }
 
-    /* Bouton Android (Bleu Pur) */
+    /* Bouton Android */
     .btn-android {
       background-color: var(--primary-blue);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.25);
     }
 
     .btn-android:hover {
       background-color: var(--primary-hover);
     }
 
-    /* Bouton PWA / iOS (Blanc & Bordure) */
+    /* Bouton PWA / iOS */
     .btn-pwa {
       background-color: #ffffff;
       color: var(--text-dark);
@@ -171,6 +233,65 @@
       width: 24px;
       height: 24px;
       fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Section Présentation Détaillée (40+ lignes d'explications) */
+    .about-section {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      margin-bottom: 2.5rem;
+      width: 100%;
+      max-width: 900px;
+      text-align: left;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+
+    .about-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--african-gold), var(--african-terracotta));
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+
+    .about-section h2 {
+      font-size: 1.5rem;
+      color: var(--primary-blue);
+      margin-bottom: 1rem;
+    }
+
+    .about-section h3 {
+      font-size: 1.15rem;
+      color: var(--african-terracotta);
+      margin-top: 1.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .about-section p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .about-section ul {
+      margin-left: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .about-section li {
+      margin-bottom: 0.4rem;
     }
 
     /* Footer */
@@ -181,6 +302,47 @@
       color: var(--text-muted);
       font-size: 0.85rem;
       border-top: 1px solid #e2e8f0;
+      margin-top: auto;
+    }
+
+    /* Media Queries pour la réactivité (Écrans PC et Tablettes) */
+    @media (min-width: 768px) {
+      header {
+        padding: 1rem 3rem;
+      }
+
+      .logo {
+        font-size: 1.6rem;
+      }
+
+      .hero {
+        padding: 3.5rem 2rem;
+      }
+
+      .hero h1 {
+        font-size: 2.6rem;
+      }
+
+      .hero .subtitle {
+        font-size: 1.15rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.8rem;
+      }
+
+      .actions {
+        flex-direction: row;
+      }
+
+      .btn-action {
+        flex: 1;
+      }
+
+      .about-section {
+        padding: 2.5rem 2.5rem;
+      }
     }
   </style>
 </head>
@@ -188,37 +350,49 @@
 
   <!-- Header -->
   <header>
-    <div class="logo">VEA MARKET</div>
+    <div class="brand">
+      <img src="apple-touch-icon.png" alt="Icône VEA Market" class="brand-icon" />
+      <div class="logo">VEA MARKET</div>
+    </div>
   </header>
 
   <!-- Contenu Principal -->
   <main class="hero">
     <h1>Achetez et vendez sur <span>VEA Market</span></h1>
-    <p>Découvrez la mode, les chaussures et les accessoires tendance près de chez vous. Choisissez votre mode d'accès pour commencer.</p>
+    <p class="subtitle">La plateforme incontournable d'achat et de vente. Trouvez de la mode, des produits cosmétiques, du matériel électronique pro et du mobilier près de chez vous.</p>
 
-    <!-- Galerie d'images Unsplash -->
+    <!-- Guide rapide d'utilisation -->
+    <section class="user-guide">
+      <h2> Comment accéder à l'application ?</h2>
+      <ul>
+        <li> Si vous utilisez un smartphone <strong>Android</strong> : Cliquez sur le bouton bleu <strong>« Application Android (.APK) »</strong> pour lancer le téléchargement direct de votre application mobile.</li>
+        <li> Si vous êtes sur <strong>iPhone (iOS) ou sur Ordinateur</strong> : Cliquez sur le bouton blanc <strong>« Version Web / iPhone (PWA) »</strong> pour accéder directement à la marketplace en ligne sans téléchargement.</li>
+      </ul>
+    </section>
+
+    <!-- Galerie d'images -->
     <section class="gallery">
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80" alt="Magasin de vêtements" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80" alt="Boutiques & Mode" loading="lazy" />
         <div class="card-body">
-          <div class="card-title">Boutiques & Mode</div>
-          <div class="card-subtitle">Des milliers d'articles tendance</div>
+          <div class="card-title">Mode, Habits & Chaussures</div>
+          <div class="card-subtitle">Découvrez des vêtements tendance, chaussures de marque et styles uniques.</div>
         </div>
       </div>
 
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Chaussures Sneakers" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80" alt="Cosmétiques et Perruques" loading="lazy" />
         <div class="card-body">
-          <div class="card-title">Chaussures & Sneakers</div>
-          <div class="card-subtitle">Les plus grandes marques disponibles</div>
+          <div class="card-title">Cosmétiques & Perruques</div>
+          <div class="card-subtitle">Produits de beauté, soins capillaires, perruques de qualité et accessoires.</div>
         </div>
       </div>
 
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80" alt="Shopping vêtements" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=80" alt="Électronique et Meubles" loading="lazy" />
         <div class="card-body">
-          <div class="card-title">Vente entre particuliers</div>
-          <div class="card-subtitle">Faites de bonnes affaires en direct</div>
+          <div class="card-title"> High-Tech & Mobilier</div>
+          <div class="card-subtitle">Appareils électroniques pros, smartphones, ordinateurs et meubles pour la maison.</div>
         </div>
       </div>
     </section>
@@ -241,11 +415,41 @@
         Version Web / iPhone (PWA)
       </a>
     </section>
+
+    <!-- Section Présentation Détaillée de VEA Market -->
+    <article class="about-section">
+      <h2>À propos de VEA Market</h2>
+      <p> Bienvenue sur <strong>VEA Market</strong>, votre place de marché dynamique conçue pour faciliter le commerce de proximité et la vente en ligne de manière fluide, conviviale et sécurisée. Inspirée par l'énergie et la convivialité des grands marchés africains contemporains, VEA Market rassemble acheteurs et vendeurs au sein d'une même plateforme intuitive accessible sur mobile et ordinateur.</p>
+
+      <p>Notre mission principale est d'offrir une vitrine digitale puissante aux commerçants, créateurs, indépendants ainsi qu'aux particuliers qui souhaitent renouveler leur garde-robe ou vendre des objets du quotidien. Grâce à des outils simples et modernes, chacun peut créer sa boutique en quelques secondes, publier ses articles et entrer en contact direct avec ses clients.</p>
+
+      <h3>Une diversité d'articles pour tous les besoins</h3>
+      <p>Sur VEA Market, vous découvrirez un large éventail de catégories soigneusement organisées pour répondre à toutes vos envies :</p>
+      <ul>
+        <li><strong>Mode & Vêtements :</strong> Une vaste sélection d'habits pour hommes, femmes et enfants, allant du prêt-à-porter moderne aux tenues traditionnelles, en passant par les créations uniques.</li>
+        <li><strong>Chaussures & Sneakers :</strong> Des modèles pour tous les styles et toutes les occasions, des paires de ville élégantes aux baskets tendance de grandes marques.</li>
+        <li><strong>Cosmétiques & Soins :</strong> Des produits de beauté, crèmes, maquillage et soins capillaires spécialement sélectionnés pour mettre en valeur votre beauté au quotidien.</li>
+        <li><strong>Perruques & Coiffure :</strong> Un grand choix de perruques naturelles et synthétiques, mèches et accessoires pour changer de look au gré de vos envies.</li>
+        <li><strong>Mobilier & Décoration :</strong> Des meubles confortables pour le salon, la chambre ou le bureau, permettant d'aménager votre intérieur avec goût.</li>
+        <li><strong>Électronique Professionnelle & High-Tech :</strong> Des smartphones, ordinateurs portables, accessoires électroniques et équipements professionnels récents et performants.</li>
+      </ul>
+
+      <h3>Pourquoi choisir VEA Market ?</h3>
+      <p>VEA Market n'est pas une simple plateforme de e-commerce classique, c'est une véritable communauté marchande. Que vous recherchiez du matériel de qualité professionnelle ou une bonne affaire entre particuliers, notre plateforme garantit une expérience optimale grâce à :</p>
+      <ul>
+        <li>Une interface rapide, légère et conçue pour consommer très peu de données mobiles.</li>
+        <li>Une compatibilité parfaite avec tous les appareils : application Android dédiée ou version Web/PWA pour iOS et ordinateurs.</li>
+        <li>Une mise en relation directe entre vendeurs et acheteurs pour des négociations transparentes et équitables.</li>
+        <li>La mise en valeur des commerces locaux et du savoir-faire régional.</li>
+      </ul>
+
+      <p>Rejoignez la communauté VEA Market dès aujourd'hui. Choisissez l'option qui vous convient ci-dessus et commencez à explorer nos offres ou à mettre vos propres produits en ligne en toute simplicité !</p>
+    </article>
   </main>
 
   <!-- Footer -->
   <footer>
-    &copy; 2026 Vea Market. Tous droits réservés.
+    &copy; 2026 VEA Market. Tous droits réservés.
   </footer>
 
 </body>
