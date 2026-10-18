@@ -792,6 +792,9 @@
       height: 28px;
       stroke: #ffffff;
     }
+    .sold-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(15, 23, 42, 0.45); z-index: 7; pointer-events: none; }
+.sold-overlay svg { width: 104px; height: 34px; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35)); }
+.product-card.is-sold .image-container img { filter: grayscale(0.7); }
   </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -926,7 +929,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, getDocs, getDocsFromServer, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, where, limit, startAfter, getDocs, getDocsFromServer, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -1133,7 +1136,12 @@ if (currentUser && !localStorage.getItem("welcome_pushed_" + currentUser.uid)) {
           const profileBtn = document.getElementById("profileBtn");
           const addBtn = document.getElementById("addProductBtn");
 
-          let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
+          const [snapVC, snapV, snapA] = await Promise.all([
+            getDoc(doc(db, "vendeurs_clients", user.uid)),
+            getDoc(doc(db, "vendeurs", user.uid)),
+            getDoc(doc(db, "acheteurs", user.uid))
+          ]);
+          let userSnap = snapVC;
           let isVendeurOrVC = false;
 
           if (userSnap.exists()) {
@@ -1142,14 +1150,14 @@ if (currentUser && !localStorage.getItem("welcome_pushed_" + currentUser.uid)) {
             addBtn.style.display = "flex";
             isVendeurOrVC = true;
           } else {
-            userSnap = await getDoc(doc(db, "vendeurs", user.uid));
+            userSnap = snapV;
             if (userSnap.exists()) {
               userRole = "vendeurs";
               profileBtn.href = "compte-v.html";
               addBtn.style.display = "flex";
               isVendeurOrVC = true;
             } else {
-              userSnap = await getDoc(doc(db, "acheteurs", user.uid));
+              userSnap = snapA;
               if (userSnap.exists()) {
                 userRole = "acheteur";
                 profileBtn.href = "compte-a.html";
@@ -1487,144 +1495,7 @@ document
       document.getElementById("adToastOverlay").classList.remove("show");
     };
 
-async function loadProducts(userPreferences, forceRefresh = false) {
-  try {
-    const q = query(
-      collection(db, "produits"),
-      orderBy("createdAt", "desc")
-    );
 
-    const querySnapshot = forceRefresh
-      ? await getDocsFromServer(q)
-      : await getDocs(q);
-
-    // 1. Initialisation des variables globales de la fonction
-    const vendeurCache = new Map();
-    const now = new Date();
-    let hasNewUnreadArticles = false;
-    const userCountry = userPreferences?.country || "";
-
-    // 2. Traitement et enrichissement des produits EN PARALLÈLE
-    const fetchedProducts = await Promise.all(
-      querySnapshot.docs.map(async (docSnap) => {
-        const product = {
-          id: docSnap.id,
-          ...docSnap.data()
-        };
-
-        // Nouveautés (< 24h)
-        if (product.createdAt) {
-          const createdDate = product.createdAt.toDate
-            ? product.createdAt.toDate()
-            : new Date(product.createdAt);
-
-          const hoursDiff = Math.abs(now - createdDate) / 36e5;
-          if (hoursDiff < 24) {
-            hasNewUnreadArticles = true;
-          }
-        }
-
-        // Produit vendu
-        product.isSold = product.vendu === true || product.statut === "vendu";
-
-        // Chargement du vendeur avec cache
-        if (product.vendeurId) {
-          try {
-            let vData = vendeurCache.get(product.vendeurId);
-
-            if (!vData) {
-              let vendeurSnap = await getDoc(doc(db, "vendeurs", product.vendeurId));
-              if (!vendeurSnap.exists()) {
-                vendeurSnap = await getDoc(doc(db, "vendeurs_clients", product.vendeurId));
-              }
-              if (vendeurSnap.exists()) {
-                vData = vendeurSnap.data();
-                vendeurCache.set(product.vendeurId, vData);
-              }
-            }
-
-            if (vData) {
-              const vAddr = vData.address || {};
-              product.shopName = vData.shopName || vData.displayName || vData.nom || "Boutique";
-              product.city = vAddr.city || vData.city || vData.ville || "";
-              product.province = vAddr.province || vData.province || "";
-              product.country = vAddr.country || vData.country || vData.pays || "";
-
-              product.vendeurIsPremium =
-                vData.isPremium === true &&
-                vData.premiumUntil &&
-                new Date(vData.premiumUntil) > now;
-            }
-          } catch (err) {
-            console.error("Erreur vendeur :", err);
-            product.shopName = "Boutique";
-          }
-        }
-
-        // Statuts de Boost
-        product.isItemBoosted =
-          product.isBoosted === true &&
-          product.boostUntil &&
-          new Date(product.boostUntil) > now;
-
-        product.isAccountBoosted = product.vendeurIsPremium === true;
-        product.hasBoostStyle = product.isItemBoosted || product.isAccountBoosted;
-
-        // Visibilité du Boost
-        let isBoostedForCurrentUser = false;
-        if (product.hasBoostStyle) {
-          const isSameCountry =
-            userCountry &&
-            product.country &&
-            userCountry.toLowerCase().trim() === product.country.toLowerCase().trim();
-
-          if (isSameCountry) {
-            isBoostedForCurrentUser = true;
-          } else {
-            // 1% de chance pour les boosts d'autres pays
-            isBoostedForCurrentUser = Math.random() < 0.01;
-          }
-        }
-
-        product.isBoostedActive = isBoostedForCurrentUser;
-
-        return product;
-      })
-    );
-
-    // 3. Badges nouveautés
-    const profileBadge = document.getElementById("profileBadge");
-    const tabBadge = document.getElementById("tabBadge");
-
-    if (hasNewUnreadArticles) {
-      if (profileBadge) profileBadge.style.display = "block";
-      if (tabBadge) tabBadge.style.display = "block";
-    }
-
-    // 4. Moteur de Feed VEA
-    allProducts = fetchedProducts;
-    allProducts = buildPersonalizedFeed(allProducts);
-    currentFeedProducts = selectFeedBatch(allProducts);
-
-    console.log(
-      "🔥 FEED VEA :",
-      currentFeedProducts.map((p) => ({
-        id: p.id,
-        nom: p.nom,
-        score: Math.round(p.feedScore),
-        boostCompte: p.isAccountBoosted,
-        boostArticle: p.isItemBoosted,
-        vu: !!feedSeenProducts[p.id]
-      }))
-    );
-
-    // 5. Affichage
-    renderProducts(currentFeedProducts);
-
-  } catch (e) {
-    console.error("Erreur chargement articles:", e);
-  }
-}
 
 function buildPersonalizedFeed(products) {
 
@@ -1654,60 +1525,6 @@ function buildPersonalizedFeed(products) {
         });
 }
 
-function selectFeedBatch(products) {
-    const now = Date.now();
-
-    // Les produits sont déjà classés par score
-    const ranked = [...products];
-
-    // Si la base contient moins ou exactement 20 produits, on affiche tout sans filtrer
-    if (ranked.length <= FEED_SIZE) {
-        lastFeedBatchIds = new Set(ranked.map(p => p.id));
-        return ranked;
-    }
-
-    // 1️⃣ Éviter les produits du dernier lot
-    let candidates = ranked.filter(product => {
-        return !lastFeedBatchIds.has(product.id);
-    });
-
-    // 2️⃣ Éviter les produits vus récemment (< 24h)
-    let notRecentlySeen = candidates.filter(product => {
-        const seenAt = feedSeenProducts[product.id];
-        if (!seenAt) return true;
-        return (now - seenAt) >= RECENTLY_SEEN_TIME;
-    });
-
-    // 3️⃣ Si on a assez de produits "jamais vus" ou "pas vus récemment"
-    if (notRecentlySeen.length >= FEED_SIZE) {
-        candidates = notRecentlySeen;
-    }
-    // 4️⃣ Si on n'a pas assez de produits non vus, on complète avec les produits déjà vus récemment
-    // mais en gardant la priorité aux produits non vus en premier
-    else {
-        const seenCandidates = candidates.filter(product => {
-            return !notRecentlySeen.some(p => p.id === product.id);
-        });
-        candidates = [...notRecentlySeen, ...seenCandidates];
-    }
-
-    // 5️⃣ Si malgré tout on n'atteint toujours pas 20 produits (ex: peu de produits au total),
-    // on va repêcher dans le dernier lot affiché pour compléter la grille
-    if (candidates.length < FEED_SIZE) {
-        const remainingFromLastBatch = ranked.filter(product => {
-            return !candidates.some(c => c.id === product.id);
-        });
-        candidates.push(...remainingFromLastBatch);
-    }
-
-    // 6️⃣ On prend exactement 20 produits maximum
-    const batch = candidates.slice(0, FEED_SIZE);
-
-    // 7️⃣ Mémoriser ce lot
-    lastFeedBatchIds = new Set(batch.map(product => product.id));
-
-    return batch;
-}
 
 function markProductAsSeen(productId) {
   if (!productId || !currentUser) return;
@@ -1717,193 +1534,350 @@ function markProductAsSeen(productId) {
   scheduleFeedSeenSave();
 }
 
+// ==========================================
+// ⚡ CHARGEMENT RAPIDE + FIL CONTINU
+// ==========================================
+const PREMIERE_PAGE = 40;        // affichée tout de suite
+const PAGES_SUIVANTES = 150;     // chargées ensuite, en arrière-plan
+const VENDEUR_CACHE_MS = 3 * 60 * 1000;
+const DOC_ROOT = `projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+const REST_URL = `https://firestore.googleapis.com/v1/${DOC_ROOT}`;
+const CHAMPS_VENDEUR = ["shopName", "displayName", "nom", "address", "city", "ville", "province", "country", "pays", "isPremium", "premiumUntil"];
+
+let rawProducts = [];
+let idsCharges = new Set();
+let curseurPage = null;
+let pagesTerminees = false;
+let chargementEnCours = false;
+let sessionChargement = 0;
+let aDesNouveautes = false;
+const vendeurCache = new Map();
+let vendeurCacheT = Date.now();
+
+// Cache des vendeurs (3 min) : évite de les relire à chaque visite
+try {
+  const c = JSON.parse(localStorage.getItem("vea_vendeurs_cache"));
+  if (c && Date.now() - c.t < VENDEUR_CACHE_MS) {
+    vendeurCacheT = c.t;
+    Object.entries(c.d).forEach(([k, v]) => vendeurCache.set(k, v));
+  }
+} catch (_) {}
+
+function sauverCacheVendeurs() {
+  try { localStorage.setItem("vea_vendeurs_cache", JSON.stringify({ t: vendeurCacheT, d: Object.fromEntries(vendeurCache) })); } catch (_) {}
+}
+
+function lireValeur(v) {
+  if (!v) return null;
+  if ("stringValue" in v) return v.stringValue;
+  if ("booleanValue" in v) return v.booleanValue;
+  if ("integerValue" in v) return Number(v.integerValue);
+  if ("doubleValue" in v) return v.doubleValue;
+  if ("timestampValue" in v) return v.timestampValue;
+  if ("arrayValue" in v) return (v.arrayValue.values || []).map(lireValeur);
+  if ("mapValue" in v) return lireChamps(v.mapValue.fields);
+  return null;
+}
+const lireChamps = (f = {}) => Object.fromEntries(Object.entries(f).map(([k, x]) => [k, lireValeur(x)]));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const dateMs = (p) => !p.createdAt ? 0 : (p.createdAt.toDate ? p.createdAt.toDate().getTime() : new Date(p.createdAt).getTime());
+
+// Les vendeurs sont lus UNE fois chacun, sans leur photo (en base64 elle pèse très lourd)
+async function chargerVendeurs(ids) {
+  const manquants = ids.filter((id) => !vendeurCache.has(id));
+  if (!manquants.length || !currentUser) return;
+  try {
+    const jeton = await currentUser.getIdToken();
+    for (let i = 0; i < manquants.length; i += 50) {
+      const lot = manquants.slice(i, i + 50);
+      const documents = lot.flatMap((id) => [`${DOC_ROOT}/vendeurs/${id}`, `${DOC_ROOT}/vendeurs_clients/${id}`]);
+      const r = await fetch(`${REST_URL}:batchGet`, {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + jeton, "Content-Type": "application/json" },
+        body: JSON.stringify({ documents, mask: { fieldPaths: CHAMPS_VENDEUR } })
+      });
+      if (!r.ok) throw new Error("batchGet " + r.status);
+      const trouves = {};
+      (await r.json()).forEach((x) => {
+        if (!x.found) return;
+        const parts = x.found.name.split("/");
+        const id = parts.pop(), col = parts.pop();
+        if (!trouves[id] || col === "vendeurs") trouves[id] = lireChamps(x.found.fields);
+      });
+      lot.forEach((id) => vendeurCache.set(id, trouves[id] || null));
+    }
+    sauverCacheVendeurs();
+  } catch (e) { console.error("Erreur vendeurs :", e); }
+}
+
+// Articles boostés + articles des comptes Premium : toujours chargés en premier
+async function chargerPrioritaires(serveur) {
+  const lire = serveur ? getDocsFromServer : getDocs;
+  try {
+    const [boostes, vV, vC] = await Promise.all([
+      lire(query(collection(db, "produits"), where("isBoosted", "==", true))),
+      lire(query(collection(db, "vendeurs"), where("isPremium", "==", true))),
+      lire(query(collection(db, "vendeurs_clients"), where("isPremium", "==", true)))
+    ]);
+    const idsPremium = [];
+    [vV, vC].forEach((s) => s.docs.forEach((d) => {
+      const { photoUrl, photo, ...data } = d.data();
+      vendeurCache.set(d.id, data);
+      idsPremium.push(d.id);
+    }));
+    const docs = [...boostes.docs];
+    for (let i = 0; i < idsPremium.length; i += 30) {
+      const s = await lire(query(collection(db, "produits"), where("vendeurId", "in", idsPremium.slice(i, i + 30))));
+      docs.push(...s.docs);
+    }
+    return docs;
+  } catch (e) { console.error("Erreur prioritaires :", e); return []; }
+}
+
+async function chargerPage(taille, serveur) {
+  const contraintes = [orderBy("createdAt", "desc")];
+  if (curseurPage) contraintes.push(startAfter(curseurPage));
+  const q = query(collection(db, "produits"), ...contraintes, limit(taille));
+  const snap = serveur ? await getDocsFromServer(q) : await getDocs(q);
+  if (snap.docs.length < taille) pagesTerminees = true;
+  if (snap.docs.length) curseurPage = snap.docs[snap.docs.length - 1];
+  return snap.docs;
+}
+
+// Même enrichissement qu'avant (vendeur, vendu, boosts), mais sans relire le vendeur pour chaque produit
+async function preparer(docs) {
+  const produits = docs.filter((d) => !idsCharges.has(d.id)).map((d) => { idsCharges.add(d.id); return { id: d.id, ...d.data() }; });
+  await chargerVendeurs([...new Set(produits.map((p) => p.vendeurId).filter(Boolean))]);
+  const now = new Date();
+
+  produits.forEach((product) => {
+    if (product.createdAt) {
+      const created = product.createdAt.toDate ? product.createdAt.toDate() : new Date(product.createdAt);
+      if (Math.abs(now - created) / 36e5 < 24) aDesNouveautes = true;
+    }
+    product.isSold = product.vendu === true || product.statut === "vendu";
+
+    const vData = product.vendeurId ? vendeurCache.get(product.vendeurId) : null;
+    if (vData) {
+      const vAddr = vData.address || {};
+      product.shopName = vData.shopName || vData.displayName || vData.nom || "Boutique";
+      product.city = vAddr.city || vData.city || vData.ville || "";
+      product.province = vAddr.province || vData.province || "";
+      product.country = vAddr.country || vData.country || vData.pays || "";
+      product.vendeurIsPremium = vData.isPremium === true && !!vData.premiumUntil && new Date(vData.premiumUntil) > now;
+    } else if (product.vendeurId) {
+      product.shopName = "Boutique";
+    }
+
+    product.isItemBoosted = product.isBoosted === true && !!product.boostUntil && new Date(product.boostUntil) > now;
+    product.isAccountBoosted = product.vendeurIsPremium === true;
+    product.hasBoostStyle = product.isItemBoosted || product.isAccountBoosted;
+
+    let visible = false;
+    if (product.hasBoostStyle) {
+      const memePays = userCountry && product.country && userCountry.toLowerCase().trim() === product.country.toLowerCase().trim();
+      visible = memePays ? true : Math.random() < 0.01;
+    }
+    product.isBoostedActive = visible;
+  });
+  return produits;
+}
+
+// Le fil continue à la suite : chaque lot est classé, puis ajouté
+function ajouterAuFil(produits) {
+  const classes = buildPersonalizedFeed(produits);
+  currentFeedProducts.push(...classes);
+  rawProducts.push(...classes);
+  allProducts = [...rawProducts].sort((a, b) => b.feedScore - a.feedScore || dateMs(b) - dateMs(a));
+}
+
+function majBadges() {
+  if (!aDesNouveautes) return;
+  const pb = document.getElementById("profileBadge"), tb = document.getElementById("tabBadge");
+  if (pb) pb.style.display = "block";
+  if (tb) tb.style.display = "block";
+}
+
+async function loadProducts(userPreferences, forceRefresh = false) {
+  const session = ++sessionChargement;
+  const grid = document.getElementById("productsGrid");
+  try {
+    chargementEnCours = true;
+    rawProducts = []; allProducts = []; currentFeedProducts = [];
+    idsCharges = new Set(); curseurPage = null; pagesTerminees = false;
+    if (forceRefresh) { vendeurCache.clear(); vendeurCacheT = Date.now(); }
+    if (!grid.children.length) renderProducts(currentFeedProducts);   // "Chargement..."
+
+    // 1) Première page + articles prioritaires : affichage immédiat
+    const [docs, prioritaires] = await Promise.all([chargerPage(PREMIERE_PAGE, forceRefresh), chargerPrioritaires(forceRefresh)]);
+    if (session !== sessionChargement) return;
+    ajouterAuFil(await preparer([...prioritaires, ...docs]));
+    if (session !== sessionChargement) return;
+    majBadges();
+    renderProducts(currentFeedProducts);
+
+    // 2) Le reste du catalogue arrive en arrière-plan : le fil continue et la recherche trouve tout
+    while (!pagesTerminees && session === sessionChargement) {
+      const suite = await preparer(await chargerPage(PAGES_SUIVANTES, forceRefresh));
+      if (session !== sessionChargement) return;
+      ajouterAuFil(suite);
+      majBadges();
+      const term = document.getElementById("searchInput").value.toLowerCase().trim();
+      if (activeFilter === "all" && !term) remplirEcran(); else applyFilters();
+    }
+  } catch (e) {
+    console.error("Erreur chargement articles:", e);
+  } finally {
+    if (session === sessionChargement) {
+      chargementEnCours = false;
+      if (!grid.children.length) grid.innerHTML = `<div class="empty-state">${currentI18n.empty}</div>`;
+    }
+  }
+}
+
+// ==========================================
+// 🖼️ AFFICHAGE PAR LOTS (défilement infini)
+// ==========================================
+let renderSource = [];
+let renderIndex = 0;
+
+const sentinelle = document.createElement("div");
+sentinelle.style.height = "1px";
+document.getElementById("productsGrid").insertAdjacentElement("afterend", sentinelle);
+new IntersectionObserver((e) => { if (e[0].isIntersecting) remplirEcran(); }, { rootMargin: "800px" }).observe(sentinelle);
+
+const feedObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    const productId = entry.target.dataset.productId;
+    if (productId) markProductAsSeen(productId);
+    feedObserver.unobserve(entry.target);
+  });
+}, { threshold: 0.5 });
+
+const SVG_VENDU = `<svg viewBox="0 0 120 40" role="img" aria-label="Vendu"><rect x="1" y="1" width="118" height="38" rx="19" fill="#ef4444"/><path d="M19 21l5 5 9-11" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="44" y="26" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="17" font-weight="800" fill="#fff" letter-spacing="1">VENDU</text></svg>`;
+
+function creerCarte(p, canLike) {
+  const isFav = userFavorites.includes(p.id);
+  const favCount = p.favoris || 0;
+
+  let imagesList = [];
+  if (Array.isArray(p.images) && p.images.length > 0) imagesList = p.images;
+  else if (p.image) imagesList = [p.image];
+  const firstImage = imagesList.length > 0 ? imagesList[0] : "";
+
+  let dotsHtml = "";
+  if (imagesList.length > 1) {
+    dotsHtml = `<div class="image-dots">${imagesList.map((_, idx) => `<div class="dot ${idx === 0 ? "active" : ""}"></div>`).join("")}</div>`;
+  }
+
+  const favButtonHtml = canLike ? `
+    <button class="fav-btn ${isFav ? "active" : ""}" data-id="${esc(p.id)}" onclick="toggleFavorite(event, '${esc(p.id)}')">
+      <div class="svg-1">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </div>
+      <div class="svg-2">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </div>
+      <span class="fav-count">${favCount}</span>
+    </button>` : "";
+
+  let boostClass = "";
+  if (p.isAccountBoosted) boostClass = "card-boosted-account";
+  else if (p.isItemBoosted) boostClass = "card-boosted-item";
+  else if (p.hasBoostStyle) boostClass = "card-boosted";
+
+  const card = document.createElement("div");
+  card.dataset.productId = p.id;
+  card.className = `product-card ${boostClass} ${p.isSold ? "is-sold" : ""}`;
+  card.onclick = (e) => { if (!e.target.closest(".fav-btn")) window.location.href = `article.html?id=${encodeURIComponent(p.id)}`; };
+
+  const proBadgeHtml = p.vendeurIsPremium ? `
+    <span class="badge-pro" title="Certifié Premium Pro">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="#ca8a04" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      Pro
+    </span>` : "";
+
+  let boostBadgeHtml = "";
+  if (p.isAccountBoosted) {
+    boostBadgeHtml = `<span class="badge-boost" title="Compte Boosté"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
+  } else if (p.isItemBoosted) {
+    boostBadgeHtml = `<span class="badge-boost-item" title="Article Boosté"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
+  }
+
+  card.innerHTML = `
+    ${boostBadgeHtml}
+    <div class="image-container">
+      <img src="${esc(firstImage)}" alt="${esc(p.nom || "Produit")}" loading="lazy">
+      ${p.isSold ? `<div class="sold-overlay">${SVG_VENDU}</div>` : ""}
+      <div class="shop-badge">${esc(p.shopName || "Boutique")}</div>
+      <div style="position: absolute; top: 10px; right: 10px; z-index: 5;" class="vendor-flag"></div>
+      ${dotsHtml}
+      ${favButtonHtml}
+    </div>
+    <div class="product-info">
+      <span class="product-type">
+        ${esc(p.type || "")}
+        ${proBadgeHtml}
+      </span>
+      <span class="product-price">${esc(p.prix)} ${esc(p.devise)}</span>
+      <span class="product-stock">Stock: ${esc(p.stock)}</span>
+    </div>`;
+
+  const countryName = p.country;
+  const flagContainer = card.querySelector(".vendor-flag");
+  if (flagContainer && countryName) {
+    const cleanCountry = countryName.toLowerCase().trim();
+    const isoCode = countryCodeMap[cleanCountry] || cleanCountry.substring(0, 2);
+    if (isoCode && isoCode.length === 2) {
+      flagContainer.innerHTML = `<div class="country-flag-badge" title="${esc(countryName)}"><img src="https://flagcdn.com/w80/${esc(isoCode)}.png" alt="${esc(countryName)}"></div>`;
+    }
+  }
+  return card;
+}
+
+function ajouterCartes() {
+  const grid = document.getElementById("productsGrid");
+  const term = document.getElementById("searchInput").value.toLowerCase().trim();
+  const canLike = userRole === "acheteur" || userRole === "vendeurs_clients";
+  const placeholder = grid.querySelector(".empty-state");
+  if (placeholder) placeholder.remove();
+
+  let n = 0;
+  while (renderIndex < renderSource.length && n < FEED_SIZE) {
+    const p = renderSource[renderIndex++];
+    if (p.isSold && !term) continue;        // jamais dans le fil, mais visible en recherche
+    const card = creerCarte(p, canLike);
+    grid.appendChild(card);
+    if (activeFilter === "all" && !term) feedObserver.observe(card);
+    n++;
+  }
+}
+
+// Ajoute des lots tant que l'écran (et 800 px en dessous) n'est pas rempli
+function remplirEcran() {
+  let garde = 0;
+  while (renderIndex < renderSource.length && garde++ < 25 &&
+         sentinelle.getBoundingClientRect().top < window.innerHeight + 800) {
+    ajouterCartes();
+  }
+}
+
 function renderProducts(products) {
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
-  const feedObserver =
-    new IntersectionObserver(
-        (entries) => {
-
-            entries.forEach(entry => {
-
-                if (!entry.isIntersecting) {
-                    return;
-                }
-
-                const productId =
-                    entry.target.dataset.productId;
-
-                if (productId) {
-                    markProductAsSeen(productId);
-                }
-
-                feedObserver.unobserve(
-                    entry.target
-                );
-            });
-
-        },
-        {
-            threshold: 0.5
-        }
-    );
-
-  const term = document.getElementById("searchInput").value.toLowerCase().trim();
-
-  let displayList = products.filter(p => {
-    if (!term) {
-      return !p.isSold;
-    }
-    return true;
-  });
-
-  if (displayList.length === 0) {
-    grid.innerHTML = `<div class="empty-state">${currentI18n.empty}</div>`;
-    return;
+  renderSource = products;
+  renderIndex = 0;
+  remplirEcran();
+  if (!grid.children.length) {
+    grid.innerHTML = (chargementEnCours && products === currentFeedProducts)
+      ? `<div class="empty-state">${currentI18n.loading || "Chargement..."}</div>`
+      : `<div class="empty-state">${currentI18n.empty}</div>`;
   }
-
-  const canLike = userRole === "acheteur" || userRole === "vendeurs_clients";
-
-  displayList.forEach(p => {
-    const isFav = userFavorites.includes(p.id);
-    const favCount = p.favoris || 0;
-
-    let imagesList = [];
-    if (Array.isArray(p.images) && p.images.length > 0) {
-      imagesList = p.images;
-    } else if (p.image) {
-      imagesList = [p.image];
-    }
-
-    const firstImage = imagesList.length > 0 ? imagesList[0] : '';
-    const hasMultipleImages = imagesList.length > 1;
-
-    let dotsHtml = '';
-    if (hasMultipleImages) {
-      dotsHtml = `<div class="image-dots">`;
-      imagesList.forEach((_, idx) => {
-        dotsHtml += `<div class="dot ${idx === 0 ? 'active' : ''}"></div>`;
-      });
-      dotsHtml += `</div>`;
-    }
-
-    // 2. BOUTON FAVORIS
-    const favButtonHtml = canLike ? `
-      <button class="fav-btn ${isFav ? 'active' : ''}" data-id="${p.id}" onclick="toggleFavorite(event, '${p.id}')">
-        <div class="svg-1">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-        </div>
-        <div class="svg-2">
-          <svg viewBox="0 0 24 24" width="18" height="18">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-        </div>
-        <span class="fav-count">${favCount}</span>
-      </button>
-    ` : '';
-
-    let boostClass = '';
-    if (p.isAccountBoosted) {
-      boostClass = 'card-boosted-account';
-    } else if (p.isItemBoosted) {
-      boostClass = 'card-boosted-item';
-    } else if (p.hasBoostStyle) {
-      boostClass = 'card-boosted';
-    }
-
-    const card = document.createElement("div");
-    card.dataset.productId = p.id;
-    card.className = `product-card ${boostClass}`;
-    card.onclick = (e) => {
-      if (!e.target.closest('.fav-btn')) {
-        window.location.href = `article.html?id=${p.id}`;
-      }
-    };
-
-    // 2. BADGE PRO (Affiché pour le vendeur Premium)
-    let proBadgeHtml = '';
-    if (p.vendeurIsPremium) {
-        proBadgeHtml = `
-        <span class="badge-pro" title="Certifié Premium Pro">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="#ca8a04" stroke="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-            Pro
-        </span>
-        `;
-    }
-
-    // 3. BADGES DE BOOST DISTINCTS
-    let boostBadgeHtml = '';
-    if (p.isAccountBoosted) {
-        // Badge Doré pour le Boost Compte
-        boostBadgeHtml = `
-        <span class="badge-boost" title="Compte Boosté">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-        </span>
-        `;
-    } else if (p.isItemBoosted) {
-        // Badge Bleu pour le Boost Article
-        boostBadgeHtml = `
-        <span class="badge-boost-item" title="Article Boosté">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-        </span>
-        `;
-    }
-
-    let soldIndicator = '';
-    if (p.isSold) {
-      soldIndicator = `<span style="background:#ef4444; color:#fff; font-size:0.65rem; padding:2px 6px; border-radius:6px; margin-left:4px; font-weight:bold;">✔ Vendu</span>`;
-    }
-
-    // 4. INJECTION DU CONTENU HTML
-    card.innerHTML = `
-      ${boostBadgeHtml}
-      <div class="image-container">
-        <img src="${firstImage}" alt="${p.nom || 'Produit'}" loading="lazy">
-        <div class="shop-badge">${p.shopName || 'Boutique'}</div>
-        <div style="position: absolute; top: 10px; right: 10px; z-index: 5;" class="vendor-flag"></div>
-        ${dotsHtml}
-        ${favButtonHtml}
-      </div>
-      <div class="product-info">
-        <span class="product-type">
-          ${p.type || ''}
-          ${proBadgeHtml}
-          ${soldIndicator}
-        </span>
-        <span class="product-price">${p.prix} ${p.devise}</span>
-        <span class="product-stock">Stock: ${p.stock}</span>
-      </div>
-    `;
-
-    // 5. GESTION DU DRAPEAU DU PAYS
-    const countryName = p.country;
-    const flagContainer = card.querySelector(".vendor-flag");
-    if (flagContainer && countryName) {
-      const cleanCountry = countryName.toLowerCase().trim();
-      const isoCode = countryCodeMap[cleanCountry] || cleanCountry.substring(0, 2);
-      if (isoCode && isoCode.length === 2) {
-        flagContainer.innerHTML = `
-          <div class="country-flag-badge" title="${countryName}">
-            <img src="https://flagcdn.com/w80/${isoCode}.png" alt="${countryName}">
-          </div>
-        `;
-      }
-    }
-
-    grid.appendChild(card);
-    if (
-        activeFilter === "all" &&
-        !term
-    ) {
-        feedObserver.observe(card);
-    }
-  });
 }
 
     window.handleSearch = function() {
@@ -1958,6 +1932,8 @@ function applyFilters() {
   const term = document.getElementById("searchInput").value.toLowerCase().trim();
 
   const now = new Date();
+    // Sans recherche, on affiche le fil continu
+  if (activeFilter === "all" && !term) { renderProducts(currentFeedProducts); return; }
 
   const sourceProducts =
     activeFilter === "all" && !term
@@ -1967,7 +1943,8 @@ function applyFilters() {
   const filtered = sourceProducts.filter(p => {
 
     // Ne pas afficher les articles vendus
-    if (p.isSold) return false;
+        // Vendus : cachés dans le fil et « Nouveautés », visibles en recherche
+    if (p.isSold && (!term || activeFilter === "nouveautes")) return false;
 
     // ==========================================
     // 🆕 ONGLET NOUVEAUTÉS
