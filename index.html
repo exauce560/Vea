@@ -516,5 +516,37 @@
     &copy; 2026 Vea Market. Tous droits réservés.
   </footer>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // Utilise le même projet Firebase que ta page de connexion.
+  const firebaseConfig = {
+    apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
+    authDomain: "v-ea-fb4c4.firebaseapp.com",
+    projectId: "v-ea-fb4c4",
+    storageBucket: "v-ea-fb4c4.firebasestorage.app",
+    messagingSenderId: "357462139035",
+    appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
+    measurementId: "G-WEG1X65STP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Attendre que Firebase vérifie la session existante.
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Utilisateur déjà connecté : passer directement à l'accueil.
+      window.location.replace("acceuil.html");
+    }
+  });
+</script>
+</body>
+</html>
+
 </body>
 </html>
