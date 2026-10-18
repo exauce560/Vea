@@ -1821,9 +1821,10 @@ function creerCarte(p, canLike) {
     boostBadgeHtml = `<span class="badge-boost-item" title="Article Boosté"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
   }
 
+
   card.innerHTML = `
-    ${boostBadgeHtml}
     <div class="image-container">
+      ${boostBadgeHtml}
       <img src="${esc(firstImage)}" alt="${esc(p.nom || "Produit")}" loading="lazy">
       ${p.isSold ? `<div class="sold-overlay">${SVG_VENDU}</div>` : ""}
       <div class="shop-badge">${esc(p.shopName || "Boutique")}</div>
@@ -1839,6 +1840,7 @@ function creerCarte(p, canLike) {
       <span class="product-price">${esc(p.prix)} ${esc(p.devise)}</span>
       <span class="product-stock">Stock: ${esc(p.stock)}</span>
     </div>`;
+
 
   const countryName = p.country;
   const flagContainer = card.querySelector(".vendor-flag");
