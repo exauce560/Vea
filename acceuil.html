@@ -1634,11 +1634,12 @@ async function chargerPrioritaires(serveur) {
   } catch (e) { console.error("Erreur prioritaires :", e); return []; }
 }
 
-async function chargerPage(taille, serveur) {
+async function chargerPage(taille, serveur, session) {
   const contraintes = [orderBy("createdAt", "desc")];
   if (curseurPage) contraintes.push(startAfter(curseurPage));
   const q = query(collection(db, "produits"), ...contraintes, limit(taille));
   const snap = serveur ? await getDocsFromServer(q) : await getDocs(q);
+  if (session !== sessionChargement) return [];   // un nouveau chargement a démarré
   if (snap.docs.length < taille) pagesTerminees = true;
   if (snap.docs.length) curseurPage = snap.docs[snap.docs.length - 1];
   return snap.docs;
@@ -1646,7 +1647,12 @@ async function chargerPage(taille, serveur) {
 
 // Même enrichissement qu'avant (vendeur, vendu, boosts), mais sans relire le vendeur pour chaque produit
 async function preparer(docs) {
-  const produits = docs.filter((d) => !idsCharges.has(d.id)).map((d) => { idsCharges.add(d.id); return { id: d.id, ...d.data() }; });
+  const produits = [];
+  for (const d of docs) {
+    if (idsCharges.has(d.id)) continue;      // déjà pris (boosté, Premium ou page) : pas de doublon
+    idsCharges.add(d.id);
+    produits.push({ id: d.id, ...d.data() });
+  }
   await chargerVendeurs([...new Set(produits.map((p) => p.vendeurId).filter(Boolean))]);
   const now = new Date();
 
@@ -1664,6 +1670,7 @@ async function preparer(docs) {
       product.city = vAddr.city || vData.city || vData.ville || "";
       product.province = vAddr.province || vData.province || "";
       product.country = vAddr.country || vData.country || vData.pays || "";
+      product.premiumUntil = vData.premiumUntil || null;
       product.vendeurIsPremium = vData.isPremium === true && !!vData.premiumUntil && new Date(vData.premiumUntil) > now;
     } else if (product.vendeurId) {
       product.shopName = "Boutique";
@@ -1686,6 +1693,7 @@ async function preparer(docs) {
 // Le fil continue à la suite : chaque lot est classé, puis ajouté
 function ajouterAuFil(produits) {
   const classes = buildPersonalizedFeed(produits);
+  console.log("🚀 Boosts détectés :", classes.filter((p) => p.hasBoostStyle).map((p) => ({ nom: p.nom, article: p.isItemBoosted, compte: p.isAccountBoosted })));
   currentFeedProducts.push(...classes);
   rawProducts.push(...classes);
   allProducts = [...rawProducts].sort((a, b) => b.feedScore - a.feedScore || dateMs(b) - dateMs(a));
@@ -1709,7 +1717,7 @@ async function loadProducts(userPreferences, forceRefresh = false) {
     if (!grid.children.length) renderProducts(currentFeedProducts);   // "Chargement..."
 
     // 1) Première page + articles prioritaires : affichage immédiat
-    const [docs, prioritaires] = await Promise.all([chargerPage(PREMIERE_PAGE, forceRefresh), chargerPrioritaires(forceRefresh)]);
+    const [docs, prioritaires] = await Promise.all([chargerPage(PREMIERE_PAGE, forceRefresh, session), chargerPrioritaires(forceRefresh)]);
     if (session !== sessionChargement) return;
     ajouterAuFil(await preparer([...prioritaires, ...docs]));
     if (session !== sessionChargement) return;
@@ -1718,7 +1726,7 @@ async function loadProducts(userPreferences, forceRefresh = false) {
 
     // 2) Le reste du catalogue arrive en arrière-plan : le fil continue et la recherche trouve tout
     while (!pagesTerminees && session === sessionChargement) {
-      const suite = await preparer(await chargerPage(PAGES_SUIVANTES, forceRefresh));
+      const suite = await preparer(await chargerPage(PAGES_SUIVANTES, forceRefresh, session));
       if (session !== sessionChargement) return;
       ajouterAuFil(suite);
       majBadges();
@@ -1786,10 +1794,14 @@ function creerCarte(p, canLike) {
       <span class="fav-count">${favCount}</span>
     </button>` : "";
 
+    // Boost revérifié au moment de l'affichage (dates)
+  const t = Date.now();
+  const articleBoost = p.isBoosted === true && !!p.boostUntil && new Date(p.boostUntil).getTime() > t;
+  const compteBoost = p.vendeurIsPremium === true && !!p.premiumUntil && new Date(p.premiumUntil).getTime() > t;
+
   let boostClass = "";
-  if (p.isAccountBoosted) boostClass = "card-boosted-account";
-  else if (p.isItemBoosted) boostClass = "card-boosted-item";
-  else if (p.hasBoostStyle) boostClass = "card-boosted";
+  if (compteBoost) boostClass = "card-boosted-account";
+  else if (articleBoost) boostClass = "card-boosted-item";
 
   const card = document.createElement("div");
   card.dataset.productId = p.id;
@@ -1803,9 +1815,9 @@ function creerCarte(p, canLike) {
     </span>` : "";
 
   let boostBadgeHtml = "";
-  if (p.isAccountBoosted) {
+  if (compteBoost) {
     boostBadgeHtml = `<span class="badge-boost" title="Compte Boosté"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
-  } else if (p.isItemBoosted) {
+  } else if (articleBoost) {
     boostBadgeHtml = `<span class="badge-boost-item" title="Article Boosté"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
   }
 
