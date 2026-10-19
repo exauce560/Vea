@@ -563,7 +563,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -611,76 +611,232 @@
       "senegal": "sn", "sénégal": "sn"
     };
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    // ==========================================
+// ⚡ CHARGEMENT RAPIDE DU FIL
+// ==========================================
+const PAGE_FEED = 12;   // nombre d'articles chargés à la fois
+const DOC_ROOT = `projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+const REST_URL = `https://firestore.googleapis.com/v1/${DOC_ROOT}`;
+// Le vendeur est lu SANS sa photo (en base64 elle pèse très lourd) : la photo vient plus tard
+const CHAMPS_VENDEUR = ["shopName", "nom", "address", "country", "pays", "city", "ville", "isPremium", "premiumUntil", "telephone", "phone", "whatsapp"];
 
-    window.OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.login(user.uid);
-    });
+const vendeurCache = new Map();
+const photoCache = new Map();
+const idsAffiches = new Set();
+let curseur = null;
+let feedTermine = false;
+let chargementSuite = false;
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function lireValeur(v) {
+  if (!v) return null;
+  if ("stringValue" in v) return v.stringValue;
+  if ("booleanValue" in v) return v.booleanValue;
+  if ("integerValue" in v) return Number(v.integerValue);
+  if ("doubleValue" in v) return v.doubleValue;
+  if ("timestampValue" in v) return v.timestampValue;
+  if ("arrayValue" in v) return (v.arrayValue.values || []).map(lireValeur);
+  if ("mapValue" in v) return lireChamps(v.mapValue.fields);
+  return null;
+}
+const lireChamps = (f = {}) => Object.fromEntries(Object.entries(f).map(([k, x]) => [k, lireValeur(x)]));
+
+// Accès Firestore par l'API REST : marche connecté ou non (les liens partagés restent ouverts à tous)
+async function restFetch(url, corps) {
+  const headers = { "Content-Type": "application/json" };
+  if (currentUser) headers.Authorization = "Bearer " + await currentUser.getIdToken();
+  const r = await fetch(`${url}${url.includes("?") ? "&" : "?"}key=${firebaseConfig.apiKey}`, {
+    method: corps ? "POST" : "GET",
+    headers,
+    body: corps ? JSON.stringify(corps) : undefined
+  });
+  if (!r.ok) throw new Error("Firestore " + r.status);
+  return r.json();
+}
+
+// Les vendeurs d'un lot : UNE seule requête groupée
+async function chargerVendeurs(ids) {
+  const manquants = [...new Set(ids.filter(Boolean))].filter((id) => !vendeurCache.has(id));
+  for (let i = 0; i < manquants.length; i += 50) {
+    const lot = manquants.slice(i, i + 50);
     try {
-      let userSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
-      let userData = null;
+      const r = await restFetch(`${REST_URL}:batchGet`, {
+        documents: lot.flatMap((id) => [`${DOC_ROOT}/vendeurs/${id}`, `${DOC_ROOT}/vendeurs_clients/${id}`]),
+        mask: { fieldPaths: CHAMPS_VENDEUR }
+      });
+      const trouves = {};
+      r.forEach((x) => {
+        if (!x.found) return;
+        const parts = x.found.name.split("/");
+        const id = parts.pop(), col = parts.pop();
+        if (!trouves[id] || col === "vendeurs") trouves[id] = { ...lireChamps(x.found.fields), _col: col };
+      });
+      lot.forEach((id) => vendeurCache.set(id, trouves[id] || null));
+    } catch (e) { console.error("Erreur vendeurs :", e); }
+  }
+}
 
-      if (userSnap.exists()) {
-        userRole = "vendeurs_clients";
-        userData = userSnap.data();
-      } else {
-        userSnap = await getDoc(doc(db, "vendeurs", user.uid));
-        if (userSnap.exists()) {
-          userRole = "vendeurs";
-          userData = userSnap.data();
-        } else {
-          userRole = "acheteur";
-        }
-      }
+// La photo du vendeur, seulement quand sa carte est (presque) à l'écran
+async function chargerPhotoVendeur(id) {
+  if (photoCache.has(id)) return photoCache.get(id);
+  const v = vendeurCache.get(id);
+  if (!v) return "";
+  try {
+    const d = await restFetch(`${REST_URL}/${v._col}/${id}?mask.fieldPaths=photoUrl&mask.fieldPaths=photo`);
+    const f = lireChamps(d.fields);
+    const url = f.photoUrl || f.photo || "";
+    photoCache.set(id, url);
+    return url;
+  } catch (_) { return ""; }
+}
 
-    } catch (e) {
-      console.error("Erreur d'identification du rôle :", e);
+// Rôle de l'utilisateur (seulement utile au bouton WhatsApp) : n'bloque plus l'affichage
+async function detecterRole(user) {
+  try {
+    const r = await restFetch(`${REST_URL}:batchGet`, {
+      documents: [`${DOC_ROOT}/vendeurs_clients/${user.uid}`, `${DOC_ROOT}/vendeurs/${user.uid}`],
+      mask: { fieldPaths: ["role"] }
+    });
+    const existe = (col) => r.some((x) => x.found && x.found.name.endsWith(`/${col}/${user.uid}`));
+    userRole = existe("vendeurs_clients") ? "vendeurs_clients" : existe("vendeurs") ? "vendeurs" : "acheteur";
+  } catch (e) { console.error("Erreur d'identification du rôle :", e); }
+}
+
+// Remplit la carte avec les infos du vendeur (nom, ville, pays, drapeau, badge, WhatsApp)
+function remplirVendeur(card, product) {
+  const v = vendeurCache.get(product.vendeurId);
+  if (!v) return;
+  const addr = v.address || {};
+  const countryName = addr.country || v.country || v.pays || "";
+  const cityName = addr.city || v.city || v.ville || "---";
+
+  card.querySelector(".vendor-name").textContent = v.shopName || v.nom || "Boutique";
+
+  // Compte boosté = abonnement VIP encore valide (même règle que l'accueil)
+  const compteBoost = v.isPremium === true && !!v.premiumUntil && new Date(v.premiumUntil) > new Date();
+  if (compteBoost) {
+    card.classList.add("boosted-account");
+    const c = card.querySelector(".account-boost-badge-container");
+    if (c) {
+      c.innerHTML = `<span class="account-boost-badge" title="Compte Boosté"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg></span>`;
     }
   }
-  loadFeedData();
-});
-    async function loadFeedData() {
-      const feedContainer = document.getElementById("feedContainer");
-      try {
-        const querySnapshot = await getDocs(collection(db, "produits"));
-        let products = [];
 
-        querySnapshot.forEach((docSnap) => {
-          products.push({ id: docSnap.id, ...docSnap.data() });
-        });
+  card.querySelector(".v-country").textContent = countryName || "---";
+  card.querySelector(".v-city").textContent = cityName;
 
-        if (products.length === 0) {
-          document.getElementById("loadingScreen").textContent = "Aucun produit disponible.";
-          return;
-        }
+  const flagContainer = card.querySelector(".vendor-flag");
+  if (flagContainer && countryName) {
+    const clean = countryName.toLowerCase().trim();
+    const iso = countryCodeMap[clean] || clean.substring(0, 2);
+    if (iso && iso.length === 2) {
+      flagContainer.innerHTML = `<div class="country-flag-badge" title="${esc(countryName)}"><img src="https://flagcdn.com/w80/${esc(iso)}.png" alt="${esc(countryName)}"></div>`;
+    }
+  }
+  card._whatsapp = v.telephone || v.phone || v.whatsapp || "";
+}
 
-        if (initialProductId) {
-          const targetIndex = products.findIndex(p => p.id === initialProductId);
-          if (targetIndex > -1) {
-            const targetProduct = products.splice(targetIndex, 1)[0];
-            products.unshift(targetProduct);
-          }
-        }
+async function chargerPageProduits() {
+  const contraintes = [orderBy("createdAt", "desc")];
+  if (curseur) contraintes.push(startAfter(curseur));
+  const snap = await getDocs(query(collection(db, "produits"), ...contraintes, limit(PAGE_FEED)));
+  if (snap.docs.length < PAGE_FEED) feedTermine = true;
+  if (snap.docs.length) curseur = snap.docs[snap.docs.length - 1];
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
 
-        feedContainer.innerHTML = "";
+// La photo du vendeur se charge quand sa carte approche de l'écran
+const avatarObserver = new IntersectionObserver((entries) => {
+  entries.forEach(async (e) => {
+    if (!e.isIntersecting) return;
+    avatarObserver.unobserve(e.target);
+    const id = e.target.dataset.vendeurId;
+    const url = id ? await chargerPhotoVendeur(id) : "";
+    if (url) e.target.querySelector(".vendor-avatar").src = url;
+  });
+}, { rootMargin: "100% 0px" });
 
-        for (const product of products) {
-          const card = await buildProductCard(product);
-          feedContainer.appendChild(card);
-        }
+// Quand on approche de la fin du fil, on charge la suite (défilement continu)
+const suiteObserver = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    suiteObserver.unobserve(e.target);
+    chargerSuite();
+  });
+}, { rootMargin: "100% 0px" });
 
-        document.getElementById("loadingScreen").style.display = "none";
+async function chargerSuite() {
+  if (chargementSuite || feedTermine) return;
+  chargementSuite = true;
+  try { ajouterCartes(await chargerPageProduits()); }
+  catch (e) { console.error("Erreur chargement suite :", e); }
+  finally { chargementSuite = false; }
+}
 
-      } catch (error) {
-        console.error("Erreur de chargement du feed :", error);
-        document.getElementById("loadingScreen").textContent = "Erreur lors du chargement des données.";
+function ajouterCartes(produits) {
+  const feed = document.getElementById("feedContainer");
+  const paires = [];
+  produits.forEach((p) => {
+    if (idsAffiches.has(p.id)) return;       // jamais deux fois le même article
+    idsAffiches.add(p.id);
+    const card = buildProductCard(p);
+    card.dataset.vendeurId = p.vendeurId || "";
+    feed.appendChild(card);                   // l'article s'affiche tout de suite
+    paires.push({ p, card });
+  });
+
+  // Puis les infos vendeurs arrivent (une seule requête pour tout le lot)
+  chargerVendeurs(paires.map(({ p }) => p.vendeurId)).then(() => {
+    paires.forEach(({ p, card }) => { remplirVendeur(card, p); avatarObserver.observe(card); });
+  });
+
+  if (!feedTermine && feed.children.length) {
+    suiteObserver.observe(feed.children[Math.max(0, feed.children.length - 3)]);
+  }
+}
+
+async function loadFeedData() {
+  const loading = document.getElementById("loadingScreen");
+  chargementSuite = true;
+  try {
+    const pagePromise = chargerPageProduits();   // part tout de suite, en parallèle
+    if (initialProductId) {
+      // L'article demandé s'affiche en premier, sans attendre le reste
+      const snap = await getDoc(doc(db, "produits", initialProductId));
+      if (snap.exists()) {
+        ajouterCartes([{ id: snap.id, ...snap.data() }]);
+        loading.style.display = "none";
       }
     }
+    ajouterCartes(await pagePromise);
+    if (!idsAffiches.size) { loading.textContent = "Aucun produit disponible."; return; }
+    loading.style.display = "none";
+  } catch (error) {
+    console.error("Erreur de chargement du feed :", error);
+    if (!idsAffiches.size) loading.textContent = "Erreur lors du chargement des données.";
+  } finally {
+    chargementSuite = false;
+  }
+}
 
-    async function buildProductCard(product) {
+// Le rôle est cherché en arrière-plan : il n'empêche plus l'affichage
+onAuthStateChanged(auth, (user) => {
+  currentUser = user || null;
+  if (!user) return;
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function (OneSignal) { await OneSignal.login(user.uid); });
+  detecterRole(user);
+});
+
+// Un seul écouteur pour fermer les menus de partage (avant : un par article)
+document.addEventListener("click", () => {
+  document.querySelectorAll(".share-menu.active").forEach((m) => m.classList.remove("active"));
+});
+
+loadFeedData();
+
+    function buildProductCard(product) {
       const card = document.createElement("div");
       card.className = "product-view";
 
@@ -696,7 +852,8 @@ onAuthStateChanged(auth, async (user) => {
       const isDeliverable = product.livraison === true;
 
       // Vérification si l'article est boosté
-      const isArticleBoosted = product.boost === true || product.isBoosted === true;
+      const isArticleBoosted = (product.boost === true || product.isBoosted === true || product.boosted === true)
+        && !!product.boostUntil && new Date(product.boostUntil) > new Date() && product.vendu !== true;
 
       let imagesList = [];
       if (Array.isArray(product.images) && product.images.length > 0) {
@@ -708,8 +865,8 @@ onAuthStateChanged(auth, async (user) => {
       }
 
       let imagesHTML = '<div class="image-carousel">';
-      imagesList.forEach(url => {
-        imagesHTML += `<img class="bg-image" src="${url}" alt="${product.nom || 'Produit'}">`;
+      imagesList.forEach((url, i) => {
+        imagesHTML += `<img class="bg-image" src="${esc(url)}" alt="${esc(product.nom || 'Produit')}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
       });
       imagesHTML += '</div>';
 
@@ -849,67 +1006,7 @@ onAuthStateChanged(auth, async (user) => {
         }
       });
 
-      let whatsappNumber = "";
-      if (product.vendeurId) {
-        try {
-          // Recherche dans la collection 'vendeurs' ou 'vendeurs_clients'
-          let vendeurSnap = await getDoc(doc(db, "vendeurs", product.vendeurId));
-          if (!vendeurSnap.exists()) {
-            vendeurSnap = await getDoc(doc(db, "vendeurs_clients", product.vendeurId));
-          }
-
-          if (vendeurSnap.exists()) {
-            const vendeur = vendeurSnap.data();
-            const addr = vendeur.address || {};
-
-            const countryName = addr.country || vendeur.country || vendeur.pays || "";
-            const cityName = addr.city || vendeur.city || vendeur.ville || "---";
-
-            card.querySelector(".vendor-name").textContent = vendeur.shopName || vendeur.nom || "Boutique";
-
-            // Vérification si le compte (vendeur ou vendeur_client) est boosté ou VIP
-            const isAccountBoosted = vendeur.boost === true || vendeur.isBoosted === true || vendeur.isPremium === true;
-            if (isAccountBoosted) {
-              card.classList.add("boosted-account");
-
-              const boostContainer = card.querySelector(".account-boost-badge-container");
-              if (boostContainer) {
-                boostContainer.innerHTML = `
-                    <span class="account-boost-badge" title="Compte Boosté">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                    </span>
-                `;
-              }
-            }
-
-            card.querySelector(".v-country").textContent = countryName || "---";
-            card.querySelector(".v-city").textContent = cityName;
-
-            const flagContainer = card.querySelector(".vendor-flag");
-            if (flagContainer && countryName) {
-              const cleanCountry = countryName.toLowerCase().trim();
-              const isoCode = countryCodeMap[cleanCountry] || cleanCountry.substring(0, 2);
-              if (isoCode && isoCode.length === 2) {
-                flagContainer.innerHTML = `
-                  <div class="country-flag-badge" title="${countryName}">
-                    <img src="https://flagcdn.com/w80/${isoCode}.png" alt="${countryName}">
-                  </div>
-                `;
-              }
-            }
-
-            if (vendeur.photoUrl || vendeur.photo) {
-              card.querySelector(".vendor-avatar").src = vendeur.photoUrl || vendeur.photo;
-            }
-
-            whatsappNumber = vendeur.telephone || vendeur.phone || vendeur.whatsapp || "";
-          }
-        } catch (e) {
-          console.error("Erreur chargement vendeur :", e);
-        }
-      }
+      card._whatsapp = "";   // rempli par remplirVendeur() quand le vendeur est chargé
 
       const waBtn = card.querySelector(".whatsapp-btn");
       waBtn.addEventListener("click", () => {
@@ -918,6 +1015,7 @@ onAuthStateChanged(auth, async (user) => {
           return;
         }
 
+        const whatsappNumber = card._whatsapp || "";
         if (whatsappNumber) {
           const cleanPhone = String(whatsappNumber).replace(/[^0-9]/g, '');
           const message = encodeURIComponent(`Bonjour, je suis intéressé par votre article "${product.nom || ''}" à ${product.prix} ${product.devise || 'FC'}.`);
@@ -953,10 +1051,6 @@ onAuthStateChanged(auth, async (user) => {
         navigator.clipboard.writeText(productUrl).then(() => {
           showToast("Lien de l'article copié dans le presse-papier !");
         });
-        shareMenu.classList.remove("active");
-      });
-
-      document.addEventListener("click", () => {
         shareMenu.classList.remove("active");
       });
 

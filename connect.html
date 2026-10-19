@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion</title>
+
+  <!-- Connexions ouvertes à l'avance : gagne plusieurs secondes sur mobile -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://apis.google.com" crossorigin>
+  <link rel="preconnect" href="https://accounts.google.com" crossorigin>
+  <link rel="preconnect" href="https://v-ea-fb4c4.firebaseapp.com" crossorigin>
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="manifest" href="site.webmanifest">
+
   <style>
     * {
       box-sizing: border-box;
@@ -120,30 +135,14 @@
     }
   </style>
 </head>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="manifest" href="site.webmanifest">
-
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "31639645-a285-43ec-9366-175f51dff21c",
-    });
-  });
-</script>
-
 <body>
 
   <div class="card-container">
 
-    <!-- Écran de chargement initial -->
+    <!-- Écran de chargement -->
     <div id="loader" class="loader-container hidden">
       <div class="spinner"></div>
-      <p style="margin: 0;" id="loader-text">Vérification du compte...</p>
+      <p style="margin: 0;" id="loader-text">Connexion à Google...</p>
     </div>
 
     <!-- Écran de connexion -->
@@ -174,12 +173,15 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // 👉 Pour accélérer la connexion sur iPhone, remplace cette valeur par "vea-market.duckdns.org"
+    //    APRÈS avoir fait les étapes d'activation (voir les explications).
+    const AUTH_DOMAIN = "v-ea-fb4c4.firebaseapp.com";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
-      authDomain: "v-ea-fb4c4.firebaseapp.com",
+      authDomain: AUTH_DOMAIN,
       projectId: "v-ea-fb4c4",
       storageBucket: "v-ea-fb4c4.firebasestorage.app",
       messagingSenderId: "357462139035",
@@ -188,74 +190,80 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
 
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
+    provider.setCustomParameters({ prompt: "select_account" });
 
-    // Fonction de vérification et redirection dans Firestore
+    const DOC_ROOT = `projects/${firebaseConfig.projectId}/databases/(default)/documents`;
+    const $ = (id) => document.getElementById(id);
+
+    // Le compte existe-t-il déjà ? UNE seule requête, sans les photos (qui pèsent très lourd)
+    async function compteExiste(user) {
+      try { if (localStorage.getItem("vea_compte_" + user.uid) === "1") return true; } catch (_) {}
+
+      const jeton = await user.getIdToken();
+      const reponse = await fetch(`https://firestore.googleapis.com/v1/${DOC_ROOT}:batchGet`, {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + jeton, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documents: ["acheteurs", "vendeurs", "vendeurs_clients"].map((c) => `${DOC_ROOT}/${c}/${user.uid}`),
+          mask: { fieldPaths: ["role"] }
+        })
+      });
+      if (!reponse.ok) throw new Error("Firestore " + reponse.status);
+
+      const existe = (await reponse.json()).some((x) => x.found);
+      if (existe) { try { localStorage.setItem("vea_compte_" + user.uid, "1"); } catch (_) {} }
+      return existe;
+    }
+
     async function redirectUser(user) {
       try {
-        // 1. Recherche dans la collection acheteurs
-        const acheteurSnap = await getDoc(doc(db, "acheteurs", user.uid));
-        if (acheteurSnap.exists()) {
-          window.location.assign("./acceuil.html");
-          return;
-        }
-
-        // 2. Recherche dans la collection vendeurs
-        const vendeurSnap = await getDoc(doc(db, "vendeurs", user.uid));
-        if (vendeurSnap.exists()) {
-          window.location.assign("./acceuil.html");
-          return;
-        }
-
-        // 3. Recherche dans la collection vendeurs_clients
-        const vendeurClientSnap = await getDoc(doc(db, "vendeurs_clients", user.uid));
-        if (vendeurClientSnap.exists()) {
-          window.location.assign("./acceuil.html");
-          return;
-        }
-
-        // 4. Si c'est un nouveau compte
-        window.location.assign("./acheteur.html");
+        $("loader-text").textContent = "Ouverture de votre compte...";
+        const existe = await compteExiste(user);
+        window.location.assign(existe ? "./acceuil.html" : "./acheteur.html");
       } catch (err) {
         console.error("Erreur de base de données :", err);
-        showError("Erreur lors de la recherche du compte dans Firestore.");
+        showError("Erreur lors de la recherche du compte. Vérifiez votre connexion et réessayez.");
       }
     }
 
     function showError(msg) {
-      document.getElementById("loader").classList.add("hidden");
-      document.getElementById("login-content").classList.remove("hidden");
-      const errElem = document.getElementById("error-message");
+      $("loader").classList.add("hidden");
+      $("login-content").classList.remove("hidden");
+      const errElem = $("error-message");
       errElem.textContent = msg;
       errElem.classList.remove("hidden");
     }
 
     // Action lors du clic sur le bouton Google
-    window.loginWithGoogle = async function() {
-      // Masquer le bouton et afficher le loader pendant la tentative
-      document.getElementById("login-content").classList.add("hidden");
-      document.getElementById("loader").classList.remove("hidden");
-      document.getElementById("error-message").classList.add("hidden");
+    window.loginWithGoogle = async function () {
+      $("login-content").classList.add("hidden");
+      $("loader").classList.remove("hidden");
+      $("error-message").classList.add("hidden");
+      $("loader-text").textContent = "Connexion à Google...";
+
+      // Si le réseau est lent, on le dit au lieu de laisser tourner sans explication
+      const minuteurLent = setTimeout(() => {
+        $("loader-text").textContent = "Connexion lente, merci de patienter...";
+      }, 8000);
 
       try {
-        // Ouverture de la fenêtre contextuelle (Popup)
         const result = await signInWithPopup(auth, provider);
-        if (result && result.user) {
-          await redirectUser(result.user);
-        }
+        clearTimeout(minuteurLent);
+        if (result && result.user) await redirectUser(result.user);
       } catch (error) {
+        clearTimeout(minuteurLent);
         console.error("Erreur de connexion :", error);
 
-        // Si l'utilisateur ferme lui-même la popup sans se connecter, on ne montre pas une erreur critique
-        if (error.code === 'auth/popup-closed-by-user') {
-          document.getElementById("loader").classList.add("hidden");
-          document.getElementById("login-content").classList.remove("hidden");
+        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
+          $("loader").classList.add("hidden");
+          $("login-content").classList.remove("hidden");
+        } else if (error.code === "auth/popup-blocked") {
+          showError("La fenêtre de connexion a été bloquée. Autorisez les fenêtres contextuelles puis réessayez.");
+        } else if (error.code === "auth/network-request-failed") {
+          showError("Pas de connexion internet stable. Réessayez dans un instant.");
         } else {
           showError("Échec de connexion : " + error.message);
         }
