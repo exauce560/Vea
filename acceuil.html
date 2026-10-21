@@ -1161,8 +1161,14 @@ function calculateFeedScore(product) {
     // 🚀 BOOST COMPTE +1000
     // ==========================================
 
+        // Le boost compte à fond tant que l'article n'a pas été vu récemment.
+    // Après l'avoir vu, il ne garde que 20 % de son bonus et laisse la place aux autres.
+    const vuAvant = feedSeenProducts[product.id];
+    const dejaVuRecemment = !!vuAvant && (Date.now() - vuAvant) < RECENTLY_SEEN_TIME;
+    const facteurBoost = dejaVuRecemment ? 0.2 : 1;
+
     if (product.isAccountBoosted) {
-        score += 1000;
+        score += 1000 * facteurBoost;
     }
 
     // ==========================================
@@ -1170,7 +1176,7 @@ function calculateFeedScore(product) {
     // ==========================================
 
     if (product.isItemBoosted) {
-        score += 700;
+        score += 700 * facteurBoost;
     }
 
     // ==========================================
@@ -1382,30 +1388,36 @@ document
 
 function buildPersonalizedFeed(products) {
 
-    return products
+    const getDate = (p) => {
+        if (!p.createdAt) return 0;
+        return p.createdAt.toDate
+            ? p.createdAt.toDate().getTime()
+            : new Date(p.createdAt).getTime();
+    };
+
+    const comparer = (a, b) => {
+        if (b.feedScore !== a.feedScore) return b.feedScore - a.feedScore;
+        return getDate(b) - getDate(a);
+    };
+
+    const classes = products
         .map(product => ({
             ...product,
             feedScore: calculateFeedScore(product)
         }))
-        .sort((a, b) => {
+        .sort(comparer);
 
-            if (b.feedScore !== a.feedScore) {
-                return b.feedScore - a.feedScore;
-            }
+    // Une boutique boostée ne doit pas occuper tout le haut du fil :
+    // chaque article supplémentaire de la même boutique perd 150 points
+    const parBoutique = {};
+    classes.forEach((p) => {
+        if (!p.isAccountBoosted || !p.vendeurId) return;
+        const n = parBoutique[p.vendeurId] || 0;
+        p.feedScore -= 150 * n;
+        parBoutique[p.vendeurId] = n + 1;
+    });
 
-            const getDate = (p) => {
-
-                if (!p.createdAt) {
-                    return 0;
-                }
-
-                return p.createdAt.toDate
-                    ? p.createdAt.toDate().getTime()
-                    : new Date(p.createdAt).getTime();
-            };
-
-            return getDate(b) - getDate(a);
-        });
+    return classes.sort(comparer);
 }
 
 
