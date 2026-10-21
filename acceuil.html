@@ -795,6 +795,31 @@
     .sold-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(15, 23, 42, 0.45); z-index: 7; pointer-events: none; }
 .sold-overlay svg { width: 104px; height: 34px; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35)); }
 .product-card.is-sold .image-container img { filter: grayscale(0.7); }
+/* Toast de connexion (5 secondes) */
+.reseau-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 160%);
+  max-width: min(92vw, 420px);
+  background: rgba(15, 23, 42, 0.96);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border-left: 4px solid #0284c7;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  z-index: 3000;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+.reseau-toast.show { transform: translate(-50%, 0); opacity: 1; }
+.reseau-toast.warn { border-left-color: #f59e0b; }
+.reseau-toast.err  { border-left-color: #ef4444; }
+.reseau-toast.ok   { border-left-color: #22c55e; }
   </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -815,7 +840,7 @@
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   // Son de notification personnalisé
-  const customNotificationSound = new Audio("assets/sounds/notif.mp3");
+  const customNotificationSound = new Audio("notif.mp3");
 
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
@@ -875,6 +900,7 @@
   </div>
 
   <main class="grid-container" id="productsGrid"></main>
+  <div class="reseau-toast" id="reseauToast" role="status" aria-live="polite"></div>
 
   <div class="ad-toast-overlay" id="adToastOverlay">
     <div class="ad-toast-card">
@@ -929,7 +955,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, where, limit, startAfter, getDocs, getDocsFromServer, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeFirestore, collection, query, orderBy, where, limit, startAfter, getDocs, getDocsFromServer, doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -943,7 +969,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const auth = getAuth(app);
 
     const storedTheme = localStorage.getItem("app_theme") || "light";
@@ -1037,16 +1063,10 @@ async function envoyerPushCustom({
 
     const result = await response.json();
 
-    console.log(
-      "📨 Réponse complète du Worker :",
-      JSON.stringify(result, null, 2)
-    );
 
     if (!response.ok) {
       throw new Error(result.error || "Erreur du Worker");
     }
-
-    console.log("Notification envoyée :", result);
 
   } catch (err) {
     console.error("Erreur d'envoi de la notification :", err);
@@ -1066,163 +1086,26 @@ if (currentUser && !localStorage.getItem("welcome_pushed_" + currentUser.uid)) {
 }
 
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        let preferences = [];
-        console.log("🔥 Firebase utilisateur connecté :", user.uid);
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "verification.html";
+    return;
+  }
+  currentUser = user;
 
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    try { await OneSignal.login(user.uid); }
+    catch (error) { console.error("❌ Erreur OneSignal :", error); }
+  });
 
-        window.OneSignalDeferred.push(async function(OneSignal) {
-
-              console.log("🔥 Callback OneSignal exécuté");
-
-            try {
-
-                await OneSignal.login(user.uid);
-
-                console.log(
-                    "✅ OneSignal connecté avec UID :",
-                    user.uid
-                );
-
-                console.log(
-                    "🔔 Permission avant :",
-                    OneSignal.Notifications.permission
-                );
-
-                console.log(
-                    "🔔 OptIn avant :",
-                    OneSignal.User.PushSubscription.optedIn
-                );
-
-                console.log(
-                    "🆔 Subscription ID avant :",
-                    OneSignal.User.PushSubscription.id
-                );
-
-                console.log("🔔 Demande d'autorisation Push...");
-
-                await OneSignal.Notifications.requestPermission();
-
-                console.log(
-                    "🔔 Permission après :",
-                    OneSignal.Notifications.permission
-                );
-
-                console.log(
-                    "🔔 OptIn après :",
-                    OneSignal.User.PushSubscription.optedIn
-                );
-
-                console.log(
-                    "🆔 Subscription ID après :",
-                    OneSignal.User.PushSubscription.id
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "❌ Erreur OneSignal :",
-                    error
-                );
-            }
-        });
-
-
-
-        try {
-          const profileBtn = document.getElementById("profileBtn");
-          const addBtn = document.getElementById("addProductBtn");
-
-          const [snapVC, snapV, snapA] = await Promise.all([
-            getDoc(doc(db, "vendeurs_clients", user.uid)),
-            getDoc(doc(db, "vendeurs", user.uid)),
-            getDoc(doc(db, "acheteurs", user.uid))
-          ]);
-          let userSnap = snapVC;
-          let isVendeurOrVC = false;
-
-          if (userSnap.exists()) {
-            userRole = "vendeurs_clients";
-            profileBtn.href = "compte-v.html";
-            addBtn.style.display = "flex";
-            isVendeurOrVC = true;
-          } else {
-            userSnap = snapV;
-            if (userSnap.exists()) {
-              userRole = "vendeurs";
-              profileBtn.href = "compte-v.html";
-              addBtn.style.display = "flex";
-              isVendeurOrVC = true;
-            } else {
-              userSnap = snapA;
-              if (userSnap.exists()) {
-                userRole = "acheteur";
-                profileBtn.href = "compte-a.html";
-                addBtn.style.display = "none";
-              }
-            }
-          }
-
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            feedSeenProducts = userData.feedSeenProducts || {};
-            const addr = userData.address || {};
-
-            userCity = addr.city || userData.city || userData.ville || "";
-            userProvince = addr.province || userData.province || "";
-            userCountry = addr.country || userData.country || userData.pays || "";
-
-            document.getElementById("cityName").textContent = userCity || "--";
-
-            if (userRole === "vendeurs") {
-                userCollectionName = "vendeurs";
-            } else if (userRole === "vendeurs_clients") {
-                userCollectionName = "vendeurs_clients";
-            } else {
-                userCollectionName = "acheteurs";
-            }
-
-            const photoUrl = userData.photoUrl || userData.photo || user.photoUrl;
-            if (photoUrl) {
-              profileBtn.innerHTML = `<img src="${photoUrl}" alt="Profil"><span class="unread-badge" id="profileBadge" style="display: none;"></span>`;
-            }
-
-            preferences = userData.preferences || [];
-            userPreferencesCache = preferences;
-            userFavorites = Array.isArray(userData.favoris) ? userData.favoris : [];
-            searchHistory = Array.isArray(userData.searchHistory) ? userData.searchHistory : [];
-
-            if (!localStorage.getItem("app_lang") && userData.langue) {
-              currentI18n = i18n[userData.langue] || i18n.fr;
-              localStorage.setItem("app_lang", userData.langue);
-            }
-
-            if (!localStorage.getItem("app_theme") && userData.darkMode !== undefined) {
-              const themeName = userData.darkMode === true ? "dark" : "light";
-              document.documentElement.setAttribute("data-theme", themeName);
-              localStorage.setItem("app_theme", themeName);
-            }
-
-            // MODIFICATION 2: Ne pas afficher la pub si le vendeur ou vendeur_client est DEJA boosté ou premium
-            const isUserBoosted = userData.isPremium || userData.isBoosted || (userData.boostUntil && new Date(userData.boostUntil) > new Date());
-            if (isVendeurOrVC && !isUserBoosted) {
-              checkAndShowAd(userData);
-            }
-          }
-        } catch (e) {
-          console.error("Erreur chargement profil:", e);
-        }
-
-        document.getElementById("searchInput").placeholder = currentI18n.search;
-
-        loadProducts(preferences);
-      } else {
-        window.location.href = "verification.html";
-      }
-    });
+    // Le profil se charge en parallèle. Les articles n'attendent plus que 2,5 s au maximum
+  // (le profil enregistré sur l'appareil sert à personnaliser en attendant).
+  const profil = chargerProfil(user);
+  await Promise.race([profil, new Promise((r) => setTimeout(r, 2500))]);
+  document.getElementById("searchInput").placeholder = currentI18n.search;
+  loadProducts(userPreferencesCache);
+});
 
 
 function scheduleFeedSeenSave() {
@@ -1415,7 +1298,7 @@ document
 
         if (currentUser) {
 
-            await updateDoc(
+             updateDoc(
                 doc(
                     db,
                     userCollectionName,
@@ -1424,7 +1307,7 @@ document
                 {
                     feedSeenProducts
                 }
-            );
+            ).catch(() => {});   // sans attendre : il se synchronisera au retour du réseau
         }
 
         // 🔥 NOUVEAU FEED
@@ -1640,6 +1523,7 @@ async function chargerPage(taille, serveur, session) {
   const q = query(collection(db, "produits"), ...contraintes, limit(taille));
   const snap = serveur ? await getDocsFromServer(q) : await getDocs(q);
   if (session !== sessionChargement) return [];   // un nouveau chargement a démarré
+  if (snap.metadata.fromCache && snap.docs.length === 0) throw new Error("reseau-indisponible");
   if (snap.docs.length < taille) pagesTerminees = true;
   if (snap.docs.length) curseurPage = snap.docs[snap.docs.length - 1];
   return snap.docs;
@@ -1693,7 +1577,6 @@ async function preparer(docs) {
 // Le fil continue à la suite : chaque lot est classé, puis ajouté
 function ajouterAuFil(produits) {
   const classes = buildPersonalizedFeed(produits);
-  console.log("🚀 Boosts détectés :", classes.filter((p) => p.hasBoostStyle).map((p) => ({ nom: p.nom, article: p.isItemBoosted, compte: p.isAccountBoosted })));
   currentFeedProducts.push(...classes);
   rawProducts.push(...classes);
   allProducts = [...rawProducts].sort((a, b) => b.feedScore - a.feedScore || dateMs(b) - dateMs(a));
@@ -1709,6 +1592,9 @@ function majBadges() {
 async function loadProducts(userPreferences, forceRefresh = false) {
   const session = ++sessionChargement;
   const grid = document.getElementById("productsGrid");
+  // On garde l'ancien contenu : rien ne disparaît tant que le nouveau n'est pas arrivé
+  const ancien = { rawProducts, allProducts, currentFeedProducts, idsCharges, curseurPage, pagesTerminees };
+  let minuteurLent = null;
   try {
     chargementEnCours = true;
     rawProducts = []; allProducts = []; currentFeedProducts = [];
@@ -1716,15 +1602,21 @@ async function loadProducts(userPreferences, forceRefresh = false) {
     if (forceRefresh) { vendeurCache.clear(); vendeurCacheT = Date.now(); }
     if (!grid.children.length) renderProducts(currentFeedProducts);   // "Chargement..."
 
-    // 1) Première page + articles prioritaires : affichage immédiat
+    // Après 4 s sans réponse : on prévient (les articles enregistrés restent affichés)
+    minuteurLent = setTimeout(() => { if (session === sessionChargement) signalerReseau("lent"); }, 4000);
+
+    // 1) Première page + articles prioritaires
     const [docs, prioritaires] = await Promise.all([chargerPage(PREMIERE_PAGE, forceRefresh, session), chargerPrioritaires(forceRefresh)]);
+    clearTimeout(minuteurLent);
     if (session !== sessionChargement) return;
     ajouterAuFil(await preparer([...prioritaires, ...docs]));
     if (session !== sessionChargement) return;
     majBadges();
-    renderProducts(currentFeedProducts);
+    sauverFilCache();               // gardé sur l'appareil pour la prochaine fois
+    appliquerFilFrais(forceRefresh);
+    signalerReseau("ok");
 
-    // 2) Le reste du catalogue arrive en arrière-plan : le fil continue et la recherche trouve tout
+    // 2) Le reste du catalogue arrive en arrière-plan
     while (!pagesTerminees && session === sessionChargement) {
       const suite = await preparer(await chargerPage(PAGES_SUIVANTES, forceRefresh, session));
       if (session !== sessionChargement) return;
@@ -1733,12 +1625,26 @@ async function loadProducts(userPreferences, forceRefresh = false) {
       const term = document.getElementById("searchInput").value.toLowerCase().trim();
       if (activeFilter === "all" && !term) remplirEcran(); else applyFilters();
     }
+    if (session === sessionChargement) sauverFilCache();
   } catch (e) {
+    clearTimeout(minuteurLent);
     console.error("Erreur chargement articles:", e);
+    if (session === sessionChargement) {
+      // Échec réseau : on remet ce qui était affiché, rien ne disparaît
+      if (rawProducts.length === 0 && ancien.currentFeedProducts.length > 0) {
+        ({ rawProducts, allProducts, currentFeedProducts, idsCharges, curseurPage, pagesTerminees } = ancien);
+      }
+      besoinRafraichir = true;       // on recharge dès que le réseau revient
+      signalerReseau(navigator.onLine ? "lent" : "coupe");
+    }
   } finally {
     if (session === sessionChargement) {
       chargementEnCours = false;
-      if (!grid.children.length) grid.innerHTML = `<div class="empty-state">${currentI18n.empty}</div>`;
+      if (!grid.children.length) {
+        grid.innerHTML = `<div class="empty-state">${besoinRafraichir
+          ? "Pas de connexion. Les articles s'afficheront dès le retour du réseau."
+          : currentI18n.empty}</div>`;
+      }
     }
   }
 }
@@ -1865,6 +1771,8 @@ function ajouterCartes() {
   while (renderIndex < renderSource.length && n < FEED_SIZE) {
     const p = renderSource[renderIndex++];
     if (p.isSold && !term) continue;        // jamais dans le fil, mais visible en recherche
+    if (idsGrille.has(p.id)) continue;      // déjà à l'écran (par exemple venu du cache)
+    idsGrille.add(p.id);        // jamais dans le fil, mais visible en recherche
     const card = creerCarte(p, canLike);
     grid.appendChild(card);
     if (activeFilter === "all" && !term) feedObserver.observe(card);
@@ -1884,6 +1792,7 @@ function remplirEcran() {
 function renderProducts(products) {
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
+  idsGrille.clear();
   renderSource = products;
   renderIndex = 0;
   remplirEcran();
@@ -2206,6 +2115,256 @@ window.addEventListener("online", () => {
 
 // Vérification au démarrage
 updateConnectionStatus();
+// ==========================================
+// 📡 CONNEXION FAIBLE : CACHE + SURVEILLANCE
+// ==========================================
+const idsGrille = new Set();
+let etatReseau = "ok";            // "ok" | "lent" | "coupe"
+let besoinRafraichir = false;
+let toastReseauTimer = null;
+let dernierToastReseau = 0;
+
+// ---------- Toast de 5 secondes ----------
+function showReseauToast(message, type = "info") {
+  const t = document.getElementById("reseauToast");
+  if (!t) return;
+  t.textContent = message;
+  t.className = `reseau-toast ${type} show`;
+  dernierToastReseau = Date.now();
+  clearTimeout(toastReseauTimer);
+  toastReseauTimer = setTimeout(() => t.classList.remove("show"), 5000);
+}
+
+function signalerReseau(etat) {
+  if (etat === etatReseau) return;
+  etatReseau = etat;
+  if (etat === "ok") {
+    if (besoinRafraichir) { besoinRafraichir = false; loadProducts(userPreferencesCache); }
+    showReseauToast("Connexion rétablie ✓", "ok");
+  } else if (Date.now() - dernierToastReseau > 15000 || etat === "coupe") {
+    if (etat === "lent") showReseauToast("Connexion lente : les derniers articles enregistrés restent affichés.", "warn");
+    else showReseauToast("Pas de connexion : vous voyez les derniers articles enregistrés.", "err");
+  }
+}
+
+// Test réel de la connexion (navigator.onLine seul n'est pas fiable sur mobile)
+async function testerReseau() {
+  if (!navigator.onLine) { signalerReseau("coupe"); return; }
+  const debut = performance.now();
+  const controle = new AbortController();
+  const stop = setTimeout(() => controle.abort(), 6000);
+  try {
+    await fetch("https://firestore.googleapis.com/", { mode: "no-cors", cache: "no-store", signal: controle.signal });
+    signalerReseau(performance.now() - debut > 3500 ? "lent" : "ok");
+  } catch (e) {
+    signalerReseau(e.name === "AbortError" ? "lent" : "coupe");
+  } finally { clearTimeout(stop); }
+}
+
+function surveillerReseau() {
+  window.addEventListener("online", testerReseau);
+  window.addEventListener("offline", () => signalerReseau("coupe"));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") testerReseau(); });
+  setInterval(testerReseau, 20000);
+  testerReseau();
+}
+
+// ---------- Accès Firestore par l'API REST (sans les photos, sans attendre les 10 s) ----------
+async function restFetch(url, corps) {
+  const headers = { "Content-Type": "application/json" };
+  if (currentUser) headers.Authorization = "Bearer " + await currentUser.getIdToken();
+  const r = await fetch(`${url}${url.includes("?") ? "&" : "?"}key=${firebaseConfig.apiKey}`, {
+    method: corps ? "POST" : "GET",
+    headers,
+    body: corps ? JSON.stringify(corps) : undefined
+  });
+  if (!r.ok) throw new Error("Firestore " + r.status);
+  return r.json();
+}
+
+// ---------- Profil enregistré sur l'appareil (ville, photo, préférences...) ----------
+const CLE_PROFIL = "vea_profil_cache";
+const CHAMPS_PROFIL = ["feedSeenProducts", "address", "city", "ville", "province", "country", "pays", "preferences", "favoris", "searchHistory", "langue", "darkMode", "isPremium", "isBoosted", "boostUntil", "lastAdShown"];
+
+function lireProfilCache() { try { return JSON.parse(localStorage.getItem(CLE_PROFIL)) || null; } catch (_) { return null; } }
+function sauverProfilCache(partiel) {
+  try { localStorage.setItem(CLE_PROFIL, JSON.stringify({ ...(lireProfilCache() || {}), ...partiel })); } catch (_) {}
+}
+
+function appliquerProfilUI({ city, role, photo }) {
+  if (city !== undefined) document.getElementById("cityName").textContent = city || "--";
+  const profileBtn = document.getElementById("profileBtn");
+  const addBtn = document.getElementById("addProductBtn");
+  if (role) {
+    profileBtn.href = role === "acheteur" ? "compte-a.html" : "compte-v.html";
+    addBtn.style.display = role === "acheteur" ? "none" : "flex";
+  }
+  if (photo) {
+    profileBtn.innerHTML = `<img src="${esc(photo)}" alt="Profil"><span class="unread-badge" id="profileBadge" style="display: none;"></span>`;
+    majBadges();
+  }
+}
+
+// Au démarrage : ville, photo et préférences s'affichent TOUT DE SUITE, avant tout réseau
+function appliquerProfilCache() {
+  const c = lireProfilCache();
+  if (!c) return;
+  userRole = c.role || userRole;
+  userCollectionName = c.collection || userCollectionName;
+  userCity = c.city || ""; userProvince = c.province || ""; userCountry = c.country || "";
+  userPreferencesCache = c.preferences || [];
+  userFavorites = c.favoris || [];
+  searchHistory = c.searchHistory || [];
+  feedSeenProducts = c.feedSeenProducts || {};
+  appliquerProfilUI({ city: c.city, role: c.role, photo: c.photo });
+}
+
+// La photo de profil est réduite (96 px, environ 4 Ko) pour tenir dans le localStorage
+function creerMiniature(src, taille = 96) {
+  return new Promise((ok) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const c = document.createElement("canvas");
+        c.width = c.height = taille;
+        const s = Math.min(img.width, img.height);
+        c.getContext("2d").drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, taille, taille);
+        ok(c.toDataURL("image/jpeg", 0.75));
+      } catch (_) { ok(src.startsWith("http") ? src : ""); }
+    };
+    img.onerror = () => ok(src.startsWith("http") ? src : "");
+    img.src = src;
+  });
+}
+
+async function chargerPhotoProfil(user, col) {
+  const c = lireProfilCache();
+  if (c && c.photo && Date.now() - (c.photoT || 0) < 24 * 3600 * 1000) return;   // déjà gardée (24 h)
+  try {
+    const d = await restFetch(`${REST_URL}/${col}/${user.uid}?mask.fieldPaths=photoUrl&mask.fieldPaths=photo`);
+    const f = lireChamps(d.fields);
+    const src = f.photoUrl || f.photo || "";
+    if (!src) return;
+    const mini = await creerMiniature(src);
+    if (mini) { appliquerProfilUI({ photo: mini }); sauverProfilCache({ photo: mini, photoT: Date.now() }); }
+  } catch (_) {}
+}
+
+// Même logique que l'ancien bloc, mais en REST et sans la photo
+async function chargerProfil(user) {
+  try {
+    const noms = ["vendeurs_clients", "vendeurs", "acheteurs"];
+    const r = await restFetch(`${REST_URL}:batchGet`, {
+      documents: noms.map((c) => `${DOC_ROOT}/${c}/${user.uid}`),
+      mask: { fieldPaths: CHAMPS_PROFIL }
+    });
+    let col = null, userData = null;
+    for (const c of noms) {
+      const x = r.find((y) => y.found && y.found.name.endsWith(`/${c}/${user.uid}`));
+      if (x) { col = c; userData = lireChamps(x.found.fields); break; }
+    }
+    if (!userData) return false;
+
+    userRole = col === "acheteurs" ? "acheteur" : col;
+    userCollectionName = col;
+    const isVendeurOrVC = userRole !== "acheteur";
+
+    feedSeenProducts = { ...(userData.feedSeenProducts || {}), ...feedSeenProducts };
+    const addr = userData.address || {};
+    userCity = addr.city || userData.city || userData.ville || "";
+    userProvince = addr.province || userData.province || "";
+    userCountry = addr.country || userData.country || userData.pays || "";
+    userPreferencesCache = userData.preferences || [];
+    userFavorites = Array.isArray(userData.favoris) ? userData.favoris : [];
+    searchHistory = Array.isArray(userData.searchHistory) ? userData.searchHistory : [];
+
+    appliquerProfilUI({ city: userCity, role: userRole });
+    sauverProfilCache({ role: userRole, collection: col, city: userCity, province: userProvince, country: userCountry,
+      preferences: userPreferencesCache, favoris: userFavorites, searchHistory });
+
+    if (!localStorage.getItem("app_lang") && userData.langue) {
+      currentI18n = i18n[userData.langue] || i18n.fr;
+      localStorage.setItem("app_lang", userData.langue);
+      document.getElementById("searchInput").placeholder = currentI18n.search;
+    }
+    if (!localStorage.getItem("app_theme") && userData.darkMode !== undefined) {
+      const themeName = userData.darkMode === true ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", themeName);
+      localStorage.setItem("app_theme", themeName);
+    }
+
+    const isUserBoosted = userData.isPremium || userData.isBoosted || (userData.boostUntil && new Date(userData.boostUntil) > new Date());
+    if (isVendeurOrVC && !isUserBoosted) checkAndShowAd(userData);
+
+    chargerPhotoProfil(user, col);   // sans attendre
+    return true;
+  } catch (e) {
+    console.error("Erreur chargement profil:", e);
+    return false;
+  }
+}
+
+// Favoris, historique et articles vus : gardés quand on quitte la page
+function sauverEtatLocal() { sauverProfilCache({ favoris: userFavorites, searchHistory, feedSeenProducts }); }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") sauverEtatLocal(); });
+window.addEventListener("pagehide", sauverEtatLocal);
+
+// ---------- Fil enregistré sur l'appareil (comme Pinterest : on voit toujours quelque chose) ----------
+const CHAMPS_CACHE = ["id", "nom", "prix", "devise", "stock", "type", "image", "images", "vendeurId", "favoris", "vendu", "statut",
+  "isBoosted", "boostUntil", "createdAt", "shopName", "city", "province", "country", "premiumUntil", "vendeurIsPremium"];
+const enChaine = (v) => (typeof v === "string" || v == null) ? v : (v.toDate ? v.toDate().toISOString() : undefined);
+
+function sauverFilCache() {
+  try {
+    const items = currentFeedProducts.filter((p) => !p.isSold).slice(0, 60).map((p) => {
+      const o = {};
+      CHAMPS_CACHE.forEach((k) => {
+        if (p[k] === undefined) return;
+        o[k] = (k === "createdAt" || k === "boostUntil" || k === "premiumUntil") ? enChaine(p[k]) : p[k];
+      });
+      return o;
+    });
+    localStorage.setItem("vea_feed_cache", JSON.stringify({ t: Date.now(), items }));
+  } catch (_) {}
+}
+
+function reconstruireProduit(p) {
+  const now = Date.now();
+  p.isSold = p.vendu === true || p.statut === "vendu";
+  p.isItemBoosted = p.isBoosted === true && !!p.boostUntil && new Date(p.boostUntil).getTime() > now;
+  p.isAccountBoosted = p.vendeurIsPremium === true && !!p.premiumUntil && new Date(p.premiumUntil).getTime() > now;
+  p.hasBoostStyle = p.isItemBoosted || p.isAccountBoosted;
+  return p;
+}
+
+function afficherFilDepuisCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem("vea_feed_cache"));
+    if (!c || !Array.isArray(c.items) || !c.items.length) return;
+    const liste = c.items.map(reconstruireProduit);
+    rawProducts = [...liste]; allProducts = [...liste]; currentFeedProducts = liste;
+    renderProducts(currentFeedProducts);
+  } catch (_) {}
+}
+
+// Quand le vrai fil arrive : il remplace le cache si tu n'as pas encore défilé,
+// sinon il s'ajoute à la suite SANS effacer ce que tu regardes
+function appliquerFilFrais(force) {
+  const term = document.getElementById("searchInput").value.toLowerCase().trim();
+  if (activeFilter !== "all" || term) { applyFilters(); return; }
+  const grid = document.getElementById("productsGrid");
+  if (force || window.scrollY < 80 || !grid.querySelector(".product-card")) {
+    renderProducts(currentFeedProducts);
+  } else {
+    renderSource = currentFeedProducts; renderIndex = 0; remplirEcran();
+  }
+}
+
+// ---------- Démarrage : tout ce qui est enregistré s'affiche immédiatement ----------
+appliquerProfilCache();
+afficherFilDepuisCache();
+surveillerReseau();
   </script>
 </body>
 </html>
