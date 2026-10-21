@@ -1402,14 +1402,23 @@
         }
     };
 
-    window.logoutUser = function() {
-      signOut(auth).then(() => {
-        showToast("Déconnexion réussie");
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 1000);
-      });
-    };
+
+window.logoutUser = async function() {
+  try {
+    await signOut(auth);
+
+    // Effacer TOUT le LocalStorage
+    localStorage.clear();
+
+    // Retour à la page de connexion
+    window.location.replace("index.html");
+
+  } catch (err) {
+    console.error("Erreur lors de la déconnexion :", err);
+    showToast("Erreur lors de la déconnexion.");
+  }
+};
+
 
     window.updateDescription = async function() {
       const desc = document.getElementById("descInput").value.trim();
