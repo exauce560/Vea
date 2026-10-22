@@ -1245,23 +1245,6 @@ async function checkRealPayment(refTransa) {
   };
 }
 
-// Pour chaque produit du vendeur récupéré de Firestore :
-const dateBoost = produit.boostUntil ? new Date(produit.boostUntil) : null;
-if (dateBoost) {
-  const diffJours = Math.ceil((dateBoost - new Date()) / (1000 * 60 * 60 * 24));
-
-  // Si le boost expire dans exactement 3 jours
-  if (diffJours === 3) {
-    envoyerPushCustom({
-      idDestinataire: currentUser.uid,
-      titre: "Votre Boost expire bientôt ! ⚡",
-      message: `Le boost pour votre article "${produit.nom}" se termine dans 3 jours. Renouvelez-le pour rester en tête !`,
-      lienUrl: "https://vea-market.duckdns.org/premium.html",
-      soundFile: "notif.mp3"
-    });
-  }
-}
-
   async function waitForPaymentConfirmation(refTransa) {
     const startTime = Date.now();
     while (Date.now() - startTime < PAYMENT_TIMEOUT) {
@@ -1286,7 +1269,31 @@ if (dateBoost) {
     productsUnsubscribe = onSnapshot(productsQuery, (snapshot) => {
       boostedProductsData = {};
       snapshot.forEach((docSnap) => {
-        boostedProductsData[docSnap.id] = docSnap.data();
+        const produit = docSnap.data();
+        boostedProductsData[docSnap.id] = produit;
+
+        // Pour chaque produit du vendeur : notification 3 jours avant la fin du boost
+        const brut = produit.boostUntil;
+        const dateBoost = brut ? (typeof brut.toDate === "function" ? brut.toDate() : new Date(brut)) : null;
+
+        if (dateBoost && produit.isBoosted === true && produit.vendu !== true) {
+          const diffJours = Math.ceil((dateBoost - new Date()) / (1000 * 60 * 60 * 24));
+
+          // Clé unique : une seule notification par boost, même si la page se recharge
+          const notifKey = `push_sent_3days_${docSnap.id}_${dateBoost.getTime()}`;
+
+          // Si le boost expire dans exactement 3 jours
+          if (diffJours === 3 && !localStorage.getItem(notifKey)) {
+            envoyerPushCustom({
+              idDestinataire: currentUser.uid,
+              titre: "Votre Boost expire bientôt ! ⚡",
+              message: `Le boost pour votre article "${produit.nom}" se termine dans 3 jours. Renouvelez-le pour rester en tête !`,
+              lienUrl: "https://vea-market.duckdns.org/premium.html",
+              soundFile: "notif.mp3"
+            });
+            localStorage.setItem(notifKey, "true");
+          }
+        }
       });
       renderTimers();
     });
@@ -1314,7 +1321,7 @@ if (dateBoost) {
         const diffJours = Math.ceil((expiry - Date.now()) / (1000 * 60 * 60 * 24));
 
         // Clé unique dans localStorage pour ne pas envoyer la notification plusieurs fois
-        const notifKey = `push_sent_3days_${boost.id || boost.boostUntil}`;
+        const notifKey = `push_sent_3days_${boost.articleId || ""}_${expiry}`;
 
         if (diffJours === 3 && !localStorage.getItem(notifKey)) {
           envoyerPushCustom({
