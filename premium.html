@@ -574,6 +574,125 @@
  * {
     -webkit-tap-highlight-color: transparent;
  }
+/* Pas d'espace vide quand il n'y a aucun boost / VIP actif */
+.active-status-container:empty { display: none; }
+
+/* ========== TABLETTE & PC ========== */
+@media (min-width: 768px) {
+  body { max-width: 1120px; margin: 0 auto; padding: 24px 32px 56px; }
+
+  /* Barre du haut collée à l'écran */
+  .header {
+    position: sticky; top: 16px; z-index: 50;
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: 18px; padding: 12px 18px; margin-bottom: 32px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  .header-title { font-size: 1.2rem; }
+  .back-btn { background: rgba(255, 255, 255, 0.05); transition: background 0.2s; }
+  .back-btn:hover { background: rgba(255, 255, 255, 0.12); }
+
+  /* Boosts / VIP actifs côte à côte */
+  .active-status-container {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px; margin-bottom: 32px;
+  }
+
+  /* Titre de section */
+  .section-header { margin-bottom: 24px; }
+  .section-title { font-size: 1.6rem; }
+  .section-subtitle { font-size: 0.95rem; margin-top: 6px; }
+
+  /* Les 2 offres côte à côte, même hauteur */
+  .plans-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px; margin-bottom: 40px; align-items: stretch;
+  }
+  .plan-card {
+    display: flex; flex-direction: column; padding: 32px; border-radius: 24px;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .plan-card:hover {
+    transform: translateY(-4px); border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+  .plan-card.gold-border:hover {
+    border-color: rgba(255, 215, 0, 0.7);
+    box-shadow: 0 16px 40px rgba(255, 165, 0, 0.12);
+  }
+  .plan-top { margin-bottom: 22px; }
+  .plan-info h3 { font-size: 1.3rem; }
+  .plan-price { font-size: 2rem; }
+  .plan-features { gap: 14px; margin-bottom: 28px; }
+  .plan-features li { font-size: 0.95rem; }
+
+  /* Boutons alignés en bas des deux cartes */
+  .btn-buy-plan { margin-top: auto; padding: 16px; font-size: 1rem; transition: filter 0.2s, transform 0.2s; }
+  .btn-buy-plan:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+  .trust-footer { margin-top: 8px; font-size: 0.85rem; }
+
+  /* Fenêtres centrées au lieu de remonter du bas */
+  .modal { align-items: center; padding: 24px; }
+  .modal-content {
+    border-radius: 24px; border: 1px solid var(--card-border);
+    max-width: 520px; animation: popIn 0.25s ease-out;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Notifications en haut à droite (au lieu de toute la largeur) */
+  #toast-container { left: auto; right: 24px; top: 24px; width: 380px; }
+}
+/* ===== Carrousel : articles pas encore boostés ===== */
+.unboosted-section {
+  display: none; background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 20px; padding: 16px; margin-bottom: 24px; overflow: hidden;
+}
+.unboosted-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+.unboosted-head > i {
+  width: 38px; height: 38px; flex-shrink: 0; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(99, 102, 241, 0.15); color: #818CF8;
+}
+.unboosted-title { font-size: 0.95rem; font-weight: 800; }
+.unboosted-msg { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+
+.unboosted-track {
+  display: flex; gap: 12px; overflow-x: auto; position: relative;
+  scrollbar-width: none; padding-bottom: 2px;
+}
+.unboosted-track::-webkit-scrollbar { display: none; }
+
+.ub-card {
+  flex: 0 0 150px; background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.ub-thumb {
+  width: 100%; height: 100px; background: #1E293B;
+  display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+}
+.ub-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.ub-body { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.ub-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ub-price { font-size: 0.78rem; color: var(--accent-green); font-weight: 600; }
+.ub-btn {
+  margin-top: 2px; padding: 8px; border: none; border-radius: 8px; cursor: pointer;
+  background: var(--accent-purple); color: #fff; font-size: 0.75rem; font-weight: 800;
+}
+
+@media (min-width: 768px) {
+  .unboosted-section { padding: 22px; border-radius: 24px; margin-bottom: 32px; }
+  .unboosted-title { font-size: 1.1rem; }
+  .unboosted-msg { font-size: 0.9rem; }
+  .ub-card { flex-basis: 190px; transition: border-color 0.2s, transform 0.2s; }
+  .ub-card:hover { border-color: rgba(99, 102, 241, 0.6); transform: translateY(-3px); }
+  .ub-thumb { height: 130px; }
+  .ub-btn:hover { filter: brightness(1.12); }
+}
   </style>
 
 <meta name="mobile-web-app-capable" content="yes">
@@ -642,23 +761,19 @@
     </div>
   </div>
 
-  <!-- Carte Virtuelle -->
-  <div class="virtual-card">
-    <div class="card-top">
-      <div class="card-chip"></div>
-      <div class="card-brand" data-i18n="active_balance">SOLDE ACTIF</div>
-    </div>
-    <div class="card-label" data-i18n="available_in_account">Disponible dans le compte</div>
-    <div class="card-balance" id="userBalance">0.00 $</div>
-
-    <div class="card-actions">
-
-    </div>
-  </div>
-
   <!-- Timers Actifs -->
   <div class="active-status-container" id="activeStatusContainer"></div>
-
+  <!-- Articles pas encore boostés -->
+  <div class="unboosted-section" id="unboostedSection">
+    <div class="unboosted-head">
+      <i class="fa-solid fa-bullhorn"></i>
+      <div>
+        <div class="unboosted-title" id="unboostedTitle"></div>
+        <div class="unboosted-msg" id="unboostedMsg"></div>
+      </div>
+    </div>
+    <div class="unboosted-track" id="unboostedTrack"></div>
+  </div>
   <!-- Offres -->
   <div class="section-header">
     <div class="section-title" data-i18n="boost_section_title">Boostez votre Visibilité</div>
@@ -859,7 +974,10 @@
       hours_short: "h",
       min_short: "m",
       sec_short: "s",
-      expired: "Expiré"
+      expired: "Expiré",
+      unboosted_title: "{count} article(s) pas encore boosté(s)",
+      unboosted_msg: "Boostez-les pour passer en tête de recherche et gagner jusqu'à +300% de vues.",
+      btn_boost_short: "Booster · 1.50 $"
     },
     en: {
       header_title: "Wallet & Boost",
@@ -903,7 +1021,10 @@
       hours_short: "h",
       min_short: "m",
       sec_short: "s",
-      expired: "Expired"
+      expired: "Expired",
+      unboosted_title: "{count} item(s) not boosted yet",
+      unboosted_msg: "Boost them to reach the top of search and get up to +300% more views.",
+      btn_boost_short: "Boost · $1.50"
     }
   };
 
@@ -1296,10 +1417,122 @@ async function checkRealPayment(refTransa) {
         }
       });
       renderTimers();
+      renderUnboosted();
+    });
+  }
+  // ============================================================
+  // CARROUSEL : ARTICLES PAS ENCORE BOOSTÉS
+  // ============================================================
+
+  let unboostedRaf = null;
+  let unboostedPaused = false;
+
+  function getUnboostedArticles() {
+    const now = Date.now();
+    return Object.entries(boostedProductsData).filter(([, p]) => {
+      if (p.vendu === true || p.statut === "vendu") return false;
+      const brut = p.boostUntil;
+      const exp = brut ? (typeof brut.toDate === "function" ? brut.toDate().getTime() : new Date(brut).getTime()) : 0;
+      return !(p.isBoosted === true && exp > now);
     });
   }
 
-  function renderTimers() {
+  function buildUnboostedCard([id, p], isClone) {
+    const imgUrl = Array.isArray(p.images) && p.images.length ? p.images[0] : (p.image || "");
+
+    const card = document.createElement("div");
+    card.className = "ub-card";
+    if (isClone) card.setAttribute("aria-hidden", "true");
+
+    const thumb = document.createElement("div");
+    thumb.className = "ub-thumb";
+    if (imgUrl) {
+      const img = document.createElement("img");
+      img.src = imgUrl;
+      img.alt = "";
+      img.loading = "lazy";
+      thumb.appendChild(img);
+    } else {
+      thumb.innerHTML = '<i class="fa-solid fa-image"></i>';
+    }
+
+    const body = document.createElement("div");
+    body.className = "ub-body";
+
+    const name = document.createElement("div");
+    name.className = "ub-name";
+    name.textContent = p.nom || "Sans nom";
+
+    const price = document.createElement("div");
+    price.className = "ub-price";
+    price.textContent = `${p.prix ?? ""} ${p.devise || "$"}`;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "ub-btn";
+    btn.textContent = window.getTranslation("btn_boost_short");
+    if (isClone) btn.tabIndex = -1;
+    btn.onclick = () => window.payService("boost_item", 1.50, 7, id, imgUrl);
+
+    body.append(name, price, btn);
+    card.append(thumb, body);
+    return card;
+  }
+
+  function renderUnboosted() {
+    const section = document.getElementById("unboostedSection");
+    const track = document.getElementById("unboostedTrack");
+    if (!section || !track) return;
+
+    cancelAnimationFrame(unboostedRaf);
+    const items = getUnboostedArticles();
+
+    if (items.length === 0) {
+      section.style.display = "none";
+      track.innerHTML = "";
+      return;
+    }
+
+    document.getElementById("unboostedTitle").textContent =
+      window.getTranslation("unboosted_title", { count: items.length });
+    document.getElementById("unboostedMsg").textContent =
+      window.getTranslation("unboosted_msg");
+
+    track.innerHTML = "";
+    section.style.display = "block";
+    items.forEach((it) => track.appendChild(buildUnboostedCard(it, false)));
+
+    // Défilement automatique seulement si ça dépasse, et si l'utilisateur ne l'a pas désactivé
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || track.scrollWidth <= track.clientWidth + 4) return;
+
+    // On duplique la liste pour une boucle sans coupure
+    items.forEach((it) => track.appendChild(buildUnboostedCard(it, true)));
+    const loopAt = track.children[items.length].offsetLeft - track.children[0].offsetLeft;
+
+    let pos = 0;
+    track.scrollLeft = 0;
+
+    const step = () => {
+      if (!unboostedPaused) {
+        pos += 0.5;
+        if (pos >= loopAt) pos %= loopAt;
+        track.scrollLeft = pos;
+      }
+      unboostedRaf = requestAnimationFrame(step);
+    };
+
+    // Pause quand on touche ou survole, reprise ensuite
+    const resume = () => { pos = track.scrollLeft; unboostedPaused = false; };
+    track.onmouseenter = () => { unboostedPaused = true; };
+    track.onmouseleave = resume;
+    track.ontouchstart = () => { unboostedPaused = true; };
+    track.ontouchend = () => setTimeout(resume, 2000);
+
+    unboostedRaf = requestAnimationFrame(step);
+  }
+
+function renderTimers() {
     const container = document.getElementById("activeStatusContainer");
     if (!container) return;
 
@@ -1312,31 +1545,6 @@ async function checkRealPayment(refTransa) {
 
     const hasVip = Boolean(userData && userData.isPremium && userData.premiumUntil);
     const activeBoosts = Array.isArray(userData?.boosts) ? userData.boosts : [];
-    // --- VÉRIFICATION DE L'EXPIRATION DES BOOSTS (3 JOURS) ---
-    if (auth.currentUser) {
-      for (const boost of activeBoosts) {
-        if (!boost.boostUntil) continue;
-
-        const expiry = new Date(boost.boostUntil).getTime();
-        const diffJours = Math.ceil((expiry - Date.now()) / (1000 * 60 * 60 * 24));
-
-        // Clé unique dans localStorage pour ne pas envoyer la notification plusieurs fois
-        const notifKey = `push_sent_3days_${boost.articleId || ""}_${expiry}`;
-
-        if (diffJours === 3 && !localStorage.getItem(notifKey)) {
-          envoyerPushCustom({
-            idDestinataire: auth.currentUser.uid,
-            titre: "Votre Boost expire bientôt ! ⚡",
-            message: "Le boost pour votre article se termine dans 3 jours. Renouvelez-le pour rester en tête !",
-            lienUrl: "https://vea-market.duckdns.org/premium.html",
-            soundFile: "alert_sound"
-          });
-
-          // Marque la notification comme envoyée localement
-          localStorage.setItem(notifKey, "true");
-        }
-      }
-    }
     if (!hasVip && activeBoosts.length === 0) return;
 
     const updateClocks = async () => {
@@ -1423,6 +1631,7 @@ async function checkRealPayment(refTransa) {
     updateClocks();
     timerInterval = setInterval(updateClocks, 1000);
   }
+
 
   function formatTimeLeft(ms) {
     if (ms <= 0) return window.getTranslation("expired");
