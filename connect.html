@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion</title>
 
-  <!-- Connexions ouvertes à l'avance : gagne plusieurs secondes sur mobile -->
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://apis.google.com" crossorigin>
-  <link rel="preconnect" href="https://accounts.google.com" crossorigin>
-  <link rel="preconnect" href="https://v-ea-fb4c4.firebaseapp.com" crossorigin>
-  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="manifest" href="site.webmanifest">
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({ appId: "31639645-a285-43ec-9366-175f51dff21c" });
+    });
+  </script>
 
   <style>
     * {
@@ -25,8 +25,8 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
-
     body {
       background-color: #f4f7f9;
       display: flex;
@@ -35,7 +35,6 @@
       min-height: 100vh;
       padding: 20px;
     }
-
     .card-container {
       background: #ffffff;
       width: 100%;
@@ -45,138 +44,148 @@
       box-shadow: 0 10px 30px rgba(0, 119, 182, 0.12), 0 2px 8px rgba(0, 80, 140, 0.06);
       text-align: center;
     }
-
     .logo-icon {
-      width: 70px;
-      height: 70px;
-      background: #e0f2fe;
-      color: #0077b6;
+      width: 70px; height: 70px;
+      background: #e0f2fe; color: #0077b6;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       margin: 0 auto 20px auto;
     }
+    .logo-icon svg { width: 36px; height: 36px; }
+    h1 { font-size: 1.4rem; color: #1e293b; margin-bottom: 8px; }
+    p { font-size: 0.9rem; color: #64748b; margin-bottom: 28px; line-height: 1.4; }
 
-    .logo-icon svg {
-      width: 36px;
-      height: 36px;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      color: #1e293b;
-      margin-bottom: 8px;
-    }
-
-    p {
-      font-size: 0.9rem;
-      color: #64748b;
-      margin-bottom: 28px;
-      line-height: 1.4;
-    }
-
-    .btn-google {
+    .btn {
       width: 100%;
-      background-color: #ffffff;
-      color: #1e293b;
+      background: #ffffff; color: #1e293b;
       border: 1px solid #cbd5e1;
       padding: 12px 16px;
       border-radius: 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: 0.95rem; font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
       transition: background-color 0.2s, border-color 0.2s;
     }
-
-    .btn-google:hover {
-      background-color: #f8fafc;
-      border-color: #94a3b8;
+    .btn:hover { background: #f8fafc; border-color: #94a3b8; }
+    .btn svg { width: 20px; height: 20px; }
+    .btn + .btn { margin-top: 10px; }
+    .btn-primary { background: #0077b6; border-color: #0077b6; color: #fff; }
+    .btn-primary:hover { background: #006aa3; border-color: #006aa3; }
+    .btn-link {
+      border: none; background: none; color: #0077b6;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-top: 16px; padding: 6px;
     }
+    .btn-link:disabled { color: #94a3b8; cursor: default; }
 
-    .btn-google svg {
-      width: 20px;
-      height: 20px;
+    input {
+      width: 100%;
+      border: 1px solid #cbd5e1; border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 16px; /* évite le zoom auto sur iPhone */
+      color: #1e293b; margin-bottom: 14px; outline: none; text-align: center;
     }
+    input:focus { border-color: #0077b6; box-shadow: 0 0 0 3px #e0f2fe; }
+    #code-input { letter-spacing: 0.5em; font-size: 1.4rem; font-weight: 600; }
 
-    .loader-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .loader-container { display: flex; flex-direction: column; align-items: center; gap: 12px; }
     .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #e0f2fe;
-      border-top: 3px solid #0077b6;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      width: 32px; height: 32px;
+      border: 3px solid #e0f2fe; border-top: 3px solid #0077b6;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .toast {
+      position: fixed; left: 50%; bottom: 28px;
+      transform: translate(-50%, 20px);
+      max-width: calc(100% - 32px);
+      background: #1e293b; color: #fff;
+      padding: 12px 18px; border-radius: 12px;
+      font-size: 0.9rem; line-height: 1.35;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s; z-index: 50;
     }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .error-msg {
-      color: #ef4444;
-      font-size: 0.85rem;
-      margin-top: 15px;
-    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { background: #dc2626; }
   </style>
 </head>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <body>
 
   <div class="card-container">
 
-    <!-- Écran de chargement -->
+    <!-- Chargement -->
     <div id="loader" class="loader-container hidden">
       <div class="spinner"></div>
-      <p style="margin: 0;" id="loader-text">Connexion à Google...</p>
+      <p style="margin: 0;" id="loader-text"></p>
     </div>
 
-    <!-- Écran de connexion -->
+    <!-- 1. Connexion Google -->
     <div id="login-content">
       <div class="logo-icon">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       </div>
-
-      <h1>Changer ou Choisir un Compte</h1>
-      <p>Sélectionnez le compte Google avec lequel vous souhaitez vous connecter.</p>
-
-      <button class="btn-google" onclick="loginWithGoogle()">
+      <h1 data-i="title"></h1>
+      <p data-i="subtitle"></p>
+      <button id="btn-google" class="btn">
         <svg viewBox="0 0 24 24">
           <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
           <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.14C3.25 21.27 7.31 24 12 24z"/>
           <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.59H1.27C.46 8.21 0 10.05 0 12s.46 3.79 1.27 5.41l4.01-3.14z"/>
           <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.73 1.27 6.59l4.01 3.14c.95-2.83 3.6-4.98 6.72-4.98z"/>
         </svg>
-        Choisir un compte Google
+        <span data-i="google"></span>
       </button>
+    </div>
 
-      <p id="error-message" class="error-msg hidden"></p>
+    <!-- 2. Type de compte -->
+    <div id="role-content" class="hidden">
+      <h1 data-i="roleTitle"></h1>
+      <p data-i="roleSub"></p>
+      <button class="btn" data-role="acheteur" data-i="acheteur"></button>
+      <button class="btn" data-role="vendeur" data-i="vendeur"></button>
+      <button class="btn" data-role="vendeur_client" data-i="vendeurClient"></button>
+      <button class="btn-link" data-action="cancel" data-i="cancel"></button>
+    </div>
+
+    <!-- 3. Nom de la boutique -->
+    <div id="shop-content" class="hidden">
+      <h1 data-i="shopTitle"></h1>
+      <p data-i="shopSub"></p>
+      <input id="shop-input" type="text" autocomplete="off" data-ip="shopPh">
+      <button id="btn-shop" class="btn btn-primary" data-i="continue"></button>
+      <button class="btn-link" data-action="back" data-i="back"></button>
+    </div>
+
+    <!-- 4. Code à 6 chiffres -->
+    <div id="code-content" class="hidden">
+      <h1 data-i="codeTitle"></h1>
+      <p id="code-sub"></p>
+      <input id="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······">
+      <button id="btn-code" class="btn btn-primary" data-i="validate"></button>
+      <button id="btn-resend" class="btn-link"></button>
+      <br>
+      <button class="btn-link" data-action="cancel" data-i="cancel"></button>
     </div>
 
   </div>
 
+  <div id="toast" class="toast"></div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // 👉 Pour accélérer la connexion sur iPhone, remplace cette valeur par "vea-market.duckdns.org"
-    //    APRÈS avoir fait les étapes d'activation (voir les explications).
+    /* ================= CONFIG ================= */
+
+    // 👉 Pour accélérer la connexion sur iPhone : "vea-market.duckdns.org" (après activation)
     const AUTH_DOMAIN = "v-ea-fb4c4.firebaseapp.com";
 
     const firebaseConfig = {
@@ -189,86 +198,317 @@
       measurementId: "G-WEG1X65STP"
     };
 
+    // Envoi du code par e-mail, gratuit et sans serveur (plan Spark) via EmailJS.
+    // Laisse les 3 valeurs vides = pas de code, on passe directement à l'accueil.
+    const EMAILJS = { serviceId: "", templateId: "", publicKey: "" };
+
+    const PAGE_ACCUEIL = "./acceuil.html";
+    const CODE_VALIDITE_MIN = 15;
+    const MAX_ESSAIS = 3;           // essais de vérification du compte
+    const MAX_ESSAIS_CODE = 5;      // essais de saisie du code
+    const COLLECTIONS = { acheteur: "acheteurs", vendeur: "vendeurs", vendeur_client: "vendeurs_clients" };
+
+    /* ================= LANGUE (fr / en) ================= */
+
+    const LANG = (navigator.language || "fr").toLowerCase().startsWith("fr") ? "fr" : "en";
+    document.documentElement.lang = LANG;
+    const TXT = {
+      fr: {
+        title: "Changer ou Choisir un Compte",
+        subtitle: "Sélectionnez le compte Google avec lequel vous souhaitez vous connecter.",
+        google: "Choisir un compte Google",
+        checking: "Vérification du compte...",
+        connecting: "Connexion à Google...",
+        slow: "Connexion lente, merci de patienter...",
+        opening: "Ouverture de votre compte...",
+        noAccount: "Aucun compte trouvé avec ce compte Google. Veuillez d'abord créer un compte.",
+        roleTitle: "Quel est votre type de compte ?",
+        roleSub: "Choisissez le type de compte que vous avez créé.",
+        acheteur: "Acheteur", vendeur: "Vendeur", vendeurClient: "Vendeur-client",
+        shopTitle: "Nom de votre boutique",
+        shopSub: "Saisissez le nom exact de votre boutique.",
+        shopPh: "Nom de la boutique",
+        continue: "Continuer", back: "Retour", cancel: "Changer de compte Google",
+        mismatch: "Ces informations ne correspondent pas à ce compte Google.",
+        tooMany: "Trop d'essais. Veuillez vous reconnecter.",
+        codeTitle: "Code de vérification",
+        codeSent: "Un code à 6 chiffres a été envoyé à ",
+        validate: "Valider",
+        resend: "Renvoyer le code",
+        resendIn: "Renvoyer dans ",
+        codeBad: "Code incorrect.",
+        codeExpired: "Code expiré. Demandez-en un nouveau.",
+        codeInvalidFormat: "Saisissez les 6 chiffres.",
+        sendFail: "Impossible d'envoyer le code. Réessayez.",
+        popupBlocked: "La fenêtre de connexion a été bloquée. Réessayez.",
+        network: "Connexion Internet instable. Réessayez.",
+        failed: "Échec de connexion : ",
+        dbError: "Erreur lors de la recherche du compte. Vérifiez votre connexion et réessayez."
+      },
+      en: {
+        title: "Switch or Choose an Account",
+        subtitle: "Select the Google account you want to sign in with.",
+        google: "Choose a Google account",
+        checking: "Checking account...",
+        connecting: "Connecting to Google...",
+        slow: "Slow connection, please wait...",
+        opening: "Opening your account...",
+        noAccount: "No account found for this Google account. Please create an account first.",
+        roleTitle: "What is your account type?",
+        roleSub: "Choose the type of account you created.",
+        acheteur: "Buyer", vendeur: "Seller", vendeurClient: "Seller-buyer",
+        shopTitle: "Your shop name",
+        shopSub: "Enter the exact name of your shop.",
+        shopPh: "Shop name",
+        continue: "Continue", back: "Back", cancel: "Use another Google account",
+        mismatch: "This information does not match this Google account.",
+        tooMany: "Too many attempts. Please sign in again.",
+        codeTitle: "Verification code",
+        codeSent: "A 6-digit code was sent to ",
+        validate: "Confirm",
+        resend: "Resend code",
+        resendIn: "Resend in ",
+        codeBad: "Incorrect code.",
+        codeExpired: "Code expired. Request a new one.",
+        codeInvalidFormat: "Enter the 6 digits.",
+        sendFail: "Could not send the code. Please try again.",
+        popupBlocked: "The sign-in window was blocked. Please try again.",
+        network: "Unstable Internet connection. Please try again.",
+        failed: "Sign-in failed: ",
+        dbError: "Error while looking up the account. Check your connection and try again."
+      }
+    }[LANG];
+    const t = (k) => TXT[k];
+
+    document.querySelectorAll("[data-i]").forEach((el) => (el.textContent = t(el.dataset.i)));
+    document.querySelectorAll("[data-ip]").forEach((el) => (el.placeholder = t(el.dataset.ip)));
+
+    /* ================= OUTILS ================= */
+
+    const $ = (id) => document.getElementById(id);
+    const SCREENS = ["loader", "login-content", "role-content", "shop-content", "code-content"];
+    const show = (id) => SCREENS.forEach((s) => $(s).classList.toggle("hidden", s !== id));
+
+    let toastTimer;
+    function showToast(msg, type = "info") {
+      const el = $("toast");
+      el.textContent = msg;
+      el.className = "toast show" + (type === "error" ? " error" : "");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove("show"), 4500);
+    }
+
+    // Comparaison tolérante : sans accents, sans majuscules, espaces simplifiés
+    const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+
+    /* ================= FIREBASE ================= */
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
-
     const DOC_ROOT = `projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-    const $ = (id) => document.getElementById(id);
 
-    // Le compte existe-t-il déjà ? UNE seule requête, sans les photos (qui pèsent très lourd)
-    async function compteExiste(user) {
-      try { if (localStorage.getItem("vea_compte_" + user.uid) === "1") return true; } catch (_) {}
-
+    // Lit un document en ne demandant QUE shopName et displayName (pas les photos). Retourne null s'il n'existe pas.
+    async function lireDoc(user, collection) {
       const jeton = await user.getIdToken();
-      const reponse = await fetch(`https://firestore.googleapis.com/v1/${DOC_ROOT}:batchGet`, {
-        method: "POST",
-        headers: { "Authorization": "Bearer " + jeton, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          documents: ["acheteurs", "vendeurs", "vendeurs_clients"].map((c) => `${DOC_ROOT}/${c}/${user.uid}`),
-          mask: { fieldPaths: ["role"] }
-        })
-      });
-      if (!reponse.ok) throw new Error("Firestore " + reponse.status);
-
-      const existe = (await reponse.json()).some((x) => x.found);
-      if (existe) { try { localStorage.setItem("vea_compte_" + user.uid, "1"); } catch (_) {} }
-      return existe;
+      const url = `https://firestore.googleapis.com/v1/${DOC_ROOT}/${collection}/${user.uid}?mask.fieldPaths=shopName&mask.fieldPaths=displayName`;
+      const r = await fetch(url, { headers: { Authorization: "Bearer " + jeton } });
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error("Firestore " + r.status);
+      const f = (await r.json()).fields || {};
+      return { shopName: f.shopName?.stringValue || "", displayName: f.displayName?.stringValue || "" };
     }
 
-    async function redirectUser(user) {
-      try {
-        $("loader-text").textContent = "Ouverture de votre compte...";
-        const existe = await compteExiste(user);
-        window.location.assign(existe ? "./acceuil.html" : "./acheteur.html");
-      } catch (err) {
-        console.error("Erreur de base de données :", err);
-        showError("Erreur lors de la recherche du compte. Vérifiez votre connexion et réessayez.");
-      }
+    /* ================= ÉTAT ================= */
+
+    let user = null, comptes = null, role = null, essais = 0;
+    let codeHash = null, codeExpire = 0, codeEssais = 0, cooldownTimer;
+
+    function reinitialiser() {
+      user = comptes = role = null; essais = 0; codeHash = null;
+      clearInterval(cooldownTimer);
+      $("shop-input").value = ""; $("code-input").value = "";
+      show("login-content");
     }
 
-    function showError(msg) {
-      $("loader").classList.add("hidden");
-      $("login-content").classList.remove("hidden");
-      const errElem = $("error-message");
-      errElem.textContent = msg;
-      errElem.classList.remove("hidden");
+    async function annuler() {
+      try { await signOut(auth); } catch (_) {}
+      reinitialiser();
     }
 
-    // Action lors du clic sur le bouton Google
-    window.loginWithGoogle = async function () {
-      $("login-content").classList.add("hidden");
-      $("loader").classList.remove("hidden");
-      $("error-message").classList.add("hidden");
-      $("loader-text").textContent = "Connexion à Google...";
+    /* ================= ÉTAPE 1 : GOOGLE + EXISTENCE ================= */
 
-      // Si le réseau est lent, on le dit au lieu de laisser tourner sans explication
-      const minuteurLent = setTimeout(() => {
-        $("loader-text").textContent = "Connexion lente, merci de patienter...";
-      }, 8000);
+    async function handleGoogleLogin() {
+      show("loader");
+      $("loader-text").textContent = t("connecting");
+      const lent = setTimeout(() => ($("loader-text").textContent = t("slow")), 8000);
 
       try {
         const result = await signInWithPopup(auth, provider);
-        clearTimeout(minuteurLent);
-        if (result && result.user) await redirectUser(result.user);
+        clearTimeout(lent);
+        if (result.user) await demarrer(result.user);
       } catch (error) {
-        clearTimeout(minuteurLent);
+        clearTimeout(lent);
         console.error("Erreur de connexion :", error);
-
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          $("loader").classList.add("hidden");
-          $("login-content").classList.remove("hidden");
-        } else if (error.code === "auth/popup-blocked") {
-          showError("La fenêtre de connexion a été bloquée. Autorisez les fenêtres contextuelles puis réessayez.");
-        } else if (error.code === "auth/network-request-failed") {
-          showError("Pas de connexion internet stable. Réessayez dans un instant.");
-        } else {
-          showError("Échec de connexion : " + error.message);
-        }
+        show("login-content");
+        const c = error.code;
+        if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return;
+        if (c === "auth/popup-blocked") showToast(t("popupBlocked"), "error");
+        else if (c === "auth/network-request-failed") showToast(t("network"), "error");
+        else showToast(t("failed") + error.message, "error");
       }
-    };
+    }
+
+    async function demarrer(u) {
+      user = u;
+      $("loader-text").textContent = t("checking");
+      show("loader");
+      try {
+        const [a, v, vc] = await Promise.all(Object.values(COLLECTIONS).map((c) => lireDoc(u, c)));
+        comptes = { acheteur: a, vendeur: v, vendeur_client: vc };
+      } catch (err) {
+        console.error("Erreur de base de données :", err);
+        show("login-content");
+        showToast(t("dbError"), "error");
+        return;
+      }
+
+      if (!comptes.acheteur && !comptes.vendeur && !comptes.vendeur_client) {
+        showToast(t("noAccount"));           // le compte n'existe pas → on l'invite à en créer un
+        await annuler();
+        return;
+      }
+      show("role-content");
+    }
+
+    /* ================= ÉTAPE 2 : TYPE DE COMPTE ================= */
+
+    function choisirRole(r) {
+      role = r;
+      if (r === "acheteur") return verifierCoherence();
+      show("shop-content");
+      $("shop-input").focus();
+    }
+
+    /* ================= ÉTAPE 3 : COHÉRENCE ================= */
+
+    async function verifierCoherence() {
+      const doc = comptes[role];     // document {uid} du bon type de compte
+      let ok = !!doc;
+
+      if (ok && role === "acheteur") {
+        // displayName enregistré = nom du compte Google (si le champ existe)
+        if (doc.displayName) ok = norm(doc.displayName) === norm(user.displayName);
+      } else if (ok) {
+        // shopName enregistré = nom saisi
+        ok = norm(doc.shopName) !== "" && norm(doc.shopName) === norm($("shop-input").value);
+      }
+
+      if (!ok) {
+        essais++;
+        if (essais >= MAX_ESSAIS) { showToast(t("tooMany"), "error"); await annuler(); return; }
+        showToast(t("mismatch"), "error");
+        show(role === "acheteur" ? "role-content" : "shop-content");
+        return;
+      }
+
+      if (!(EMAILJS.serviceId && EMAILJS.templateId && EMAILJS.publicKey)) return terminer();
+
+      show("loader");
+      $("loader-text").textContent = t("checking");
+      try {
+        await envoyerCode();
+      } catch (err) {
+        console.error("Envoi du code :", err);
+        show(role === "acheteur" ? "role-content" : "shop-content");
+        showToast(t("sendFail"), "error");
+        return;
+      }
+      $("code-sub").textContent = t("codeSent") + user.email;
+      show("code-content");
+      $("code-input").focus();
+    }
+
+    /* ================= ÉTAPE 4 : CODE À 6 CHIFFRES ================= */
+
+    async function sha256(s) {
+      const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+      return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function envoyerCode() {
+      const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, "0");
+      const r = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: EMAILJS.serviceId,
+          template_id: EMAILJS.templateId,
+          user_id: EMAILJS.publicKey,
+          template_params: { to_email: user.email, code, minutes: CODE_VALIDITE_MIN }
+        })
+      });
+      if (!r.ok) throw new Error("EmailJS " + r.status);
+      codeHash = await sha256(code + user.uid);
+      codeExpire = Date.now() + CODE_VALIDITE_MIN * 60000;
+      codeEssais = 0;
+      demarrerCooldown(30);
+    }
+
+    function demarrerCooldown(sec) {
+      const btn = $("btn-resend");
+      clearInterval(cooldownTimer);
+      btn.disabled = true;
+      let reste = sec;
+      const maj = () => {
+        if (reste <= 0) { clearInterval(cooldownTimer); btn.disabled = false; btn.textContent = t("resend"); return; }
+        btn.textContent = t("resendIn") + reste + "s";
+        reste--;
+      };
+      maj();
+      cooldownTimer = setInterval(maj, 1000);
+    }
+
+    async function validerCode() {
+      const saisi = $("code-input").value.trim();
+      if (!/^\d{6}$/.test(saisi)) return showToast(t("codeInvalidFormat"), "error");
+      if (Date.now() > codeExpire) return showToast(t("codeExpired"), "error");
+
+      if ((await sha256(saisi + user.uid)) === codeHash) return terminer();
+
+      codeEssais++;
+      $("code-input").value = "";
+      if (codeEssais >= MAX_ESSAIS_CODE) { showToast(t("tooMany"), "error"); await annuler(); return; }
+      showToast(t("codeBad"), "error");
+    }
+
+    async function renvoyerCode() {
+      $("btn-resend").disabled = true;
+      try { await envoyerCode(); $("code-input").value = ""; }
+      catch (err) { console.error(err); showToast(t("sendFail"), "error"); demarrerCooldown(10); }
+    }
+
+    /* ================= FIN : REDIRECTION ================= */
+
+    function terminer() {
+      show("loader");
+      $("loader-text").textContent = t("opening");
+      try { sessionStorage.setItem("vea_verifie", JSON.stringify({ uid: user.uid, role, t: Date.now() })); } catch (_) {}
+      window.location.assign(PAGE_ACCUEIL);
+    }
+
+    /* ================= ÉVÉNEMENTS ================= */
+
+    $("btn-google").addEventListener("click", handleGoogleLogin);
+    document.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => choisirRole(b.dataset.role)));
+    document.querySelectorAll("[data-action=cancel]").forEach((b) => b.addEventListener("click", annuler));
+    document.querySelector("[data-action=back]").addEventListener("click", () => show("role-content"));
+    $("btn-shop").addEventListener("click", verifierCoherence);
+    $("shop-input").addEventListener("keydown", (e) => e.key === "Enter" && verifierCoherence());
+    $("btn-code").addEventListener("click", validerCode);
+    $("code-input").addEventListener("keydown", (e) => e.key === "Enter" && validerCode());
+    $("btn-resend").addEventListener("click", renvoyerCode);
   </script>
 </body>
 </html>
