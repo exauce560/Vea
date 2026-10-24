@@ -394,17 +394,24 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    // Vérifie si ce compte Google existe déjà dans l'un des 3 types de compte
+async function compteExisteDeja(uid) {
+  const collections = ["acheteurs", "vendeurs", "vendeurs_clients"];
+  const reponses = await Promise.all(collections.map((c) => getDoc(doc(db, c, uid))));
+  return reponses.some((s) => s.exists());
+}
+
+const MSG_EXISTE = (navigator.language || "fr").toLowerCase().startsWith("fr")
+  ? "Ce compte existe déjà. Veuillez vous reconnecter."
+  : "This account already exists. Please sign in instead.";
+
     // Fonction pour sauvegarder les données du vendeur dans Firestore après vérification
     async function saveVendorData(user) {
       // 1. VÉRIFICATION : Est-ce que la boutique vendeur existe déjà ?
       const vendorRef = doc(db, "vendeurs", user.uid);
-      const docSnap = await getDoc(vendorRef);
 
-      if (docSnap.exists()) {
-        // Le compte existe déjà -> On bloque
-        showToast("Un compte vendeur existe déjà avec ce profil Google.", "error");
-
-        // Déconnexion de la session Google
+      if (await compteExisteDeja(user.uid)) {
+        showToast(MSG_EXISTE, "error");
         await signOut(auth);
         return;
       }

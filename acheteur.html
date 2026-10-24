@@ -301,18 +301,28 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    // Vérifie si ce compte Google existe déjà dans l'un des 3 types de compte
+async function compteExisteDeja(uid) {
+  const collections = ["acheteurs", "vendeurs", "vendeurs_clients"];
+  const reponses = await Promise.all(collections.map((c) => getDoc(doc(db, c, uid))));
+  return reponses.some((s) => s.exists());
+}
+
+const MSG_EXISTE = (navigator.language || "fr").toLowerCase().startsWith("fr")
+  ? "Ce compte existe déjà. Veuillez vous reconnecter."
+  : "This account already exists. Please sign in instead.";
+
+    provider.setCustomParameters({
+      prompt: "select_account"
+    });
 
     // Enregistrer les données de l'acheteur dans Firestore après vérification
     async function processBuyerRegistration(user) {
       // 1. VÉRIFICATION : Est-ce que le compte existe déjà ?
       const userRef = doc(db, "acheteurs", user.uid);
-      const docSnap = await getDoc(userRef);
 
-      if (docSnap.exists()) {
-        // Le compte existe déjà -> On refuse la création
-        showToast("Un compte existe déjà avec ce profil Google.", "error");
-
-        // Déconnexion de la session Google initiée
+      if (await compteExisteDeja(user.uid)) {
+        showToast(MSG_EXISTE, "error");
         await signOut(auth);
         return;
       }
