@@ -547,6 +547,71 @@
  * {
     -webkit-tap-highlight-color: transparent;
  }
+/* Conteneurs invisibles sur téléphone (la mise en page mobile ne change pas) */
+.col-main, .col-side { display: contents; }
+
+/* Barre "connexion instable" */
+.retry-bar {
+  display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 200; align-items: center; gap: 12px;
+  background: #1e293b; color: #fff; padding: 10px 14px; border-radius: 12px;
+  font-size: 0.85rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: calc(100% - 24px);
+}
+
+/* Tablette */
+@media (min-width: 700px) and (max-width: 1023px) {
+  .app-container { max-width: 720px; }
+  .products-container { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Ordinateur */
+@media (min-width: 1024px) {
+  body { padding: 20px 32px 48px; align-items: stretch; }
+
+  .app-container {
+    max-width: 1240px; width: 100%; margin: 0 auto;
+    display: grid; grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 24px; align-items: start;
+  }
+  .header, .profile-card, footer { grid-column: 1 / -1; }
+
+  /* Barre du haut */
+  .header {
+    position: sticky; top: 12px; z-index: 30;
+    background: var(--card-bg); border: 1px solid var(--border-color);
+    border-radius: 16px; padding: 12px 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .header > span { font-size: 1.05rem !important; }
+
+  /* Bandeau profil */
+  .profile-card {
+    padding: 24px 28px; gap: 24px;
+    background: linear-gradient(120deg, rgba(37,99,235,0.14), transparent 55%), var(--card-bg);
+  }
+  .profile-avatar { width: 96px; height: 96px; }
+  .profile-name { font-size: 1.5rem; }
+  .profile-location-container { font-size: 0.95rem; }
+  .edit-profile-btn:hover { background: rgba(37,99,235,0.1); border-color: var(--primary); }
+
+  /* Colonne gauche : liens + produits */
+  .col-main { display: flex; flex-direction: column; gap: 16px; grid-column: 1; grid-row: 3; min-width: 0; }
+  .section-title { margin-top: 8px; font-size: 0.8rem; }
+  .social-links-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .products-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .product-img-wrapper { height: 160px; }
+  .product-card { transition: border-color 0.2s, transform 0.2s; }
+  .product-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+
+  /* Colonne droite : configuration (reste visible au scroll) */
+  .col-side {
+    display: flex; flex-direction: column; gap: 16px;
+    grid-column: 2; grid-row: 3; position: sticky; top: 96px;
+  }
+  .menu-item:hover { background: rgba(37,99,235,0.07); }
+
+  .modal-content { max-width: 460px; }
+  .back-button { left: 32px; bottom: 32px; }
+}
   </style>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -611,7 +676,7 @@
         <button type="button" class="edit-profile-btn" onclick="openProfileModal()" data-i18n="btn_edit_profile">Modifier le profil</button>
       </div>
     </div>
-
+    <div class="col-main">
     <!-- Section Liens Sociaux -->
     <div class="section-title">
       <span>Réseaux & Liens</span>
@@ -626,8 +691,9 @@
     <div id="vendorProductsContainer" class="products-container">
       <span style="grid-column: span 2; text-align: center; color: var(--text-muted); padding: 16px;" data-i18n="loading_products">Chargement des produits...</span>
     </div>
-
+    </div>
     <!-- Paramètres & Menus -->
+    <div class="col-side">
     <div class="section-title" data-i18n="section_config">Configuration</div>
     <div class="menu-list">
 
@@ -706,6 +772,7 @@
           <span data-i18n="menu_logout">Se déconnecter</span>
         </span>
       </button>
+    </div>
     </div>
 
     <footer style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
@@ -998,48 +1065,88 @@
 
     window.ASK_ON_HOMEPAGE_WHEN_SOLD = localStorage.getItem("ask_homepage_when_sold") === "true";
 
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    // Relit 3 fois avant d'abandonner (micro-coupures réseau)
+    async function getDocRetry(ref, essais = 3) {
+      let derniere;
+      for (let i = 0; i < essais; i++) {
+        try { return await getDoc(ref); }
+        catch (e) { derniere = e; await wait(800 * (i + 1)); }
+      }
+      throw derniere;
+    }
+
+    function hideRetryBar() {
+      const bar = document.getElementById("retryBar");
+      if (bar) bar.style.display = "none";
+    }
+
+    function showRetryBar(onRetry) {
+      let bar = document.getElementById("retryBar");
+      if (!bar) {
+        bar = document.createElement("div");
+        bar.id = "retryBar";
+        bar.className = "retry-bar";
+        bar.innerHTML = '<span></span><button type="button" class="btn btn-primary btn-icon"></button>';
+        document.body.appendChild(bar);
+      }
+      const en = (localStorage.getItem("app_lang") || "fr") === "en";
+      bar.querySelector("span").textContent = en ? "Unstable connection. Your session is safe." : "Connexion instable. Votre session est conservée.";
+      const btn = bar.querySelector("button");
+      btn.textContent = en ? "Retry" : "Réessayer";
+      btn.onclick = onRetry;
+      bar.style.display = "flex";
+    }
+
+    async function chargerCompte(user) {
+      hideRetryBar();
+      const etat = await verifyAndLoadUserData(user.uid);
+
+      if (etat === "ok") {
+        loadVendorProducts(user.uid);
+        checkAndScheduleSoldReminder(user.uid);
+      } else if (etat === "absent") {
+        // Seul cas où on déconnecte : le compte n'existe vraiment pas
+        showToast("Accès refusé. Compte réservé aux vendeurs.");
+        setTimeout(() => signOut(auth).then(() => window.location.href = "index.html"), 2000);
+      } else {
+        // Erreur réseau ou d'affichage : on garde la session
+        showRetryBar(() => chargerCompte(user));
+      }
+    }
+
+    // Retour d'Internet : on recharge automatiquement
+    window.addEventListener("online", () => {
+      if (currentUser && !userCollection) chargerCompte(currentUser);
+    });
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
         window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-        window.OneSignalDeferred.push(async function(OneSignal) {
-           await OneSignal.login(user.uid);
+        window.OneSignalDeferred.push(async function (OneSignal) {
+          await OneSignal.login(user.uid);
         });
-
-        const isValidUser = await verifyAndLoadUserData(user.uid);
-        if (isValidUser) {
-          loadVendorProducts(user.uid);
-          checkAndScheduleSoldReminder(user.uid);
-        } else {
-          showToast("Accès refusé. Compte réservé aux vendeurs.");
-          setTimeout(() => {
-            signOut(auth).then(() => window.location.href = "index.html");
-          }, 2000);
-        }
+        chargerCompte(user);
       } else {
-        window.location.href = "verification.html";
+        // Petite marge pour éviter une fausse déconnexion
+        await wait(1500);
+        if (!auth.currentUser) window.location.href = "verification.html";
       }
     });
 
     async function verifyAndLoadUserData(uid) {
       try {
-        let ref = doc(db, "vendeurs", uid);
-        let snap = await getDoc(ref);
-
+        let snap = await getDocRetry(doc(db, "vendeurs", uid));
         if (snap.exists()) {
           userCollection = "vendeurs";
         } else {
-          ref = doc(db, "vendeurs_clients", uid);
-          snap = await getDoc(ref);
-          if (snap.exists()) {
-            userCollection = "vendeurs_clients";
-          }
+          snap = await getDocRetry(doc(db, "vendeurs_clients", uid));
+          if (snap.exists()) userCollection = "vendeurs_clients";
         }
 
-        if (!snap.exists() || !userCollection) {
-          return false;
-        }
+        if (!snap.exists() || !userCollection) return "absent";
 
         const data = snap.data();
         const shopName = data.shopName || data.nom || "Ma Boutique";
@@ -1104,11 +1211,10 @@
         document.getElementById("descInput").value = desc;
 
         renderSocialLinks();
-        return true;
+        return "ok";
       } catch (err) {
         console.error("Erreur chargement profil:", err);
-        showToast("Erreur lors de la vérification de votre compte.");
-        return false;
+        return "error";
       }
     }
 
