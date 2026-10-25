@@ -537,93 +537,96 @@
  * {
     -webkit-tap-highlight-color: transparent;
  }
-/* ========== ORDINATEUR (≥ 1000 px) ========== */
+/* ===== Article vendu (téléphone et PC) ===== */
+.sold-overlay {
+  position: absolute; inset: 0; z-index: 4; display: grid; place-items: center;
+  background: rgba(0, 0, 0, 0.45); pointer-events: none;
+}
+.sold-stamp {
+  display: flex; align-items: center; gap: 10px; padding: 12px 26px;
+  background: #dc2626; border: 3px solid #fff; border-radius: 12px;
+  transform: rotate(-6deg); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+.sold-stamp svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 3.5; }
+.sold-stamp span { font-size: 1.5rem; font-weight: 900; letter-spacing: 3px; }
+.product-view.is-sold .bg-image { filter: grayscale(0.75) brightness(0.7); }
+.product-view.is-sold .product-price { text-decoration: line-through; opacity: 0.65; }
+
+/* ========== ORDINATEUR (≥ 1000 px) : style sobre ========== */
 .feed-nav { display: none; }
 
 @media (min-width: 1000px) {
-  html, body {
-    background:
-      radial-gradient(1200px 700px at 12% 0%, #312e81 0%, transparent 60%),
-      radial-gradient(900px 600px at 100% 100%, #831843 0%, transparent 55%),
-      #020617;
-  }
+  html, body { background: #0a0c10; }
 
   .back-btn {
-    top: 24px; left: 28px; width: 46px; height: 46px;
-    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18);
-    transition: background 0.2s, transform 0.2s;
+    top: 24px; left: 28px; width: 44px; height: 44px;
+    background: #12161d; border: 1px solid #232a36; transition: background 0.2s;
   }
-  .back-btn:hover { background: rgba(255, 255, 255, 0.22); transform: translateX(-2px); }
+  .back-btn:hover { background: #1a1f29; }
 
-  /* Scène centrée : photo à gauche (60 %), infos à droite */
+  /* Photo à gauche (60 %), infos à droite */
   .product-view {
     --w: min(1180px, calc(100vw - 160px));
     width: var(--w); margin: 0 auto;
     padding: 0 8px 0 calc(var(--w) * 0.6 + 36px);
-    justify-content: center; gap: 20px;
+    justify-content: center; gap: 16px;
   }
-
-  .image-carousel, .overlay-gradient {
-    top: 48px; bottom: 48px; height: auto; width: 60%; border-radius: 26px;
+  .image-carousel, .overlay-gradient, .sold-overlay {
+    top: 48px; bottom: 48px; left: 0; right: auto; height: auto; width: 60%; border-radius: 16px;
   }
-  .image-carousel { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); }
-  .overlay-gradient {
-    background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent 30%, transparent 70%, rgba(0,0,0,.4));
-  }
+  .image-carousel { border: 1px solid #232a36; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
+  .overlay-gradient { background: linear-gradient(to bottom, rgba(0,0,0,.25), transparent 25%, transparent 75%, rgba(0,0,0,.3)); }
   .carousel-dots { bottom: 72px; left: 30%; }
 
-  /* Boutons posés sur la photo */
-  .share-btn { top: 72px; right: auto; left: calc(60% - 58px); width: 42px; height: 42px; transition: background .2s; }
-  .share-btn:hover { background: rgba(255, 255, 255, 0.25); }
-  .share-menu { top: 122px; right: auto; left: calc(60% - 200px); }
+  .share-btn {
+    top: 72px; right: auto; left: calc(60% - 58px); width: 40px; height: 40px;
+    background: rgba(10, 12, 16, 0.7); border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .share-btn:hover { background: rgba(10, 12, 16, 0.92); }
+  .share-menu { top: 120px; right: auto; left: calc(60% - 200px); background: #12161d; border: 1px solid #232a36; }
   .pc-nav-btn {
-    display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
-    background: rgba(0, 0, 0, 0.35); border-radius: 50%; backdrop-filter: blur(6px);
+    display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+    background: rgba(10, 12, 16, 0.7); border: 1px solid rgba(255, 255, 255, 0.15);
   }
   .pc-nav-btn.prev { left: 16px; }
-  .pc-nav-btn.next { right: auto; left: calc(60% - 64px); }
+  .pc-nav-btn.next { right: auto; left: calc(60% - 60px); }
 
-  /* Colonne d'infos */
-  .vendor-header {
-    margin-top: 0; padding: 16px 18px; text-shadow: none;
-    background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px; backdrop-filter: blur(10px);
+  /* Colonne d'infos : panneaux unis, une seule teinte */
+  .vendor-header, .product-details {
+    background: #12161d; border: 1px solid #232a36; border-radius: 14px; text-shadow: none;
   }
-  .vendor-avatar { width: 60px; height: 60px; }
-  .vendor-name { font-size: 1.25rem; }
+  .vendor-header { margin-top: 0; padding: 16px 18px; }
+  .vendor-avatar { width: 56px; height: 56px; }
+  .vendor-flag-container { background: #0a0c10; backdrop-filter: none; }
+  .product-details { padding: 22px; gap: 14px; }
+  .product-price { font-size: 2.2rem; letter-spacing: -0.5px; }
+  .product-meta { font-size: 1rem; font-weight: 600; color: #cbd5e1; }
+  .cart-btn-action { background: #1a1f29; border: 1px solid #2b3342; backdrop-filter: none; }
+  .cart-btn-action:hover { background: #232a36; }
+  .whatsapp-btn { padding: 14px; font-size: 1rem; border-radius: 10px; box-shadow: none; }
+  .whatsapp-btn:hover { background: #1eb857; }
 
-  .product-details {
-    padding: 22px; gap: 14px; text-shadow: none;
-    background: linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
-    border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 22px; backdrop-filter: blur(10px);
-  }
-  .product-price {
-    font-size: 2.4rem; letter-spacing: 0;
-    background: linear-gradient(120deg, #fde68a, #fb923c, #f472b6);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .product-meta { font-size: 1.1rem; }
-  .cart-btn-action:hover { background: rgba(255, 255, 255, 0.25); }
-  .whatsapp-btn { padding: 15px; font-size: 1.05rem; }
-  .whatsapp-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-
-  /* Les halos des articles/comptes boostés entourent la photo, pas toute la scène */
+  /* Boosts : simple liseré autour de la photo, sans halo */
   .product-view.boosted-account, .product-view.boosted-item { box-shadow: none; border: none; }
-  .product-view.boosted-account .image-carousel { box-shadow: 0 0 0 2px rgba(234,179,8,.75), 0 0 46px rgba(234,179,8,.4); }
-  .product-view.boosted-item .image-carousel { box-shadow: 0 0 0 2px rgba(56,189,248,.75), 0 0 46px rgba(2,132,199,.45); }
+  .product-view.boosted-account .image-carousel { box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.7); }
+  .product-view.boosted-item .image-carousel { box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.7); }
 
-  /* Flèches pour passer d'un article à l'autre */
+  /* Flèches entre articles */
   .feed-nav {
-    display: flex; flex-direction: column; gap: 12px;
+    display: flex; flex-direction: column; gap: 10px;
     position: fixed; right: 28px; top: 50%; transform: translateY(-50%); z-index: 40;
   }
   .feed-nav button {
-    width: 48px; height: 48px; border-radius: 50%; cursor: pointer; color: #fff;
-    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-    display: grid; place-items: center; backdrop-filter: blur(8px);
-    transition: background .2s, transform .2s;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer; color: #fff;
+    background: #12161d; border: 1px solid #232a36; display: grid; place-items: center;
+    transition: background 0.2s;
   }
-  .feed-nav button:hover { background: linear-gradient(135deg, #6366f1, #db2777); transform: scale(1.08); }
+  .feed-nav button:hover { background: #232a36; }
+}
+
+/* Bouton désactivé quand l'article est vendu */
+.whatsapp-btn:disabled, .whatsapp-btn:disabled:hover {
+  background: #374151; color: #9ca3af; box-shadow: none; cursor: not-allowed; transform: none;
 }
   </style>
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -963,6 +966,10 @@ document.addEventListener("keydown", (e) => {
       const isArticleBoosted = (product.boost === true || product.isBoosted === true || product.boosted === true)
         && !!product.boostUntil && new Date(product.boostUntil) > new Date() && product.vendu !== true;
       if (isArticleBoosted) card.classList.add("boosted-item");
+      // Article vendu ou épuisé ?
+      const stockNum = product.stock == null ? NaN : Number(product.stock);
+      const isSold = product.vendu === true || product.statut === "vendu" || (Number.isFinite(stockNum) && stockNum <= 0);
+      if (isSold) card.classList.add("is-sold");
       let imagesList = [];
       if (Array.isArray(product.images) && product.images.length > 0) {
         imagesList = product.images;
@@ -991,6 +998,7 @@ document.addEventListener("keydown", (e) => {
         ${imagesHTML}
         ${dotsHTML}
         <div class="overlay-gradient"></div>
+        ${isSold ? '<div class="sold-overlay"><div class="sold-stamp"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>VENDU</span></div></div>' : ''}
 
         <button class="pc-nav-btn prev" aria-label="Photo précédente">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -1068,9 +1076,9 @@ document.addEventListener("keydown", (e) => {
             ${isArticleBoosted ? '<span class="article-boost-badge">⭐ VIP Boost</span>' : ''}
           </div>
 
-          <button class="whatsapp-btn">
+          <button class="whatsapp-btn" ${isSold ? 'disabled' : ''}>
             <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-            WHATSAPP
+            ${isSold ? 'ARTICLE VENDU' : 'WHATSAPP'}
           </button>
         </div>
       `;
