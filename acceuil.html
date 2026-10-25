@@ -1037,55 +1037,61 @@
     let feedSeenSaveTimeout = null;
     let userCollectionName = "acheteurs";
 
-async function envoyerPushCustom({
-  idDestinataire,
-  titre,
-  message,
-  lienUrl,
-  soundFile
-}) {
-  const payload = {
-    idDestinataire,
-    titre,
-    message,
-    lienUrl,
-    soundFile
-  };
+async function envoyerPushCustom({ idDestinataire, titre, message, lienUrl, soundFile }) {
+  const payload = { idDestinataire, titre, message, lienUrl, soundFile };
 
   try {
-    const response = await fetch(
-      "https://vea-push-worker.vea-payment.workers.dev",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      }
-    );
+    const response = await fetch("https://vea-push-worker.vea-payment.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
     const result = await response.json();
-
-
-    if (!response.ok) {
-      throw new Error(result.error || "Erreur du Worker");
-    }
+    if (!response.ok) throw new Error(result.error || "Erreur du Worker");
+    return true;
 
   } catch (err) {
     console.error("Erreur d'envoi de la notification :", err);
+    return false;
   }
 }
-if (currentUser && !localStorage.getItem("welcome_pushed_" + currentUser.uid)) {
-  envoyerPushCustom({
-    idDestinataire: currentUser.uid,
-    titre: "Bienvenue sur Vea Market ! 👤",
-    message: `Ravi de vous revoir ! Découvrez les derniers articles disponibles dans votre région.`,
-    lienUrl: "https://vea-market.duckdns.org/acceuil.html",
-    soundFile: "notif.mp3"
-  });
+// Notification de bienvenue : une seule fois par jour et par utilisateur
+let bienvenueEnCours = false;
 
-  // Marque la notification comme envoyée pour cet utilisateur
-  localStorage.setItem("welcome_pushed_" + currentUser.uid, "true");
+function envoyerBienvenueDuJour(user) {
+  if (bienvenueEnCours) return;
+
+  const cle = "welcome_push_day_" + user.uid;
+  const aujourdhui = new Date().toLocaleDateString("sv-SE");   // ex : 2026-10-25
+  if (localStorage.getItem(cle) === aujourdhui) return;        // déjà envoyée aujourd'hui
+
+  bienvenueEnCours = true;
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    try {
+      await OneSignal.login(user.uid);
+
+      // Pas abonné aux notifications : on n'envoie rien et on réessaiera à la prochaine visite
+      if (!(await OneSignal.User.PushSubscription.optedIn)) return;
+
+      await new Promise((r) => setTimeout(r, 1500));           // laisse OneSignal lier l'identifiant
+
+      const ok = await envoyerPushCustom({
+        idDestinataire: user.uid,
+        titre: "Bienvenue sur Vea Market ! 👤",
+        message: "Ravi de vous revoir ! Découvrez les derniers articles disponibles dans votre région.",
+        lienUrl: "https://vea-market.duckdns.org/acceuil.html",
+        soundFile: "notif.mp3"
+      });
+
+      if (ok) localStorage.setItem(cle, aujourdhui);           // marqué seulement si l'envoi a réussi
+    } catch (e) {
+      console.error("Erreur notification de bienvenue :", e);
+    } finally {
+      bienvenueEnCours = false;
+    }
+  });
 }
 
 
@@ -1095,6 +1101,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   currentUser = user;
+  envoyerBienvenueDuJour(user);
 
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async function (OneSignal) {
