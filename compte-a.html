@@ -488,6 +488,89 @@
  * {
     -webkit-tap-highlight-color: transparent;
  }
+/* ========== TABLETTE ========== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-container { max-width: 640px; }
+  .favorites-list { flex-wrap: wrap; overflow: visible; }
+}
+
+/* ========== ORDINATEUR ========== */
+@media (min-width: 1024px) {
+  body { padding: 24px 32px 56px; }
+
+  /* Deux colonnes : profil + favoris à gauche, menu à droite */
+  .app-container {
+    max-width: 1120px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px;
+    column-gap: 28px;
+    row-gap: 24px;
+    align-items: start;
+    align-content: start;
+  }
+  .header, .app-footer { grid-column: 1 / -1; }
+  .profile-card { grid-column: 1; grid-row: 2; }
+  .favorites-section { grid-column: 1; grid-row: 3; }
+  .menu-list { grid-column: 2; grid-row: 2 / span 2; position: sticky; top: 104px; }
+
+  /* Barre du haut collée à l'écran */
+  .header {
+    position: sticky; top: 16px; z-index: 50;
+    background: #1e1e1e; border: 1px solid rgba(37, 99, 235, 0.25);
+    border-radius: 18px; padding: 14px 22px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  body.light-mode .header {
+    background: #ffffff; border-color: rgba(37, 99, 235, 0.15);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  }
+  .brand-title { font-size: 1.5rem; }
+
+  /* Cartes plus aérées */
+  .card-box { border-radius: 20px; padding: 24px; }
+
+  /* Bandeau profil */
+  .profile-card {
+    gap: 28px; padding: 32px;
+    background: linear-gradient(120deg, rgba(37, 99, 235, 0.2), transparent 60%), #1e1e1e;
+  }
+  body.light-mode .profile-card {
+    background: linear-gradient(120deg, rgba(37, 99, 235, 0.1), transparent 60%), #ffffff;
+  }
+  .profile-avatar { width: 116px; height: 116px; }
+  .avatar-badge { width: 32px; height: 32px; bottom: 4px; right: 4px; }
+  .avatar-badge svg { width: 16px; height: 16px; }
+  .profile-info { gap: 8px; }
+  .profile-name { font-size: 1.8rem; }
+  .profile-country { font-size: 1.05rem; }
+  .profile-city { font-size: 0.95rem; }
+
+  /* Favoris : grille qui revient à la ligne au lieu du défilement */
+  .favorites-title { font-size: 0.9rem; margin-bottom: 4px; }
+  .favorites-list { flex-wrap: wrap; overflow: visible; gap: 22px; padding: 8px 0 4px; }
+  .fav-circle { width: 84px; height: 84px; transition: transform 0.2s, box-shadow 0.2s; }
+  .fav-item:hover .fav-circle { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35); }
+  .fav-label { width: 92px; font-size: 0.82rem; }
+  .sold-check { width: 32px; height: 32px; font-size: 18px; }
+
+  /* Menu : survol et alignement */
+  .menu-list { padding: 8px 14px; }
+  .menu-item { padding: 18px 12px; font-size: 1rem; border-radius: 10px; transition: background 0.2s; }
+  .menu-item:hover { background: rgba(37, 99, 235, 0.12); }
+  body.light-mode .menu-item:hover { background: rgba(37, 99, 235, 0.07); }
+  .menu-item-logout:hover { background: rgba(239, 68, 68, 0.12); }
+
+  /* Fenêtres plus larges */
+  .modal-content { max-width: 460px; padding: 28px; }
+
+  /* Bouton retour et interrupteurs */
+  .back-button { left: 32px; bottom: 32px; }
+  .back-button:hover { background: #333333; }
+  body.light-mode .back-button:hover { background: #f1f5f9; }
+  .switch-large, .slider-large, .switch, .slider { cursor: pointer; }
+
+  .app-footer { margin-top: 8px; }
+}
   </style>
 
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
