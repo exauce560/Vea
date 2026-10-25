@@ -1532,7 +1532,22 @@ async function checkRealPayment(refTransa) {
     unboostedRaf = requestAnimationFrame(step);
   }
 
-function renderTimers() {
+  const expiredHandled = new Set();
+
+  // Accepte une date texte, un nombre ou un Timestamp Firestore
+  function toMillis(v) {
+    if (!v) return 0;
+    if (typeof v.toMillis === "function") return v.toMillis();
+    if (typeof v === "number") return v;
+    const t = new Date(v).getTime();
+    return Number.isFinite(t) ? t : 0;
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function renderTimers() {
     const container = document.getElementById("activeStatusContainer");
     if (!container) return;
 
@@ -1542,25 +1557,22 @@ function renderTimers() {
       timerInterval = null;
     }
 
-
     const hasVip = Boolean(userData && userData.isPremium && userData.premiumUntil);
-    const activeBoosts = Array.isArray(userData?.boosts) ? userData.boosts : [];
-    if (!hasVip && activeBoosts.length === 0) return;
+    const hasBoosts = Object.values(boostedProductsData).some(
+      (p) => p.isBoosted === true && toMillis(p.boostUntil) > 0
+    );
+    if (!hasVip && !hasBoosts) return;
 
-    const updateClocks = async () => {
-      const currentTime = Date.now();
+    const updateClocks = () => {
+      const now = Date.now();
       let html = "";
-      const validBoostsForUser = [];
-      let hasBoostsChanged = false;
 
-      // VIP Timer
+      // Timer VIP
       if (hasVip) {
-        const expiry = new Date(userData.premiumUntil).getTime();
-        const totalDuration = 30 * 24 * 60 * 60 * 1000;
-        const diff = expiry - currentTime;
-
+        const expiry = toMillis(userData.premiumUntil);
+        const diff = expiry - now;
         if (diff > 0) {
-          const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
+          const pct = Math.max(0, Math.min(100, (diff / (30 * 24 * 60 * 60 * 1000)) * 100));
           html += `
             <div class="status-card vip">
               <div class="status-header">
@@ -1569,60 +1581,50 @@ function renderTimers() {
                 </div>
                 <div class="status-timer">${formatTimeLeft(diff)}</div>
               </div>
-              <div class="progress-bar">
-                <div class="progress-fill gold" style="width:${pct}%"></div>
-              </div>
+              <div class="progress-bar"><div class="progress-fill gold" style="width:${pct}%"></div></div>
             </div>`;
         }
       }
 
-      // Boosts Timers
-      for (const boost of activeBoosts) {
-        const expiry = new Date(boost.boostUntil).getTime();
-        const diff = expiry - currentTime;
-        const articleData = boost.articleId ? boostedProductsData[boost.articleId] : null;
-        const isSold = articleData && (articleData.vendu === true || articleData.statut === "vendu");
+      // Timers des articles boostés (lus dans la collection "produits")
+      for (const [id, p] of Object.entries(boostedProductsData)) {
+        if (p.isBoosted !== true) continue;
 
+        const expiry = toMillis(p.boostUntil);
+        if (!expiry) continue;
+
+        const diff = expiry - now;
+        const isSold = p.vendu === true || p.statut === "vendu";
+
+        // Boost terminé ou article vendu : on désactive le boost une seule fois
         if (isSold || diff <= 0) {
-          hasBoostsChanged = true;
-          if (boost.articleId) {
-            try {
-              await updateDoc(doc(db, "produits", boost.articleId), { isBoosted: false, boostUntil: null });
-            } catch (e) { console.error(e); }
+          if (!expiredHandled.has(id)) {
+            expiredHandled.add(id);
+            updateDoc(doc(db, "produits", id), { isBoosted: false, boostUntil: null }).catch(console.error);
           }
           continue;
         }
 
-        validBoostsForUser.push(boost);
-        const totalDuration = 7 * 24 * 60 * 60 * 1000;
-        const pct = Math.max(0, Math.min(100, (diff / totalDuration) * 100));
-        const imgHtml = boost.boostedArticleImage ? `<img src="${boost.boostedArticleImage}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">` : "";
+        const pct = Math.max(0, Math.min(100, (diff / (7 * 24 * 60 * 60 * 1000)) * 100));
+        const img = Array.isArray(p.images) && p.images.length ? p.images[0] : (p.image || "");
+        const imgHtml = img
+          ? `<img src="${escapeHtml(img)}" alt="" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">`
+          : "";
 
         html += `
           <div class="status-card">
             <div class="status-header" style="display:flex;align-items:center;gap:10px;">
               ${imgHtml}
-              <div style="flex:1;">
+              <div style="flex:1;min-width:0;">
                 <div class="status-title" style="color:#6366F1;">
                   <i class="fa-solid fa-rocket"></i> ${window.getTranslation("boost_status_title")}
                 </div>
+                <div style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.nom || "")}</div>
               </div>
               <div class="status-timer">${formatTimeLeft(diff)}</div>
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:${pct}%"></div>
-            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
           </div>`;
-      }
-
-      if (hasBoostsChanged) {
-        userData.boosts = validBoostsForUser;
-        try {
-          await updateDoc(doc(db, userRoleCollection, currentUser.uid), {
-            boosts: validBoostsForUser,
-            isBoosted: validBoostsForUser.length > 0
-          });
-        } catch (e) { console.error(e); }
       }
 
       container.innerHTML = html;
@@ -1631,7 +1633,6 @@ function renderTimers() {
     updateClocks();
     timerInterval = setInterval(updateClocks, 1000);
   }
-
 
   function formatTimeLeft(ms) {
     if (ms <= 0) return window.getTranslation("expired");
