@@ -108,6 +108,24 @@
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     .toast.error { background: #dc2626; }
+/* Aperçu du compte */
+.pv-avatar {
+  width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 50%; overflow: hidden;
+  background: #e0f2fe; color: #0077b6; font-size: 2.2rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0, 119, 182, 0.25);
+}
+.pv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pv-badge {
+  display: inline-block; background: #e0f2fe; color: #0077b6;
+  font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; margin: 4px 0 10px;
+}
+#pv-place { margin-bottom: 20px; }
+.pv-bar { height: 6px; background: #e0f2fe; border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+.pv-bar i { display: block; height: 100%; width: 0; background: #0077b6; }
+.pv-bar.run i { animation: pvfill 8s linear forwards; }
+@keyframes pvfill { to { width: 100%; } }
+.pv-sub { margin-bottom: 20px; font-size: 0.8rem; }
   </style>
 </head>
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -157,8 +175,8 @@
 
     <!-- 3. Nom de la boutique -->
     <div id="shop-content" class="hidden">
-      <h1 data-i="shopTitle"></h1>
-      <p data-i="shopSub"></p>
+      <h1 id="shop-title" data-i="shopTitle"></h1>
+      <p id="shop-sub" data-i="shopSub"></p>
       <input id="shop-input" type="text" autocomplete="off" data-ip="shopPh">
       <button id="btn-shop" class="btn btn-primary" data-i="continue"></button>
       <button class="btn-link" data-action="back" data-i="back"></button>
@@ -174,7 +192,16 @@
       <br>
       <button class="btn-link" data-action="cancel" data-i="cancel"></button>
     </div>
-
+    <!-- 5. Aperçu du compte (8 s puis accueil) -->
+    <div id="preview-content" class="hidden">
+      <div class="pv-avatar"><img id="pv-photo" alt="" class="hidden"><span id="pv-initial"></span></div>
+      <h1 id="pv-name"></h1>
+      <span class="pv-badge" id="pv-role"></span>
+      <p id="pv-place"></p>
+      <div class="pv-bar" id="pv-bar"><i></i></div>
+      <p class="pv-sub" data-i="previewSub"></p>
+      <button id="btn-open" class="btn btn-primary" data-i="openNow"></button>
+    </div>
   </div>
 
   <div id="toast" class="toast"></div>
@@ -228,6 +255,11 @@
         shopTitle: "Nom de votre boutique",
         shopSub: "Saisissez le nom exact de votre boutique.",
         shopPh: "Nom de la boutique",
+        nameTitle: "Votre nom",
+        nameSub: "Saisissez votre nom tel qu'il apparaît sur votre compte.",
+        namePh: "Nom complet",
+        previewSub: "Ouverture de l'accueil dans quelques secondes...",
+        openNow: "Ouvrir maintenant",
         continue: "Continuer", back: "Retour", cancel: "Changer de compte Google",
         mismatch: "Ces informations ne correspondent pas à ce compte Google.",
         tooMany: "Trop d'essais. Veuillez vous reconnecter.",
@@ -260,6 +292,11 @@
         shopTitle: "Your shop name",
         shopSub: "Enter the exact name of your shop.",
         shopPh: "Shop name",
+        nameTitle: "Your name",
+        nameSub: "Enter your name as it appears on your account.",
+        namePh: "Full name",
+        previewSub: "Opening the home page in a few seconds...",
+        openNow: "Open now",
         continue: "Continue", back: "Back", cancel: "Use another Google account",
         mismatch: "This information does not match this Google account.",
         tooMany: "Too many attempts. Please sign in again.",
@@ -286,7 +323,7 @@
     /* ================= OUTILS ================= */
 
     const $ = (id) => document.getElementById(id);
-    const SCREENS = ["loader", "login-content", "role-content", "shop-content", "code-content"];
+    const SCREENS = ["loader", "login-content", "role-content", "shop-content", "code-content", "preview-content"];
     const show = (id) => SCREENS.forEach((s) => $(s).classList.toggle("hidden", s !== id));
 
     let toastTimer;
@@ -386,7 +423,11 @@
 
     function choisirRole(r) {
       role = r;
-      if (r === "acheteur") return verifierCoherence();
+      const acheteur = r === "acheteur";
+      $("shop-title").textContent = t(acheteur ? "nameTitle" : "shopTitle");
+      $("shop-sub").textContent = t(acheteur ? "nameSub" : "shopSub");
+      $("shop-input").placeholder = t(acheteur ? "namePh" : "shopPh");
+      $("shop-input").value = "";
       show("shop-content");
       $("shop-input").focus();
     }
@@ -394,14 +435,15 @@
     /* ================= ÉTAPE 3 : COHÉRENCE ================= */
 
     async function verifierCoherence() {
-      const doc = comptes[role];     // document {uid} du bon type de compte
+      const doc = comptes[role];
       let ok = !!doc;
 
       if (ok && role === "acheteur") {
-        // displayName enregistré = nom du compte Google (si le champ existe)
-        if (doc.displayName) ok = norm(doc.displayName) === norm(user.displayName);
+        // Nom saisi = displayName enregistré, ou nom du compte Google
+        const saisi = norm($("shop-input").value);
+        ok = saisi !== "" && [doc.displayName, user.displayName].some((n) => n && norm(n) === saisi);
       } else if (ok) {
-        // shopName enregistré = nom saisi
+        // Nom de boutique saisi = shopName enregistré
         ok = norm(doc.shopName) !== "" && norm(doc.shopName) === norm($("shop-input").value);
       }
 
@@ -409,7 +451,7 @@
         essais++;
         if (essais >= MAX_ESSAIS) { showToast(t("tooMany"), "error"); await annuler(); return; }
         showToast(t("mismatch"), "error");
-        show(role === "acheteur" ? "role-content" : "shop-content");
+        show("shop-content");
         return;
       }
 
@@ -421,7 +463,7 @@
         await envoyerCode();
       } catch (err) {
         console.error("Envoi du code :", err);
-        show(role === "acheteur" ? "role-content" : "shop-content");
+        show("shop-content");
         showToast(t("sendFail"), "error");
         return;
       }
@@ -491,9 +533,58 @@
 
     /* ================= FIN : REDIRECTION ================= */
 
-    function terminer() {
+    const DELAI_APERCU = 8000;
+    const ROLE_LABEL = { acheteur: "acheteur", vendeur: "vendeur", vendeur_client: "vendeurClient" };
+    let apercuTimer;
+
+    // Lit les infos d'affichage du compte (photo comprise, seulement maintenant que le compte est vérifié)
+    async function chargerApercu() {
+      const jeton = await user.getIdToken();
+      const champs = ["photoUrl", "photoURL", "avatar", "address", "city", "ville", "province", "country", "pays", "shopName", "displayName"];
+      const url = `https://firestore.googleapis.com/v1/${DOC_ROOT}/${COLLECTIONS[role]}/${user.uid}?` +
+        champs.map((c) => "mask.fieldPaths=" + c).join("&");
+      const r = await fetch(url, { headers: { Authorization: "Bearer " + jeton } });
+      if (!r.ok) throw new Error("Firestore " + r.status);
+
+      const f = (await r.json()).fields || {};
+      const s = (k) => f[k]?.stringValue || "";
+      const a = f.address?.mapValue?.fields || {};
+      const sa = (k) => a[k]?.stringValue || "";
+
+      const lieu = [sa("city") || s("city") || s("ville"), sa("province") || s("province"), sa("country") || s("country") || s("pays")]
+        .filter(Boolean).join(", ");
+
+      return {
+        nom: role === "acheteur" ? (s("displayName") || user.displayName || "") : (s("shopName") || s("displayName") || ""),
+        photo: s("photoUrl") || s("photoURL") || s("avatar") || user.photoURL || "",
+        lieu: lieu || f.address?.stringValue || ""
+      };
+    }
+
+    async function terminer() {
       show("loader");
       $("loader-text").textContent = t("opening");
+
+      let info;
+      try { info = await chargerApercu(); }
+      catch (_) { info = { nom: user.displayName || "", photo: user.photoURL || "", lieu: "" }; }
+
+      $("pv-name").textContent = info.nom;
+      $("pv-role").textContent = t(ROLE_LABEL[role]);
+      $("pv-place").textContent = info.lieu;
+      $("pv-place").classList.toggle("hidden", !info.lieu);
+
+      const img = $("pv-photo");
+      if (info.photo) { img.src = info.photo; img.classList.remove("hidden"); $("pv-initial").textContent = ""; }
+      else { img.classList.add("hidden"); $("pv-initial").textContent = (info.nom || "?").charAt(0).toUpperCase(); }
+
+      show("preview-content");
+      $("pv-bar").classList.add("run");
+      apercuTimer = setTimeout(aller, DELAI_APERCU);
+    }
+
+    function aller() {
+      clearTimeout(apercuTimer);
       try { sessionStorage.setItem("vea_verifie", JSON.stringify({ uid: user.uid, role, t: Date.now() })); } catch (_) {}
       window.location.assign(PAGE_ACCUEIL);
     }
@@ -509,6 +600,7 @@
     $("btn-code").addEventListener("click", validerCode);
     $("code-input").addEventListener("keydown", (e) => e.key === "Enter" && validerCode());
     $("btn-resend").addEventListener("click", renvoyerCode);
+    $("btn-open").addEventListener("click", aller);
   </script>
 </body>
 </html>
