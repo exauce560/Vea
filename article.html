@@ -977,7 +977,8 @@ function ajouterCartes(produits) {
     idsAffiches.add(p.id);
     const card = buildProductCard(p);
     card.dataset.vendeurId = p.vendeurId || "";
-    fondObserver.observe(card);                   // l'article s'affiche tout de suite
+    feed.appendChild(card);                       // l'article s'affiche tout de suite
+    fondObserver.observe(card);
     paires.push({ p, card });
   });
 
