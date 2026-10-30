@@ -628,6 +628,25 @@
 .whatsapp-btn:disabled, .whatsapp-btn:disabled:hover {
   background: #374151; color: #9ca3af; box-shadow: none; cursor: not-allowed; transform: none;
 }
+
+.bg-blur { display: none; }
+
+@media (min-width: 1000px) {
+  .bg-blur {
+    display: block; position: fixed; inset: -60px; z-index: 0;
+    background-size: cover; background-position: center;
+    filter: blur(45px) brightness(0.45) saturate(1.3);
+    transition: opacity 0.18s ease;
+  }
+  .feed-container { z-index: 1; }
+  .vendor-header, .product-details {
+    background: rgba(10, 12, 16, 0.6);
+    backdrop-filter: blur(14px);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  .vendor-flag-container { background: rgba(10, 12, 16, 0.6); }
+}
+
   </style>
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -646,7 +665,7 @@
 </script>
 </head>
 <body>
-
+    <div class="bg-blur" id="bgBlur"></div>
   <div class="loading-screen" id="loadingScreen">Chargement du fil d'articles...</div>
 
   <button class="back-btn" onclick="history.back()" aria-label="Retour">
@@ -838,14 +857,89 @@ function remplirVendeur(card, product) {
   card._whatsapp = v.telephone || v.phone || v.whatsapp || "";
 }
 
+// ----- Ordre du fil : le même que l'accueil -----
+const PAGE_RECENT = 30;
+let ordreIds = [];
+let ordrePos = 0;
+let dernierVendeur = null;
+
+function lireOrdreAccueil() {
+  try {
+    const o = JSON.parse(localStorage.getItem("vea_feed_ordre"));
+    if (!o || !Array.isArray(o.ids) || Date.now() - o.t > 30 * 60 * 1000) return [];
+    if (initialProductId && o.ids[0] !== initialProductId) return [];
+    return o.ids;
+  } catch (_) { return []; }
+}
+
+// Évite que deux articles du même vendeur se suivent
+function melanger(produits) {
+  const reste = [...produits], res = [];
+  while (reste.length) {
+    let i = reste.findIndex((p) => p.vendeurId !== dernierVendeur);
+    if (i < 0) i = 0;
+    const [p] = reste.splice(i, 1);
+    res.push(p);
+    dernierVendeur = p.vendeurId;
+  }
+  return res;
+}
+
 async function chargerPageProduits() {
+  // 1) D'abord l'ordre exact de l'accueil (une seule requête groupée)
+  if (ordrePos < ordreIds.length) {
+    const lot = ordreIds.slice(ordrePos, ordrePos + PAGE_FEED);
+    ordrePos += lot.length;
+    try {
+      const r = await restFetch(`${REST_URL}:batchGet`, {
+        documents: lot.map((id) => `${DOC_ROOT}/produits/${id}`)
+      });
+      const parId = {};
+      r.forEach((x) => {
+        if (!x.found) return;
+        const id = x.found.name.split("/").pop();
+        parId[id] = { id, ...lireChamps(x.found.fields) };
+      });
+      return lot.map((id) => parId[id]).filter(Boolean);
+    } catch (e) {
+      console.error("Erreur ordre accueil :", e);
+      ordrePos = ordreIds.length;   // en cas d'échec, on passe aux articles récents
+    }
+  }
+
+  // 2) Ensuite (ou lien partagé) : articles récents, vendeurs mélangés
   const contraintes = [orderBy("createdAt", "desc")];
   if (curseur) contraintes.push(startAfter(curseur));
-  const snap = await getDocs(query(collection(db, "produits"), ...contraintes, limit(PAGE_FEED)));
-  if (snap.docs.length < PAGE_FEED) feedTermine = true;
+  const snap = await getDocs(query(collection(db, "produits"), ...contraintes, limit(PAGE_RECENT)));
+  if (snap.docs.length < PAGE_RECENT) feedTermine = true;
   if (snap.docs.length) curseur = snap.docs[snap.docs.length - 1];
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return melanger(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
 }
+
+// Fond flouté (PC) : suit la photo de l'article affiché
+let fondActuel = "";
+const petite = (u) => String(u).includes("res.cloudinary.com")
+  ? u.replace("/upload/", "/upload/f_auto,q_auto,w_200/") : u;
+
+function changerFond(url) {
+  if (!url || url === fondActuel) return;
+  fondActuel = url;
+  const f = document.getElementById("bgBlur");
+  f.style.opacity = 0;
+  setTimeout(() => {
+    f.style.backgroundImage = `url("${url.replace(/"/g, "%22")}")`;
+    f.style.opacity = 1;
+  }, 180);
+}
+
+const fondObserver = new IntersectionObserver((entries) => {
+  if (window.innerWidth < 1000) return;
+  entries.forEach((e) => {
+    if (!e.isIntersecting || e.intersectionRatio < 0.6) return;
+    const img = e.target.querySelector(".bg-image");
+    if (img) changerFond(petite(img.getAttribute("src")));
+  });
+}, { threshold: [0.6] });
 
 // La photo du vendeur se charge quand sa carte approche de l'écran
 const avatarObserver = new IntersectionObserver((entries) => {
@@ -883,7 +977,7 @@ function ajouterCartes(produits) {
     idsAffiches.add(p.id);
     const card = buildProductCard(p);
     card.dataset.vendeurId = p.vendeurId || "";
-    feed.appendChild(card);                   // l'article s'affiche tout de suite
+    fondObserver.observe(card);                   // l'article s'affiche tout de suite
     paires.push({ p, card });
   });
 
@@ -900,6 +994,7 @@ function ajouterCartes(produits) {
 async function loadFeedData() {
   const loading = document.getElementById("loadingScreen");
   chargementSuite = true;
+  ordreIds = lireOrdreAccueil();
   try {
     const pagePromise = chargerPageProduits();   // part tout de suite, en parallèle
     if (initialProductId) {
