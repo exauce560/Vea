@@ -708,6 +708,16 @@
         </span>
       </a>
 
+      <a href="favoris.html" id="menuFavoris" class="menu-item" style="display: none;">
+        <span class="menu-item-left">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <span data-i18n="menu_favorites">Favoris</span>
+        </span>
+        <span class="menu-item-right">
+            <span>&rsaquo;</span>
+        </span>
+      </a>
+
       <button type="button" class="menu-item" onclick="openDescModal()">
         <span class="menu-item-left">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg-icon"><path d="M3 19h18"/><path d="M15 12H3"/><path d="M9 5H3"/></svg>
@@ -776,7 +786,7 @@
     </div>
 
     <footer style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
-      VÉA Market © 2026
+      VEA Market © 2026
     </footer>
   </div>
 
@@ -940,6 +950,7 @@
         profile_updated: "Profil mis à jour !",
         desc_updated: "Description mise à jour !",
         phone_updated: "Numéro mis à jour !",
+        menu_favorites: "Favoris",
         status_error: "Erreur lors de la mise à jour du statut.",
         delete_confirm: "Produit supprimé avec succès !",
         delete_error: "Erreur lors de la suppression.",
@@ -954,6 +965,7 @@
         loading_products: "Loading products...",
         section_config: "Configuration",
         menu_subscriptions: "Subscriptions",
+        menu_favorites: "Favorites",
         menu_desc: "Shop Description",
         menu_whatsapp: "WhatsApp Number",
         menu_notifications: "Notifications",
@@ -1152,11 +1164,14 @@
         const shopName = data.shopName || data.nom || "Ma Boutique";
 
         const menuAbonnement = document.getElementById("menuAbonnement");
+        const menuFavoris = document.getElementById("menuFavoris");
         if (userCollection === "vendeurs_clients") {
-          menuAbonnement.style.display = "flex";
-          checkSubscribedSellersNewProducts(data.subscriptions || []);
+            menuAbonnement.style.display = "flex";
+            menuFavoris.style.display = "flex";
+            checkSubscribedSellersNewProducts(data.subscriptions || []);
         } else {
-          menuAbonnement.style.display = "none";
+            menuAbonnement.style.display = "none";
+            menuFavoris.style.display = "none";
         }
 
         let formattedAddress = "";
