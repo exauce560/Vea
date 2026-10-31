@@ -108,32 +108,67 @@
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     .toast.error { background: #dc2626; }
-/* Aperçu du compte */
-.pv-avatar {
-  width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 50%; overflow: hidden;
-  background: #e0f2fe; color: #0077b6; font-size: 2.2rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0, 119, 182, 0.25);
-}
-.pv-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.pv-badge {
-  display: inline-block; background: #e0f2fe; color: #0077b6;
-  font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; margin: 4px 0 10px;
-}
-#pv-place { margin-bottom: 20px; }
-.pv-bar { height: 6px; background: #e0f2fe; border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
-.pv-bar i { display: block; height: 100%; width: 0; background: #0077b6; }
-.pv-bar.run i { animation: pvfill 8s linear forwards; }
-@keyframes pvfill { to { width: 100%; } }
-.pv-sub { margin-bottom: 20px; font-size: 0.8rem; }
+    /* Vert */
+.logo-icon { background:#dcfce7; color:#16a34a; }
+.btn-primary { background:#16a34a; border-color:#16a34a; }
+.btn-primary:hover { background:#15803d; border-color:#15803d; }
+.btn-link { color:#16a34a; }
+input:focus { border-color:#16a34a; box-shadow:0 0 0 3px #dcfce7; }
+.spinner { border-color:#dcfce7; border-top-color:#16a34a; }
+
+/* Fond d'images (après choix du compte) */
+#bg { position:fixed; inset:0; z-index:-1; display:none; overflow:hidden;
+      grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
+      background:#0f172a; }
+body.with-bg #bg { display:grid; }
+#bg div { background-size:cover; background-position:center; filter:blur(8px) saturate(1.1); transform:scale(1.15); }
+#bg::after { content:""; position:absolute; inset:0; background:rgba(10,20,15,.45); }
+
+body.with-bg .card-container { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 10px 40px rgba(0,0,0,.35); }
+body.with-bg h1 { color:#fff; }
+body.with-bg p { color:#e2e8f0; }
+body.with-bg .btn-link { color:#86efac; }
+body.with-bg .btn-link:disabled { color:#cbd5e1; }
+body.with-bg .spinner { border-color:rgba(255,255,255,.3); border-top-color:#4ade80; }
   </style>
+  <!-- Activation du mode plein écran sur Safari iOS -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vea Market">
+
+<!-- Icône pour l'écran d'accueil iOS -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Fichier manifest -->
+<link rel="manifest" href="manifest.json">
+
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  // Son de notification personnalisé
+  const customNotificationSound = new Audio("notif.mp3");
+
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "31639645-a285-43ec-9366-175f51dff21c",
+    });
+
+    // Joue le son lorsqu'une notification arrive en premier plan (Foreground)
+    OneSignal.Notifications.addEventListener("foregroundWillDisplay", () => {
+      customNotificationSound.play().catch(err => console.log("Audio bloqué :", err));
+    });
+
+    // Optionnel : Joue le son lors du clic
+    OneSignal.Notifications.addEventListener("click", () => {
+      customNotificationSound.play().catch(err => console.log("Audio clic bloqué :", err));
+    });
+  });
+</script>
 </head>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="manifest" href="site.webmanifest">
 <body>
+
+<div id="bg"></div>
 
   <div class="card-container">
 
@@ -175,10 +210,11 @@
 
     <!-- 3. Nom de la boutique -->
     <div id="shop-content" class="hidden">
-      <h1 id="shop-title" data-i="shopTitle"></h1>
-      <p id="shop-sub" data-i="shopSub"></p>
+      <h1 data-i="shopTitle"></h1>
+      <p data-i="shopSub"></p>
       <input id="shop-input" type="text" autocomplete="off" data-ip="shopPh">
       <button id="btn-shop" class="btn btn-primary" data-i="continue"></button>
+      <button id="btn-forgot" class="btn-link" data-i="forgot"></button>
       <button class="btn-link" data-action="back" data-i="back"></button>
     </div>
 
@@ -192,16 +228,7 @@
       <br>
       <button class="btn-link" data-action="cancel" data-i="cancel"></button>
     </div>
-    <!-- 5. Aperçu du compte (8 s puis accueil) -->
-    <div id="preview-content" class="hidden">
-      <div class="pv-avatar"><img id="pv-photo" alt="" class="hidden"><span id="pv-initial"></span></div>
-      <h1 id="pv-name"></h1>
-      <span class="pv-badge" id="pv-role"></span>
-      <p id="pv-place"></p>
-      <div class="pv-bar" id="pv-bar"><i></i></div>
-      <p class="pv-sub" data-i="previewSub"></p>
-      <button id="btn-open" class="btn btn-primary" data-i="openNow"></button>
-    </div>
+
   </div>
 
   <div id="toast" class="toast"></div>
@@ -224,6 +251,11 @@
       appId: "1:357462139035:web:7aa2ee50350d88a843a63e",
       measurementId: "G-WEG1X65STP"
     };
+
+
+const WHATSAPP_ENDPOINT = ""; // URL de la Cloud Function, quand elle existera
+
+
 
     // Envoi du code par e-mail, gratuit et sans serveur (plan Spark) via EmailJS.
     // Laisse les 3 valeurs vides = pas de code, on passe directement à l'accueil.
@@ -255,11 +287,7 @@
         shopTitle: "Nom de votre boutique",
         shopSub: "Saisissez le nom exact de votre boutique.",
         shopPh: "Nom de la boutique",
-        nameTitle: "Votre nom",
-        nameSub: "Saisissez votre nom tel qu'il apparaît sur votre compte.",
-        namePh: "Nom complet",
-        previewSub: "Ouverture de l'accueil dans quelques secondes...",
-        openNow: "Ouvrir maintenant",
+        forgot: "Nom de boutique oublié ?", waSent: "Le nom de votre boutique a été envoyé sur votre WhatsApp.", hint: "Indice : ",
         continue: "Continuer", back: "Retour", cancel: "Changer de compte Google",
         mismatch: "Ces informations ne correspondent pas à ce compte Google.",
         tooMany: "Trop d'essais. Veuillez vous reconnecter.",
@@ -292,11 +320,6 @@
         shopTitle: "Your shop name",
         shopSub: "Enter the exact name of your shop.",
         shopPh: "Shop name",
-        nameTitle: "Your name",
-        nameSub: "Enter your name as it appears on your account.",
-        namePh: "Full name",
-        previewSub: "Opening the home page in a few seconds...",
-        openNow: "Open now",
         continue: "Continue", back: "Back", cancel: "Use another Google account",
         mismatch: "This information does not match this Google account.",
         tooMany: "Too many attempts. Please sign in again.",
@@ -305,6 +328,7 @@
         validate: "Confirm",
         resend: "Resend code",
         resendIn: "Resend in ",
+        forgot: "Forgot shop name?", waSent: "Your shop name was sent to your WhatsApp.", hint: "Hint: ",
         codeBad: "Incorrect code.",
         codeExpired: "Code expired. Request a new one.",
         codeInvalidFormat: "Enter the 6 digits.",
@@ -323,8 +347,41 @@
     /* ================= OUTILS ================= */
 
     const $ = (id) => document.getElementById(id);
-    const SCREENS = ["loader", "login-content", "role-content", "shop-content", "code-content", "preview-content"];
-    const show = (id) => SCREENS.forEach((s) => $(s).classList.toggle("hidden", s !== id));
+    /* ===== FOND D'IMAGES (depuis internet) ===== */
+const unsplash = (id) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=400&q=50`;
+
+const FOND = [
+  { id: "photo-1522335789203-aabd1fc54bc9", g: "#f9a8d4,#be185d" }, // cosmétiques
+  { id: "photo-1555041469-a586c61ea9bc",    g: "#d6b48a,#78350f" }, // meubles
+  { id: "photo-1542291026-7eec264c27ff",    g: "#fda4af,#9f1239" }, // chaussures
+  { id: "photo-1491553895911-0055eca6402d", g: "#94a3b8,#1e293b" }, // sneakers
+  { id: "photo-1498049794561-7780e7231661", g: "#67e8f9,#155e75" }, // électronique
+  { id: "photo-1517336714731-489689fd1ca8", g: "#a5b4fc,#3730a3" }, // ordinateurs
+  { id: "photo-1523275335684-37898b6baf30", g: "#fcd34d,#92400e" }, // montres
+  { id: "photo-1505740420928-5e560c06d30e", g: "#c4b5fd,#5b21b6" }, // casques audio
+  { id: "photo-1523381210434-271e8be1f52b", g: "#86efac,#166534" }  // vêtements
+];
+
+function chargerFond() {
+  const bg = $("bg");
+  FOND.forEach(({ id, g }) => {
+    const d = document.createElement("div");
+    d.style.backgroundImage = `linear-gradient(135deg,${g})`; // dégradé en attendant
+    bg.appendChild(d);
+    const img = new Image();
+    img.onload = () => {
+      d.style.backgroundImage = `url('${img.src}'),linear-gradient(135deg,${g})`;
+    };
+    img.src = unsplash(id);
+  });
+}
+chargerFond();
+    const SCREENS = ["loader", "login-content", "role-content", "shop-content", "code-content"];
+    const show = (id) => {
+        SCREENS.forEach((s) => $(s).classList.toggle("hidden", s !== id));
+        document.body.classList.toggle("with-bg", !!user && id !== "login-content");
+    };
 
     let toastTimer;
     function showToast(msg, type = "info") {
@@ -336,7 +393,7 @@
     }
 
     // Comparaison tolérante : sans accents, sans majuscules, espaces simplifiés
-    const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+    const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "");
 
     /* ================= FIREBASE ================= */
 
@@ -373,6 +430,23 @@
       try { await signOut(auth); } catch (_) {}
       reinitialiser();
     }
+
+async function nomOublie() {
+  if (WHATSAPP_ENDPOINT) {
+    try {
+      const jeton = await user.getIdToken();
+      const r = await fetch(WHATSAPP_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + jeton },
+        body: JSON.stringify({ role })
+      });
+      if (!r.ok) throw new Error(r.status);
+      return showToast(t("waSent"));
+    } catch (e) { console.error(e); return showToast(t("sendFail"), "error"); }
+  }
+  const n = comptes[role]?.shopName || "";
+  showToast(t("hint") + n.slice(0, 2) + "*".repeat(Math.max(n.length - 2, 1)));
+}
 
     /* ================= ÉTAPE 1 : GOOGLE + EXISTENCE ================= */
 
@@ -423,11 +497,7 @@
 
     function choisirRole(r) {
       role = r;
-      const acheteur = r === "acheteur";
-      $("shop-title").textContent = t(acheteur ? "nameTitle" : "shopTitle");
-      $("shop-sub").textContent = t(acheteur ? "nameSub" : "shopSub");
-      $("shop-input").placeholder = t(acheteur ? "namePh" : "shopPh");
-      $("shop-input").value = "";
+      if (r === "acheteur") return verifierCoherence();
       show("shop-content");
       $("shop-input").focus();
     }
@@ -435,15 +505,14 @@
     /* ================= ÉTAPE 3 : COHÉRENCE ================= */
 
     async function verifierCoherence() {
-      const doc = comptes[role];
+      const doc = comptes[role];     // document {uid} du bon type de compte
       let ok = !!doc;
 
       if (ok && role === "acheteur") {
-        // Nom saisi = displayName enregistré, ou nom du compte Google
-        const saisi = norm($("shop-input").value);
-        ok = saisi !== "" && [doc.displayName, user.displayName].some((n) => n && norm(n) === saisi);
+        // displayName enregistré = nom du compte Google (si le champ existe)
+        if (doc.displayName) ok = norm(doc.displayName) === norm(user.displayName);
       } else if (ok) {
-        // Nom de boutique saisi = shopName enregistré
+        // shopName enregistré = nom saisi
         ok = norm(doc.shopName) !== "" && norm(doc.shopName) === norm($("shop-input").value);
       }
 
@@ -451,7 +520,7 @@
         essais++;
         if (essais >= MAX_ESSAIS) { showToast(t("tooMany"), "error"); await annuler(); return; }
         showToast(t("mismatch"), "error");
-        show("shop-content");
+        show(role === "acheteur" ? "role-content" : "shop-content");
         return;
       }
 
@@ -463,7 +532,7 @@
         await envoyerCode();
       } catch (err) {
         console.error("Envoi du code :", err);
-        show("shop-content");
+        show(role === "acheteur" ? "role-content" : "shop-content");
         showToast(t("sendFail"), "error");
         return;
       }
@@ -533,58 +602,9 @@
 
     /* ================= FIN : REDIRECTION ================= */
 
-    const DELAI_APERCU = 8000;
-    const ROLE_LABEL = { acheteur: "acheteur", vendeur: "vendeur", vendeur_client: "vendeurClient" };
-    let apercuTimer;
-
-    // Lit les infos d'affichage du compte (photo comprise, seulement maintenant que le compte est vérifié)
-    async function chargerApercu() {
-      const jeton = await user.getIdToken();
-      const champs = ["photoUrl", "photoURL", "avatar", "address", "city", "ville", "province", "country", "pays", "shopName", "displayName"];
-      const url = `https://firestore.googleapis.com/v1/${DOC_ROOT}/${COLLECTIONS[role]}/${user.uid}?` +
-        champs.map((c) => "mask.fieldPaths=" + c).join("&");
-      const r = await fetch(url, { headers: { Authorization: "Bearer " + jeton } });
-      if (!r.ok) throw new Error("Firestore " + r.status);
-
-      const f = (await r.json()).fields || {};
-      const s = (k) => f[k]?.stringValue || "";
-      const a = f.address?.mapValue?.fields || {};
-      const sa = (k) => a[k]?.stringValue || "";
-
-      const lieu = [sa("city") || s("city") || s("ville"), sa("province") || s("province"), sa("country") || s("country") || s("pays")]
-        .filter(Boolean).join(", ");
-
-      return {
-        nom: role === "acheteur" ? (s("displayName") || user.displayName || "") : (s("shopName") || s("displayName") || ""),
-        photo: s("photoUrl") || s("photoURL") || s("avatar") || user.photoURL || "",
-        lieu: lieu || f.address?.stringValue || ""
-      };
-    }
-
-    async function terminer() {
+    function terminer() {
       show("loader");
       $("loader-text").textContent = t("opening");
-
-      let info;
-      try { info = await chargerApercu(); }
-      catch (_) { info = { nom: user.displayName || "", photo: user.photoURL || "", lieu: "" }; }
-
-      $("pv-name").textContent = info.nom;
-      $("pv-role").textContent = t(ROLE_LABEL[role]);
-      $("pv-place").textContent = info.lieu;
-      $("pv-place").classList.toggle("hidden", !info.lieu);
-
-      const img = $("pv-photo");
-      if (info.photo) { img.src = info.photo; img.classList.remove("hidden"); $("pv-initial").textContent = ""; }
-      else { img.classList.add("hidden"); $("pv-initial").textContent = (info.nom || "?").charAt(0).toUpperCase(); }
-
-      show("preview-content");
-      $("pv-bar").classList.add("run");
-      apercuTimer = setTimeout(aller, DELAI_APERCU);
-    }
-
-    function aller() {
-      clearTimeout(apercuTimer);
       try { sessionStorage.setItem("vea_verifie", JSON.stringify({ uid: user.uid, role, t: Date.now() })); } catch (_) {}
       window.location.assign(PAGE_ACCUEIL);
     }
@@ -600,7 +620,7 @@
     $("btn-code").addEventListener("click", validerCode);
     $("code-input").addEventListener("keydown", (e) => e.key === "Enter" && validerCode());
     $("btn-resend").addEventListener("click", renvoyerCode);
-    $("btn-open").addEventListener("click", aller);
+    $("btn-forgot").addEventListener("click", nomOublie);
   </script>
 </body>
 </html>
