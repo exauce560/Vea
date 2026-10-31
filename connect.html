@@ -132,6 +132,7 @@ body.with-bg .btn-link { color:#86efac; }
 body.with-bg .btn-link:disabled { color:#cbd5e1; }
 body.with-bg .spinner { border-color:rgba(255,255,255,.3); border-top-color:#4ade80; }
   </style>
+</head>
   <!-- Activation du mode plein écran sur Safari iOS -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -165,7 +166,6 @@ body.with-bg .spinner { border-color:rgba(255,255,255,.3); border-top-color:#4ad
     });
   });
 </script>
-</head>
 <body>
 
 <div id="bg"></div>
@@ -210,8 +210,8 @@ body.with-bg .spinner { border-color:rgba(255,255,255,.3); border-top-color:#4ad
 
     <!-- 3. Nom de la boutique -->
     <div id="shop-content" class="hidden">
-      <h1 data-i="shopTitle"></h1>
-      <p data-i="shopSub"></p>
+      <h1 id="shop-title" data-i="shopTitle"></h1>
+      <p id="shop-sub" data-i="shopSub"></p>
       <input id="shop-input" type="text" autocomplete="off" data-ip="shopPh">
       <button id="btn-shop" class="btn btn-primary" data-i="continue"></button>
       <button id="btn-forgot" class="btn-link" data-i="forgot"></button>
@@ -287,6 +287,7 @@ const WHATSAPP_ENDPOINT = ""; // URL de la Cloud Function, quand elle existera
         shopTitle: "Nom de votre boutique",
         shopSub: "Saisissez le nom exact de votre boutique.",
         shopPh: "Nom de la boutique",
+        nameTitle: "Votre nom", nameSub: "Saisissez le nom enregistré sur votre compte acheteur.", namePh: "Votre nom", forgotName: "Nom oublié ?",
         forgot: "Nom de boutique oublié ?", waSent: "Le nom de votre boutique a été envoyé sur votre WhatsApp.", hint: "Indice : ",
         continue: "Continuer", back: "Retour", cancel: "Changer de compte Google",
         mismatch: "Ces informations ne correspondent pas à ce compte Google.",
@@ -319,6 +320,7 @@ const WHATSAPP_ENDPOINT = ""; // URL de la Cloud Function, quand elle existera
         acheteur: "Buyer", vendeur: "Seller", vendeurClient: "Seller-buyer",
         shopTitle: "Your shop name",
         shopSub: "Enter the exact name of your shop.",
+        nameTitle: "Your name", nameSub: "Enter the name saved on your buyer account.", namePh: "Your name", forgotName: "Forgot your name?",
         shopPh: "Shop name",
         continue: "Continue", back: "Back", cancel: "Use another Google account",
         mismatch: "This information does not match this Google account.",
@@ -444,7 +446,7 @@ async function nomOublie() {
       return showToast(t("waSent"));
     } catch (e) { console.error(e); return showToast(t("sendFail"), "error"); }
   }
-  const n = comptes[role]?.shopName || "";
+  const n = (role === "acheteur" ? comptes[role]?.displayName : comptes[role]?.shopName) || "";
   showToast(t("hint") + n.slice(0, 2) + "*".repeat(Math.max(n.length - 2, 1)));
 }
 
@@ -495,32 +497,30 @@ async function nomOublie() {
 
     /* ================= ÉTAPE 2 : TYPE DE COMPTE ================= */
 
-    function choisirRole(r) {
-      role = r;
-      if (r === "acheteur") return verifierCoherence();
-      show("shop-content");
-      $("shop-input").focus();
-    }
+function choisirRole(r) {
+  role = r;
+  const a = r === "acheteur";
+  $("shop-title").textContent = t(a ? "nameTitle" : "shopTitle");
+  $("shop-sub").textContent = t(a ? "nameSub" : "shopSub");
+  $("shop-input").placeholder = t(a ? "namePh" : "shopPh");
+  $("btn-forgot").textContent = t(a ? "forgotName" : "forgot");
+  $("shop-input").value = "";
+  show("shop-content");
+  $("shop-input").focus();
+}
 
     /* ================= ÉTAPE 3 : COHÉRENCE ================= */
 
     async function verifierCoherence() {
       const doc = comptes[role];     // document {uid} du bon type de compte
-      let ok = !!doc;
-
-      if (ok && role === "acheteur") {
-        // displayName enregistré = nom du compte Google (si le champ existe)
-        if (doc.displayName) ok = norm(doc.displayName) === norm(user.displayName);
-      } else if (ok) {
-        // shopName enregistré = nom saisi
-        ok = norm(doc.shopName) !== "" && norm(doc.shopName) === norm($("shop-input").value);
-      }
+      const champ = role === "acheteur" ? doc?.displayName : doc?.shopName;
+      const ok = !!doc && norm(champ) !== "" && norm(champ) === norm($("shop-input").value);
 
       if (!ok) {
         essais++;
         if (essais >= MAX_ESSAIS) { showToast(t("tooMany"), "error"); await annuler(); return; }
         showToast(t("mismatch"), "error");
-        show(role === "acheteur" ? "role-content" : "shop-content");
+        show("shop-content");
         return;
       }
 
@@ -532,7 +532,7 @@ async function nomOublie() {
         await envoyerCode();
       } catch (err) {
         console.error("Envoi du code :", err);
-        show(role === "acheteur" ? "role-content" : "shop-content");
+        show("shop-content");
         showToast(t("sendFail"), "error");
         return;
       }
