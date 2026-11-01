@@ -152,7 +152,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const DOC_ROOT = `projects/${firebaseConfig.projectId}/databases/(default)/documents`;
-const COLS = ["acheteurs", "vendeurs", "vendeurs_clients"];
+const COLS = ["acheteurs", "vendeurs", "vendeurs_clients" ];
+const SHOP_COLS = ["vendeurs", "vendeurs_clients" ];
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -216,9 +217,9 @@ async function charger(ids) {
   const vids = [...new Set(prods.map((p) => p.d.vendeurId).filter(Boolean))];
   if (vids.length && auth.currentUser) {
     try {
-      for (let i = 0; i < vids.length; i += 40) {
-        const lot = vids.slice(i, i + 40);
-        const found = await batchGet(lot.flatMap((v) => [`vendeurs/${v}`, `vendeurs_clients/${v}`]), ["shopName", "nomBoutique", "nom", "whatsapp", "telephone"]);
+      for (let i = 0; i < vids.length; i += 30) {
+        const lot = vids.slice(i, i + 30);
+        const found = await batchGet(lot.flatMap((v) => SHOP_COLS.map((c) => `${c}/${v}`)), ["shopName", "nomBoutique", "nom", "whatsapp", "telephone"]);
         found.forEach((x) => {
           const id = x.path.split("/")[1];
           if (shops[id] && !x.path.startsWith("vendeurs/")) return;
@@ -231,6 +232,7 @@ async function charger(ids) {
   const now = Date.now();
   items = prods.map(({ id, order, d }) => {
     const s = shops[d.vendeurId] || {};
+    ljf
     const stock = d.stock === undefined ? NaN : Number(d.stock);
     const fav = Array.isArray(d.favoris) ? d.favoris.length : Number(d.favoris ?? d.favorisCount ?? d.likes ?? 0) || 0;
     const fin = d.boostUntil ? (d.boostUntil.toMillis ? d.boostUntil.toMillis() : new Date(d.boostUntil).getTime()) : 0;
