@@ -1,529 +1,409 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vea Market - Votre Marketplace Shopping</title>
-  <style>
-    :root {
-      --primary-blue: #0056b3;
-      --primary-hover: #004085;
-      --african-gold: #ff9f43;
-      --african-terracotta: #ee5253;
-      --whatsapp-green: #25d366;
-      --bg-light: #f4f6f9;
-      --text-dark: #1e272e;
-      --text-muted: #576574;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VÉA Market – Achetez et vendez en discutant sur WhatsApp</title>
+<meta name="description" content="VÉA Market met en contact acheteurs et vendeurs en RDC, au Rwanda et au Burundi. Choisissez un article, écrivez au vendeur sur WhatsApp, payez en main propre.">
+<meta name="theme-color" content="#0077B6">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
+<style>
+:root{
+  --blue:#0077B6; --blue-d:#005f92; --gold:#F5A524; --wa:#178a45;
+  --ink:#10202B; --muted:#4D606C; --bg:#F3F8FB; --card:#FFFFFF; --line:#D9E5EC; --soft:#E6F1F8;
+  --band:#04334F; --band-ink:#EAF4FA; --band-muted:#A9C4D6;
+  --r:14px; --max:1180px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--ink:#EAF2F6; --muted:#9DB1BD; --bg:#0A171F; --card:#122530; --line:#233B48; --soft:#112C3B; --band:#06283D}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-tap-highlight-color:transparent}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 20px}
+section{scroll-margin-top:76px}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
+/* ---------- En-tête ---------- */
+.top{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:1.1rem;letter-spacing:.2px}
+.brand img{width:36px;height:36px;border-radius:10px}
+.nav{display:none;gap:28px}
+.nav a{text-decoration:none;font-weight:600;font-size:.95rem;color:var(--muted)}
+.nav a:hover{color:var(--blue)}
+.top-cta{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;background:var(--blue);color:#fff;font-weight:700;font-size:.9rem;text-decoration:none}
 
-    body {
-      background-color: var(--bg-light);
-      background-image: radial-gradient(rgba(255, 159, 67, 0.12) 1px, transparent 0);
-      background-size: 20px 20px;
-      color: var(--text-dark);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+/* ---------- Boutons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 22px;border-radius:12px;font-weight:700;font-size:1rem;text-decoration:none;border:2px solid transparent;transition:transform .15s,background .15s}
+.btn:active{transform:scale(.98)}
+.btn svg{width:22px;height:22px;fill:currentColor;flex:none}
+.btn-main{background:var(--blue);color:#fff}
+.btn-main:hover{background:var(--blue-d)}
+.btn-alt{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn-alt:hover{border-color:var(--blue)}
+.btn-gold{background:var(--gold);color:#2b1c00}
+.ios-note{display:none;font-size:.9rem;color:var(--muted);margin-top:12px}
+.ios .btn-apk{display:none}
+.ios .ios-note{display:block}
 
-    /* Header / Navbar */
-    header {
-      background-color: #ffffff;
-      padding: 0.8rem 1.2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      border-bottom: 3px solid var(--african-gold);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+/* ---------- Hero ---------- */
+.hero{padding:36px 0 48px;overflow:hidden}
+.hero .wrap{display:grid;gap:40px}
+h1{font-size:clamp(2.1rem,6.4vw,3.7rem);line-height:1.05;letter-spacing:-.025em;font-weight:850}
+.lead{font-size:1.1rem;color:var(--muted);max-width:34em;margin-top:18px}
+.cta-row{display:grid;gap:12px;margin-top:28px;max-width:440px}
+.fine{font-size:.86rem;color:var(--muted);margin-top:14px}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+/* maquette téléphone */
+.stage{display:flex;justify-content:center}
+.phone{width:min(300px,82vw);background:#0b1b25;border-radius:36px;padding:10px;box-shadow:0 30px 60px -20px rgba(0,60,100,.45)}
+.screen{background:#E9F1F5;border-radius:28px;overflow:hidden;min-height:470px;display:flex;flex-direction:column}
+.s-head{background:var(--blue);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.s-av{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--blue);display:grid;place-items:center;font-weight:800}
+.s-head b{display:block;font-size:.95rem;line-height:1.1}
+.s-head small{opacity:.85;font-size:.72rem}
+.s-prod{margin:12px;background:#fff;border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;color:#10202B}
+.s-img{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,#F5A524,#ee6c4d);flex:none}
+.s-prod b{font-size:.88rem;display:block}
+.s-prod span{font-size:.82rem;color:#0077B6;font-weight:800}
+.chat{padding:4px 12px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.b{max-width:84%;padding:9px 12px;border-radius:14px;font-size:.8rem;line-height:1.35;color:#10202B;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.b.me{align-self:flex-end;background:#D7F6C9;border-bottom-right-radius:4px}
+.b.them{align-self:flex-start;background:#fff;border-bottom-left-radius:4px}
+.b time{display:block;text-align:right;font-size:.62rem;color:#5d6d77;margin-top:2px}
+.cap{text-align:center;font-size:.78rem;color:var(--muted);margin-top:14px}
+@media (prefers-reduced-motion:no-preference){
+  .chat .b{opacity:0;transform:translateY(8px);animation:pop .45s ease forwards}
+  .chat .b:nth-child(1){animation-delay:.5s}
+  .chat .b:nth-child(2){animation-delay:1.5s}
+  .chat .b:nth-child(3){animation-delay:2.6s}
+  @keyframes pop{to{opacity:1;transform:none}}
+}
 
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      object-fit: cover;
-    }
+/* ---------- Bandeau de confiance ---------- */
+.facts{border-block:1px solid var(--line);background:var(--card)}
+.facts .wrap{display:grid;gap:0}
+.fact{padding:18px 0;border-bottom:1px solid var(--line)}
+.fact:last-child{border-bottom:0}
+.fact b{display:block;font-size:1rem}
+.fact span{color:var(--muted);font-size:.92rem}
 
-    .logo {
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: var(--primary-blue);
-      letter-spacing: 0.5px;
-    }
+/* ---------- Sections ---------- */
+.sec{padding:60px 0}
+h2{font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.12;letter-spacing:-.02em;font-weight:800;max-width:20em}
+.sec-lead{color:var(--muted);margin-top:12px;max-width:38em}
 
-    /* Conteneur principal */
-    .container {
-      padding: 1.2rem 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      flex: 1;
-    }
+/* étapes */
+.steps{margin-top:36px;display:grid;gap:0;counter-reset:s}
+.step{position:relative;padding:0 0 28px 62px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.1rem}
+.step::after{content:"";position:absolute;left:21px;top:48px;bottom:4px;width:2px;background:var(--line)}
+.step:last-child{padding-bottom:0}
+.step:last-child::after{display:none}
+.step h3{font-size:1.1rem;margin-bottom:4px}
+.step p{color:var(--muted);max-width:30em}
 
-    /* Hero Section Visual-First */
-    .hero-title {
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-    }
+/* rayons */
+.tiles{margin-top:32px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tile{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:4/5;background:var(--soft)}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(4,30,46,.85),rgba(4,30,46,0) 55%)}
+.tile div{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;color:#fff}
+.tile b{display:block;font-size:1rem;line-height:1.2}
+.tile span{font-size:.8rem;opacity:.9}
 
-    .hero-title span {
-      color: var(--primary-blue);
-    }
+/* bande vendeurs */
+.band{background:var(--band);color:var(--band-ink);padding:64px 0}
+.band h2{color:#fff}
+.band .sec-lead{color:var(--band-muted)}
+.sell{margin-top:32px;display:grid;gap:0}
+.sell li{list-style:none;display:flex;gap:14px;padding:16px 0;border-top:1px solid rgba(255,255,255,.14)}
+.sell li:last-child{border-bottom:1px solid rgba(255,255,255,.14)}
+.tick{flex:none;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#2b1c00;display:grid;place-items:center;font-weight:900;font-size:.8rem;margin-top:2px}
+.sell b{display:block;color:#fff}
+.sell span{color:var(--band-muted);font-size:.94rem}
+.band .cta-row{margin-top:30px}
 
-    .hero-subtitle {
-      text-align: center;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-    }
+/* fonctions */
+.feats{margin-top:32px;display:grid;gap:0}
+.feat{padding:20px 0;border-top:1px solid var(--line)}
+.feat:last-child{border-bottom:1px solid var(--line)}
+.feat h3{font-size:1.05rem;margin-bottom:4px}
+.feat p{color:var(--muted);font-size:.96rem;max-width:32em}
 
-    /* BOUTONS D'ACCÈS SUR MOBILE (EN HAUT DIRECTEMENT) */
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.8rem;
-      width: 100%;
-      margin-bottom: 1.8rem;
-    }
+/* installation */
+.install{background:var(--card);border-block:1px solid var(--line)}
+.inst{margin-top:28px;display:grid;gap:16px}
+.inst div{background:var(--soft);border-radius:var(--r);padding:20px}
+.inst h3{font-size:1.05rem;margin-bottom:8px}
+.inst ol{padding-left:20px;color:var(--muted);font-size:.96rem}
+.inst li{margin-bottom:6px}
+.inst p{color:var(--muted);font-size:.96rem}
 
-    .btn-action {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 0.9rem 1rem;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.95rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-align: center;
-    }
+/* FAQ */
+.faq{margin-top:28px;max-width:760px}
+details{border-top:1px solid var(--line)}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:18px 36px 18px 0;font-weight:700;position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:1.5rem;font-weight:400;color:var(--blue);transition:transform .2s}
+details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+details p{padding:0 0 18px;color:var(--muted);max-width:40em}
 
-    .btn-action:active {
-      transform: scale(0.98);
-    }
+/* appel final */
+.final{text-align:center;padding:64px 0}
+.final h2{margin:0 auto}
+.final .cta-row{margin:28px auto 0}
 
-    .btn-android {
-      background-color: var(--primary-blue);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3);
-    }
+/* pied de page */
+footer{background:var(--card);border-top:1px solid var(--line);padding:28px 0 calc(28px + env(safe-area-inset-bottom,0))}
+footer .wrap{display:flex;flex-direction:column;gap:14px;align-items:flex-start;color:var(--muted);font-size:.9rem}
+footer nav{display:flex;gap:20px;flex-wrap:wrap}
+footer a{text-decoration:none;font-weight:600}
+footer a:hover{color:var(--blue)}
 
-    .btn-pwa {
-      background-color: #ffffff;
-      color: var(--text-dark);
-      border: 2px solid #dcdde1;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-    }
+/* ---------- Tablette ---------- */
+@media (min-width:720px){
+  .wrap{padding:0 32px}
+  .cta-row{grid-template-columns:1fr 1fr;max-width:560px}
+  .facts .wrap{grid-template-columns:repeat(3,1fr);gap:32px}
+  .fact{border-bottom:0;padding:24px 0}
+  .tiles{grid-template-columns:repeat(3,1fr);gap:16px}
+  .steps{grid-template-columns:repeat(3,1fr);gap:28px}
+  .step{padding:64px 0 0 0}
+  .step::after{left:56px;right:-28px;top:21px;bottom:auto;width:auto;height:2px}
+  .step:last-child::after{display:none}
+  .feats{grid-template-columns:repeat(2,1fr);column-gap:48px}
+  .feat:nth-last-child(2){border-bottom:1px solid var(--line)}
+  .inst{grid-template-columns:1fr 1fr}
+  footer .wrap{flex-direction:row;justify-content:space-between;align-items:center}
+}
 
-    .btn-action svg {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-      flex-shrink: 0;
-    }
-
-    /* ENCADRÉ VISUEL SUR LES AVANTAGES CLÉS (RÉASSURANCE) */
-    .key-features {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-      margin-bottom: 2rem;
-    }
-
-    .feature-card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 0.9rem 0.8rem;
-      border: 1px solid #f1f2f6;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 6px;
-    }
-
-    .feature-icon {
-      font-size: 1.6rem;
-      line-height: 1;
-    }
-
-    .feature-title {
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--text-dark);
-    }
-
-    .feature-desc {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      line-height: 1.2;
-    }
-
-    .feature-card.highlight {
-      grid-column: span 2;
-      background: linear-gradient(135deg, #e3f2fd, #ffffff);
-      border: 1.5 solid #90caf9;
-      flex-direction: row;
-      text-align: left;
-      padding: 1rem;
-    }
-
-    .feature-card.highlight .feature-icon {
-      font-size: 2.2rem;
-    }
-
-    /* GRILLE D'ARTICLES / CATEGORIES (MOBILE: 2 COLONNES) */
-    .section-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .catalog-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur mobile */
-      gap: 0.8rem;
-      margin-bottom: 2rem;
-    }
-
-    .product-card {
-      background: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-      border: 1px solid #f1f2f6;
-      position: relative;
-    }
-
-    .product-card img {
-      width: 100%;
-      height: 130px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .product-badge {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
-
-    .product-info {
-      padding: 0.6rem;
-    }
-
-    .product-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .product-tag {
-      font-size: 0.7rem;
-      color: var(--african-terracotta);
-      font-weight: 600;
-    }
-
-    /* MINI SECTION POURQUOI VEA (VISUEL RAPIDE) */
-    .mini-about {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 1.2rem;
-      border-top: 4px solid var(--african-gold);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-      margin-bottom: 2rem;
-    }
-
-    .mini-about h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.6rem;
-      color: var(--primary-blue);
-    }
-
-    .mini-about p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-      margin-bottom: 0.8rem;
-    }
-
-    .tags-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .tag {
-      background: #f1f2f6;
-      padding: 4px 8px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-dark);
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #ffffff;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      border-top: 1px solid #dcdde1;
-    }
-
-    /* MEDIA QUERIES (ÉCRANS PC & TABLETTES) */
-    @media (min-width: 768px) {
-      header {
-        padding: 1rem 3rem;
-      }
-
-      .container {
-        padding: 2.5rem 2rem;
-      }
-
-      .hero-title {
-        font-size: 2.4rem;
-      }
-
-      .hero-subtitle {
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
-      }
-
-      .actions {
-        grid-template-columns: 1fr 1fr;
-        max-width: 600px;
-        margin: 0 auto 2.5rem auto;
-      }
-
-      .key-features {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-      }
-
-      .feature-card.highlight {
-        grid-column: span 4;
-      }
-
-      .catalog-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 colonnes sur PC */
-        gap: 1.2rem;
-      }
-
-      .product-card img {
-        height: 180px;
-      }
-
-      .product-info {
-        padding: 0.9rem;
-      }
-
-      .product-title {
-        font-size: 1rem;
-      }
-
-      .product-tag {
-        font-size: 0.8rem;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .catalog-grid {
-        grid-template-columns: repeat(6, 1fr); /* 6 colonnes sur grand écran */
-      }
-      .product-card img {
-        height: 150px;
-      }
-    }
-  </style>
+/* ---------- Ordinateur ---------- */
+@media (min-width:1024px){
+  .nav{display:flex}
+  .hero{padding:72px 0 80px}
+  .hero .wrap{grid-template-columns:1.15fr .85fr;align-items:center;gap:64px}
+  .tiles{grid-template-columns:repeat(6,1fr);gap:14px}
+  .tile{aspect-ratio:3/4}
+  .sec{padding:88px 0}
+  .band{padding:88px 0}
+  .band .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+  .sell{margin-top:0}
+  .feats{grid-template-columns:repeat(3,1fr)}
+  .feat:nth-last-child(2){border-bottom:0}
+  .feat:nth-last-child(-n+3){border-bottom:1px solid var(--line)}
+}
+</style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="brand">
-      <img src="apple-touch-icon.png" alt="VEA" class="brand-icon" />
-      <div class="logo">VEA MARKET</div>
-    </div>
-  </header>
-
-  <div class="container">
-    
-    <!-- En-tête -->
-    <h1 class="hero-title">Achetez & Vendez sur <span>VEA Market</span></h1>
-    <p class="hero-subtitle">La marketplace 100% directe, simple et rapide.</p>
-
-    <!-- Boutons d'accès (Mis en avant directement) -->
-    <section class="actions">
-      <a href="https://github.com/exauce560/Vea/releases/download/v1.0.0/vea-market.apk" class="btn-action btn-android">
-        <svg viewBox="0 0 24 24">
-          <path d="M17.523 15.3414C17.0622 15.3414 16.6875 14.9668 16.6875 14.5059C16.6875 14.0451 17.0622 13.6705 17.523 13.6705C17.9839 13.6705 18.3586 14.0451 18.3586 14.5059C18.3586 14.9668 17.9839 15.3414 17.523 15.3414ZM6.47695 15.3414C6.0161 15.3414 5.64143 14.9668 5.64143 14.5059C5.64143 14.0451 6.0161 13.6705 6.47695 13.6705C6.9378 13.6705 7.31248 14.0451 7.31248 14.5059C7.31248 14.9668 6.9378 15.3414 6.47695 15.3414ZM17.8441 9.87321L19.5398 6.93608C19.6826 6.68884 19.598 6.37258 19.3508 6.22981C19.1035 6.08703 18.7873 6.17163 18.6445 6.41887L16.9082 9.42588C15.4222 8.74838 13.7652 8.35645 12 8.35645C10.2348 8.35645 8.57778 8.74838 7.0918 9.42588L5.35547 6.41887C5.2127 6.17163 4.89644 6.08703 4.6492 6.22981C4.40196 6.37258 4.31736 6.68884 4.46014 6.93608L6.15586 9.87321C2.69766 11.758 0.322266 15.2285 0 19.3125H24C23.6777 15.2285 21.3023 11.758 17.8441 9.87321Z"/>
-        </svg>
-        Télécharger l'Application (.APK)
-      </a>
-
-      <a href="verification.html" class="btn-action btn-pwa">
-        <svg viewBox="0 0 24 24">
-          <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09999 22C7.78999 22.05 6.79999 20.68 5.95999 19.47C4.24999 17 2.93999 12.45 4.69999 9.39C5.56999 7.87 7.12999 6.91 8.81999 6.88C10.1 6.86 11.32 7.75 12.11 7.75 C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
-        </svg>
-        Utiliser la Version Web / iPhone
-      </a>
-    </section>
-
-    <!-- Avantages Convaincants (Visual Grid) -->
-    <section class="key-features">
-      <div class="feature-card highlight">
-        <div class="feature-icon">💬</div>
-        <div>
-          <div class="feature-title">Discussion WhatsApp Directe</div>
-          <div class="feature-desc">Discutez directement avec le vendeur avant d'acheter. Aucun intermédiaire !</div>
-        </div>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">💵</div>
-        <div class="feature-title">Paiement en Espèces</div>
-        <div class="feature-desc">Pas de paiement sur l'application. Payez de main à main à la livraison.</div>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">❤️</div>
-        <div class="feature-title">Favoris & Recommandations</div>
-        <div class="feature-desc">Sauvegardez vos coups de cœur pour les acheter plus tard.</div>
-      </div>
-    </section>
-
-    <!-- Galerie d'Articles (6 Catégories en Grille Mobile 2x3) -->
-    <h2 class="section-title">🛍️ Explorez nos Rayons</h2>
-    <section class="catalog-grid">
-      
-      <!-- 1. Habits -->
-      <div class="product-card">
-        <div class="product-badge">❤️</div>
-        <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=400&q=80" alt="Habits & Mode" loading="lazy" />
-        <div class="product-info">
-          <div class="product-title">Habits & Tendance</div>
-          <div class="product-tag">Mode Homme / Femme</div>
-        </div>
-      </div>
-
-      <!-- 2. Chaussures -->
-      <div class="product-card">
-        <div class="product-badge">❤️</div>
-        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80" alt="Chaussures" loading="lazy" />
-        <div class="product-info">
-          <div class="product-title">Chaussures & Baskets</div>
-          <div class="product-tag">Toutes marques</div>
-        </div>
-      </div>
-
-      <!-- 3. Cosmétiques -->
-      <div class="product-card">
-        <div class="product-badge">❤️</div>
-        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=400&q=80" alt="Cosmétiques" loading="lazy" />
-        <div class="product-info">
-          <div class="product-title">Cosmétiques & Soins</div>
-          <div class="product-tag">Beauté & Éclat</div>
-        </div>
-      </div>
-
-      <!-- 4. Perruques -->
-      <div class="product-card">
-        <div class="product-badge">❤️</div>
-        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=400&q=80" alt="Perruques" loading="lazy" />
-        <div class="product-info">
-          <div class="product-title">Perruques & Mèches</div>
-          <div class="product-tag">Qualité supérieure</div>
-        </div>
-      </div>
-
-      <!-- 5. Meubles -->
-      <div class="product-card">
-        <div class="product-badge">❤️</div>
-        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80" alt="Meubles" loading="lazy" />
-        <div class="product-info">
-          <div class="product-title">Meubles & Deco</div>
-          <div class="product-tag">Pour la maison</div>
-        </div>
-      </div>
-
-      <!-- 6. Électronique Pro -->
-      <div class="product-card">
-        <div class="product-badge">❤️</div>
-        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80" alt="Électronique Pro" loading="lazy" />
-        <div class="product-info">
-          <div class="product-title">High-Tech & Pro</div>
-          <div class="product-tag">Phones & Laptops</div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Mini section résumé -->
-    <section class="mini-about">
-      <h3>🌍 La Marketplace Africaine Intuitive</h3>
-      <p>VEA Market est conçue pour être rapide et économique en données mobiles. Retrouvez vos articles préférés et négociez en direct.</p>
-      <div class="tags-container">
-        <span class="tag">#ContactWhatsApp</span>
-        <span class="tag">#PaiementCash</span>
-        <span class="tag">#Favoris</span>
-        <span class="tag">#AffairesDirectes</span>
-      </div>
-    </section>
-
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="apple-touch-icon.png" alt="" width="36" height="36"><span>VÉA Market</span></a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#comment">Comment ça marche</a>
+      <a href="#rayons">Rayons</a>
+      <a href="#vendre">Vendre</a>
+      <a href="#installer">Installer</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <a class="top-cta" href="verification.html">Ouvrir VÉA</a>
   </div>
+</header>
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2026 Vea Market. Tous droits réservés.
-  </footer>
+<main>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Achetez et vendez en discutant directement sur WhatsApp.</h1>
+      <p class="lead">VÉA Market réunit acheteurs et vendeurs en RDC, au Rwanda et au Burundi. Vous choisissez un article, vous écrivez au vendeur, vous payez en main propre.</p>
+      <div class="cta-row">
+        <a class="btn btn-main btn-apk" href="https://github.com/exauce560/Vea/releases/latest/download/vea-market.apk" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.523 15.341a.836.836 0 1 1 0-1.671.836.836 0 0 1 0 1.671Zm-11.046 0a.836.836 0 1 1 0-1.671.836.836 0 0 1 0 1.671Zm11.367-5.468 1.696-2.937a.349.349 0 0 0-.605-.35l-1.736 3.007A10.8 10.8 0 0 0 12 8.356c-1.765 0-3.422.392-4.908 1.07L5.355 6.419a.349.349 0 0 0-.606.35l1.697 2.937C2.998 11.592.322 15.062 0 19.313h24c-.322-4.085-2.698-7.555-6.156-9.44Z"/></svg>
+          Télécharger l’application Android
+        </a>
+        <a class="btn btn-alt" href="verification.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 0 1 5.08 16zm2.95-8H5.08a7.99 7.99 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+          Utiliser la version web
+        </a>
+      </div>
+      <p class="ios-note">Sur iPhone, utilisez la version web : ouvrez VÉA dans Safari, puis « Ajouter à l’écran d’accueil ».</p>
+      <p class="fine">Téléchargement direct depuis GitHub, sans passer par le Play Store.</p>
+    </div>
+
+    <div class="stage" aria-hidden="true">
+      <div>
+        <div class="phone">
+          <div class="screen">
+            <div class="s-head"><div class="s-av">C</div><div><b>Boutique Cosmet</b><small>Bujumbura</small></div></div>
+            <div class="s-prod"><div class="s-img"></div><div><b>Robe wax</b><span>18 000 FCFA</span></div></div>
+            <div class="chat">
+              <div class="b me">Bonjour, je suis intéressé(e) par « Robe wax » sur VÉA Market.<time>10:12</time></div>
+              <div class="b them">Bonjour ! Oui, elle est disponible. On se voit demain ?<time>10:14</time></div>
+              <div class="b me">Parfait, je paie en espèces sur place.<time>10:15</time></div>
+            </div>
+          </div>
+        </div>
+        <p class="cap">Aperçu illustratif de la discussion avec un vendeur</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Faits clés ===== -->
+<section class="facts" aria-label="Points clés">
+  <div class="wrap">
+    <div class="fact"><b>Contact direct</b><span>Vous parlez au vendeur sur WhatsApp, sans intermédiaire.</span></div>
+    <div class="fact"><b>Paiement en espèces</b><span>Aucun paiement dans l’application : on règle en main propre.</span></div>
+    <div class="fact"><b>RDC, Rwanda, Burundi</b><span>Des boutiques par pays, province et ville.</span></div>
+  </div>
+</section>
+
+<!-- ===== Comment ça marche ===== -->
+<section class="sec" id="comment">
+  <div class="wrap">
+    <h2>Trois étapes, du choix à la remise de l’article</h2>
+    <p class="sec-lead">Pas de panier ni de carte bancaire. Tout se règle entre vous et le vendeur.</p>
+    <div class="steps">
+      <div class="step"><h3>Trouvez un article</h3><p>Parcourez les rayons, cherchez par nom et gardez vos coups de cœur dans vos favoris.</p></div>
+      <div class="step"><h3>Écrivez au vendeur</h3><p>Le bouton « Contacter » ouvre WhatsApp avec un message prêt à envoyer. Négociez, posez vos questions.</p></div>
+      <div class="step"><h3>Payez en main propre</h3><p>Vous convenez d’un lieu ou d’une livraison, puis vous payez en espèces à la remise.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Rayons ===== -->
+<section class="sec" id="rayons" style="padding-top:0">
+  <div class="wrap">
+    <h2>Les rayons les plus visités</h2>
+    <p class="sec-lead">Des boutiques de mode, de beauté, de maison et de high-tech, au même endroit.</p>
+    <div class="tiles">
+      <div class="tile"><img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=500&q=70" alt="" loading="lazy"><div><b>Habits</b><span>Homme et femme</span></div></div>
+      <div class="tile"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=70" alt="" loading="lazy"><div><b>Chaussures</b><span>Baskets et plus</span></div></div>
+      <div class="tile"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=500&q=70" alt="" loading="lazy"><div><b>Cosmétiques</b><span>Soins et beauté</span></div></div>
+      <div class="tile"><img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=500&q=70" alt="" loading="lazy"><div><b>Perruques</b><span>Perruques et mèches</span></div></div>
+      <div class="tile"><img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=70" alt="" loading="lazy"><div><b>Meubles</b><span>Maison et déco</span></div></div>
+      <div class="tile"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=70" alt="" loading="lazy"><div><b>High-tech</b><span>Téléphones et ordinateurs</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Vendeurs ===== -->
+<section class="band" id="vendre">
+  <div class="wrap">
+    <div>
+      <h2>Vendez vos articles à des acheteurs près de chez vous</h2>
+      <p class="sec-lead">Ouvrez votre boutique, publiez vos photos et recevez les messages directement sur votre WhatsApp.</p>
+      <div class="cta-row">
+        <a class="btn btn-gold btn-apk" href="https://github.com/exauce560/Vea/releases/latest/download/vea-market.apk" rel="noopener">Télécharger l’application</a>
+        <a class="btn btn-gold" href="verification.html">Créer ma boutique</a>
+      </div>
+    </div>
+    <ul class="sell">
+      <li><span class="tick" aria-hidden="true">✓</span><div><b>Une boutique à votre nom</b><span>Photo, description, numéro WhatsApp et liens Facebook, Instagram ou TikTok.</span></div></li>
+      <li><span class="tick" aria-hidden="true">✓</span><div><b>Un stock toujours à jour</b><span>Marquez un article « Vendu » en un geste. Le stock baisse à chaque vente.</span></div></li>
+      <li><span class="tick" aria-hidden="true">✓</span><div><b>Des abonnés fidèles</b><span>Les acheteurs suivent votre boutique et voient vos nouveautés.</span></div></li>
+      <li><span class="tick" aria-hidden="true">✓</span><div><b>Plus de visibilité</b><span>Mettez un article en avant avec le boost, ou passez à Premium Plus.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== Fonctions ===== -->
+<section class="sec" id="fonctions">
+  <div class="wrap">
+    <h2>Conçue pour aller vite, même avec peu de données mobiles</h2>
+    <div class="feats">
+      <div class="feat"><h3>Favoris</h3><p>Gardez les articles qui vous plaisent et retrouvez-les dans votre liste d’envies.</p></div>
+      <div class="feat"><h3>Abonnements aux boutiques</h3><p>Suivez vos vendeurs préférés et repérez leurs nouveaux articles.</p></div>
+      <div class="feat"><h3>Notifications</h3><p>Recevez une alerte quand il se passe quelque chose, et coupez-les quand vous voulez.</p></div>
+      <div class="feat"><h3>Français et anglais</h3><p>Changez la langue de l’application depuis les réglages.</p></div>
+      <div class="feat"><h3>Mode sombre</h3><p>Un affichage reposant le soir, qui économise aussi la batterie.</p></div>
+      <div class="feat"><h3>Léger à utiliser</h3><p>Des pages simples qui se chargent vite sur une connexion mobile.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Installation ===== -->
+<section class="sec install" id="installer">
+  <div class="wrap">
+    <h2>Installer VÉA sur votre téléphone</h2>
+    <div class="inst">
+      <div>
+        <h3>Android</h3>
+        <ol>
+          <li>Touchez « Télécharger l’application Android ».</li>
+          <li>Ouvrez le fichier téléchargé.</li>
+          <li>Si Android le demande, autorisez l’installation depuis ce navigateur.</li>
+          <li>Ouvrez VÉA et connectez-vous avec Google.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>iPhone et ordinateur</h3>
+        <p>Utilisez la version web, sans rien installer. Sur iPhone, ouvrez-la dans Safari, touchez le bouton Partager, puis « Sur l’écran d’accueil ».</p>
+        <p style="margin-top:14px"><a class="btn btn-main" href="verification.html">Ouvrir la version web</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <h2>Questions fréquentes</h2>
+    <div class="faq">
+      <details><summary>Dois-je payer dans l’application ?</summary><p>Non. VÉA ne gère aucun paiement. Vous convenez du prix avec le vendeur sur WhatsApp et vous payez en espèces à la remise de l’article.</p></details>
+      <details><summary>Pourquoi Android affiche-t-il un avertissement à l’installation ?</summary><p>L’application est téléchargée depuis GitHub et non depuis le Play Store. Android demande donc une autorisation avant d’installer un fichier venu d’un site. Elle ne s’applique qu’à ce navigateur et vous pouvez la retirer ensuite.</p></details>
+      <details><summary>Puis-je utiliser VÉA sur iPhone ?</summary><p>Oui, avec la version web. Ouvrez-la dans Safari et ajoutez-la à l’écran d’accueil pour la retrouver comme une application.</p></details>
+      <details><summary>Dans quels pays VÉA est-il disponible ?</summary><p>Les boutiques peuvent s’inscrire en République démocratique du Congo, au Rwanda et au Burundi.</p></details>
+      <details><summary>Comment contacter un vendeur ?</summary><p>Ouvrez un article et touchez « Contacter ». WhatsApp s’ouvre avec un message déjà écrit que vous pouvez modifier avant de l’envoyer.</p></details>
+      <details><summary>Comment retirer un article de mes favoris ?</summary><p>Dans la page Favoris, touchez l’icône corbeille sur l’article. Un bouton « Annuler » apparaît quelques secondes si vous vous êtes trompé.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Appel final ===== -->
+<section class="final">
+  <div class="wrap">
+    <h2>Prêt à trouver votre prochain article ?</h2>
+    <div class="cta-row">
+      <a class="btn btn-main btn-apk" href="https://github.com/exauce560/Vea/releases/latest/download/vea-market.apk" rel="noopener">Télécharger pour Android</a>
+      <a class="btn btn-alt" href="verification.html">Utiliser la version web</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 VÉA Market. Tous droits réservés.</span>
+    <nav aria-label="Informations légales">
+      <a href="conditions.html">Conditions d’utilisation</a>
+      <a href="privacy.html">Confidentialité</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Sur iPhone/iPad, l'APK ne sert à rien : on met la version web en avant.
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) document.documentElement.classList.add("ios");
+</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getAuth,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  // Utilise le même projet Firebase que ta page de connexion.
   const firebaseConfig = {
     apiKey: "AIzaSyCY5GYE-TeUEVu6rkYQcwIkELmTM-mPZEc",
     authDomain: "v-ea-fb4c4.firebaseapp.com",
@@ -537,16 +417,10 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Attendre que Firebase vérifie la session existante.
+  // Utilisateur déjà connecté : on l'envoie directement à l'accueil.
   onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // Utilisateur déjà connecté : passer directement à l'accueil.
-      window.location.replace("acceuil.html");
-    }
+    if (user) window.location.replace("acceuil.html");
   });
 </script>
-</body>
-</html>
-
 </body>
 </html>
