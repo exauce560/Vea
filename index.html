@@ -202,6 +202,41 @@ footer a:hover{color:var(--blue)}
   .feat:nth-last-child(2){border-bottom:0}
   .feat:nth-last-child(-n+3){border-bottom:1px solid var(--line)}
 }
+/* ===== Mobile : cartes d'installation ===== */
+.m-install{display:none}
+
+@media (max-width:719px){
+  .hero .cta-row{display:none}          /* anciens gros boutons */
+  .ios-note{display:none !important}    /* remplacé par la carte iPhone */
+  .m-install{display:flex;flex-direction:column;align-items:center;gap:26px;margin-top:26px}
+
+  /* Style "Google Play" */
+  .store-apk{width:100%;max-width:440px;display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;text-decoration:none;box-shadow:0 8px 22px -12px rgba(0,60,100,.35)}
+  .store-apk:active{transform:scale(.98)}
+  .store-ico{width:64px;height:64px;border-radius:50%;object-fit:cover;flex:none;border:2px solid var(--line)}
+  .store-txt{flex:1;min-width:0}
+  .store-txt b{display:block;font-size:1.05rem;line-height:1.2}
+  .store-txt span{display:block;font-size:.8rem;color:var(--muted);margin-top:2px}
+  .store-btn{flex:none;background:var(--blue);color:#fff;font-weight:700;font-size:.9rem;padding:10px 16px;border-radius:999px}
+
+  /* Carte verticale PWA / iPhone */
+  .pwa-card{position:relative;display:block;width:min(190px,56vw);aspect-ratio:3/4;border-radius:22px;overflow:hidden;text-decoration:none;box-shadow:0 18px 36px -14px rgba(0,60,100,.55)}
+  .pwa-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .pwa-card::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(4,30,46,.9),rgba(4,30,46,.15) 70%)}
+  .pwa-label{position:absolute;left:12px;right:12px;bottom:14px;z-index:1;color:#fff;font-weight:800;font-size:1rem;line-height:1.2;text-align:center}
+  .pwa-label small{display:block;font-weight:600;font-size:.72rem;opacity:.85;margin-top:4px}
+
+  .ios .store-apk{display:none}
+}
+
+@media (max-width:719px) and (prefers-reduced-motion:no-preference){
+  .pwa-card{animation:floaty 3.2s ease-in-out infinite}
+  .pwa-card::before{content:"";position:absolute;top:0;bottom:0;width:60%;left:-80%;z-index:2;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);animation:shine 3.6s ease-in-out infinite}
+  .pwa-label{animation:pulse 1.8s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes shine{0%,55%{left:-80%}100%{left:140%}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+}
 </style>
 </head>
 <body>
@@ -236,6 +271,18 @@ footer a:hover{color:var(--blue)}
         <a class="btn btn-alt" href="verification.html">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 0 1 5.08 16zm2.95-8H5.08a7.99 7.99 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
           Utiliser la version web
+        </a>
+      </div>
+      <div class="m-install">
+        <a class="store-apk" href="https://github.com/exauce560/Vea/releases/latest/download/vea-market.apk" rel="noopener" aria-label="Télécharger l’application Android">
+          <img class="store-ico" src="apple-touch-icon.png" alt="" width="64" height="64">
+          <div class="store-txt"><b>VEA Market</b><span>Application Android · Gratuit</span></div>
+          <span class="store-btn">Télécharger</span>
+        </a>
+
+        <a class="pwa-card" href="verification.html" aria-label="Utiliser VEA sur iPhone">
+          <img src="apple-touch-icon.png" alt="" width="180" height="180">
+          <span class="pwa-label">Utiliser pour iPhone<small>Version web, sans installer</small></span>
         </a>
       </div>
       <p class="ios-note">Sur iPhone, utilisez la version web : ouvrez VÉA dans Safari, puis « Ajouter à l’écran d’accueil ».</p>
