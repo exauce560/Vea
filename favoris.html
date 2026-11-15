@@ -232,7 +232,6 @@ async function charger(ids) {
   const now = Date.now();
   items = prods.map(({ id, order, d }) => {
     const s = shops[d.vendeurId] || {};
-    ljf
     const stock = d.stock === undefined ? NaN : Number(d.stock);
     const fav = Array.isArray(d.favoris) ? d.favoris.length : Number(d.favoris ?? d.favorisCount ?? d.likes ?? 0) || 0;
     const fin = d.boostUntil ? (d.boostUntil.toMillis ? d.boostUntil.toMillis() : new Date(d.boostUntil).getTime()) : 0;
